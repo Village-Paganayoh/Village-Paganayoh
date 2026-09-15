@@ -1,291 +1,113 @@
 <!DOCTYPE html>
+2
 <html lang="pt-BR">
+3
 <head>
+4
 <meta charset="UTF-8">
+5
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Village Paganayoh | Guarajuba</title>
-
+6
+<title>Village Paganayoh</title>
+7
+ 
+8
 <style>
-
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-}
-
-html{
-    scroll-behavior:smooth;
-}
-
+9
 body{
-    font-family:Arial, Helvetica, sans-serif;
-    background:#fafafa;
-    color:#222;
+10
+margin:0;
+11
+font-family:Arial,sans-serif;
+12
 }
-
+13
+ 
+14
 .hero{
-    height:100vh;
-    background:
-    linear-gradient(rgba(0,0,0,.45), rgba(0,0,0,.45)),
-    url('por_do_sol.png');
-    background-size:cover;
-    background-position:center;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    text-align:center;
-    color:white;
+15
+height:100vh;
+16
+background:
+17
+linear-gradient(rgba(0,0,0,.4),rgba(0,0,0,.4)),
+18
+url('por_do_sol.png');
+19
+background-size:cover;
+20
+background-position:center;
+21
+display:flex;
+22
+justify-content:center;
+23
+align-items:center;
+24
+color:white;
+25
+text-align:center;
+26
 }
-
-.hero-content{
-    padding:20px;
-}
-
+27
+ 
+28
 .hero h1{
-    font-size:4rem;
-    margin-bottom:15px;
+29
+font-size:60px;
+30
+margin-bottom:15px;
+31
 }
-
+32
+ 
+33
 .hero p{
-    font-size:1.3rem;
-    margin-bottom:30px;
+34
+font-size:22px;
+35
 }
-
-.btn{
-    display:inline-block;
-    padding:15px 35px;
-    background:#c6a76a;
-    color:white;
-    text-decoration:none;
-    border-radius:40px;
-    font-weight:bold;
-}
-
-.btn:hover{
-    background:#b79559;
-}
-
-.section{
-    padding:80px 8%;
-}
-
-.section h2{
-    text-align:center;
-    font-size:2.5rem;
-    margin-bottom:25px;
-}
-
-.description{
-    max-width:900px;
-    margin:auto;
-    text-align:center;
-    line-height:1.8;
-    font-size:1.1rem;
-}
-
-.features{
-    margin-top:40px;
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(170px,1fr));
-    gap:20px;
-}
-
-.card{
-    background:white;
-    padding:20px;
-    border-radius:12px;
-    text-align:center;
-    box-shadow:0 5px 15px rgba(0,0,0,.08);
-}
-
-.icon{
-    font-size:28px;
-    margin-bottom:10px;
-}
-
-.gallery{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
-    gap:20px;
-}
-
-.gallery img{
-    width:100%;
-    height:250px;
-    object-fit:cover;
-    border-radius:15px;
-    transition:.3s;
-}
-
-.gallery img:hover{
-    transform:scale(1.03);
-}
-
-.reserve{
-    background:#f2f2f2;
-    text-align:center;
-}
-
-.reserve p{
-    max-width:800px;
-    margin:0 auto 25px auto;
-}
-
-footer{
-    background:#111;
-    color:white;
-    text-align:center;
-    padding:40px;
-}
-
-.whatsapp-float{
-    position:fixed;
-    bottom:20px;
-    right:20px;
-    background:#25D366;
-    color:white;
-    width:60px;
-    height:60px;
-    border-radius:50%;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    text-decoration:none;
-    font-size:28px;
-    box-shadow:0 4px 10px rgba(0,0,0,.3);
-}
-
-@media(max-width:768px){
-
-.hero h1{
-    font-size:2.5rem;
-}
-
-.hero p{
-    font-size:1rem;
-}
-
-.section h2{
-    font-size:2rem;
-}
-
-}
-
+36
 </style>
-
+37
+ 
+38
 </head>
+39
+ 
+40
 <body>
-
+41
+ 
+42
 <section class="hero">
-    <div class="hero-content">
-
-        <h1>Village Paganayoh</h1>
-
-        <p>
-            Seu refúgio em Guarajuba - Bahia
-        </p>
-
-        https://wa.me/5571999123532
-           Consultar Disponibilidade
-        </a>
-
-    </div>
+43
+ 
+44
+<div>
+45
+ 
+46
+<h1>Village Paganayoh</h1>
+47
+ 
+48
+<p>
+49
+Seu refúgio em Guarajuba - Bahia
+50
+</p>
+51
+ 
+52
+</div>
+53
+ 
+54
 </section>
-
-<section class="section">
-
-    <h2>Sobre o Village Paganayoh</h2>
-
-    <p class="description">
-        Viva momentos inesquecíveis em Guarajuba.
-        Conforto, lazer, segurança e contato com a natureza em um ambiente ideal para famílias e grupos.
-    </p>
-
-    <div class="features">
-
-        <div class="card">
-            <div class="icon">🏊</div>
-            Piscina
-        </div>
-
-        <div class="card">
-            <div class="icon">📶</div>
-            Wi‑Fi
-        </div>
-
-        <div class="card">
-            <div class="icon">🚗</div>
-            Estacionamento
-        </div>
-
-        <div class="card">
-            <div class="icon">🍳</div>
-            Cozinha Completa
-        </div>
-
-        <div class="card">
-            <div class="icon">🌴</div>
-            Área de Lazer
-        </div>
-
-        <div class="card">
-            <div class="icon">🏖️</div>
-            Próximo da Praia
-        </div>
-
-    </div>
-
-</section>
-
-<section class="section">
-
-    <h2>Galeria do Imóvel</h2>
-
-    <div class="gallery">
-
-        fachada.png
-        sala.png
-        cozinha.png
-        suite-principal.png
-        quarto-terreo.png
-        area-externa.png
-        piscina.png
-        lagoa-cond.png
-        praia.png
-
-    </div>
-
-</section>
-
-<section class="section reserve">
-
-    <h2>Reservas</h2>
-
-    <p>
-        Consulte disponibilidade e valores diretamente pelo WhatsApp.
-        Em breve este site terá calendário sincronizado com a agenda de reservas para evitar conflitos de datas.
-    </p>
-
-    https://wa.me/5571999123532
-       Reservar Agora
-    </a>
-
-</section>
-
-<footer>
-
-    <h3>Village Paganayoh</h3>
-
-    <p>Guarajuba • Bahia</p>
-
-    <p>WhatsApp: (71) 99912‑3532</p>
-
-</footer>
-
-https://wa.me/5571999123532
-   💬
-</a>
-
+55
+ 
+56
 </body>
+57
 </html>
