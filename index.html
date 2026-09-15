@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
+
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Village Paganayoh</title>
 
@@ -16,15 +16,17 @@
 }
 
 body{
-    font-family: Arial, sans-serif;
+    font-family: Arial, Helvetica, sans-serif;
+    color:#222;
+    line-height:1.6;
 }
 
 .hero{
     height:100vh;
 
-    background-image:
+    background:
     linear-gradient(
-        rgba(0,0,0,0.35),
+        rgba(0,0,0,0.45),
         rgba(0,0,0,0.45)
     ),
     url('por_do_sol.png');
@@ -35,52 +37,114 @@ body{
     display:flex;
     justify-content:center;
     align-items:center;
-}
 
-.content{
     text-align:center;
     color:white;
+}
+
+.hero-content{
     padding:20px;
 }
 
-.content h1{
-    font-size:4rem;
+.hero h1{
+    font-size:5rem;
     margin-bottom:20px;
 }
 
-.content p{
-    font-size:1.4rem;
+.hero p{
+    font-size:1.5rem;
     margin-bottom:30px;
+}
+
+.buttons{
+    display:flex;
+    gap:15px;
+    justify-content:center;
+    flex-wrap:wrap;
 }
 
 .btn{
     display:inline-block;
-
-    background:#C6A76A;
-
-    color:white;
-
-    text-decoration:none;
-
-    padding:15px 35px;
-
+    padding:15px 30px;
     border-radius:50px;
-
+    text-decoration:none;
     font-weight:bold;
 }
 
-.btn:hover{
-    background:#b28f4f;
+.airbnb{
+    background:#C6A76A;
+    color:white;
+}
+
+.whatsapp{
+    background:#25D366;
+    color:white;
+}
+
+.section{
+    padding:80px 10%;
+}
+
+.section h2{
+    text-align:center;
+    margin-bottom:30px;
+    font-size:2.5rem;
+}
+
+.about{
+    max-width:900px;
+    margin:auto;
+    text-align:center;
+    font-size:1.1rem;
+}
+
+.features{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+    gap:20px;
+    margin-top:40px;
+}
+
+.card{
+    background:#f7f7f7;
+    padding:25px;
+    border-radius:15px;
+    text-align:center;
+}
+
+.gallery{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+    gap:20px;
+}
+
+.gallery img{
+    width:100%;
+    height:280px;
+    object-fit:cover;
+    border-radius:15px;
+}
+
+.reserve{
+    background:#f4f4f4;
+    text-align:center;
+}
+
+.footer{
+    background:#111;
+    color:white;
+    text-align:center;
+    padding:30px;
 }
 
 @media(max-width:768px){
 
-.content h1{
-    font-size:2.5rem;
+.hero h1{
+    font-size:2.8rem;
 }
 
-.content p{
-    font-size:1.1rem;
+.hero p{
+    font-size:1.2rem;
 }
 
 }
@@ -93,20 +157,128 @@ body{
 
 <section class="hero">
 
-<div class="content">
+<div class="hero-content">
 
 <h1>Village Paganayoh</h1>
 
 <p>
-Seu refúgio em Guarajuba, Bahia
+Em Guarajuba, Litoral Norte/Bahia
 </p>
 
+<div class="buttons">
+
 <a
-class="btn"
+class="btn airbnb"
 href="https://www.airbnb.com.br/rooms/30561403"
 target="_blank">
-
 Reservar no Airbnb
-
 </a>
 
+<a
+class="btn whatsapp"
+href="https://wa.me/5571999123532"
+target="_blank">
+Falar no WhatsApp
+</a>
+
+</div>
+
+</div>
+
+</section>
+
+<section class="section">
+
+<h2>Sobre o Village Paganayoh</squecíveis em Guarajuba, um dos destinos mais desejados do litoral baiano.
+
+O Village Paganayoh oferece conforto, tranquilidade e lazer em um ambiente exclusivo, ideal para famílias e grupos que procuram descanso próximo às melhores praias da região.
+
+</p>
+
+</div>
+
+<div class="features">
+
+<div class="card">
+🏊 Piscina
+</div>
+
+<div class="card">
+📶 Wi‑Fi
+</div>
+
+<div class="card">
+🚗 Estacionamento
+</div>
+
+<div class="card">
+🍳 Cozinha Completa
+</div>
+
+<div class="card">
+🌴 Área de Lazer
+</div>
+
+<div class="card">
+🏖 Próximo da Praia
+</div>
+
+</div>
+
+</section>
+
+<section class="section">
+
+<h2>Galeria</h2>
+
+<div class="gallery">
+
+fachada.png
+
+piscina.png
+
+cozinha.png
+
+sala.png
+
+</div>
+
+</section>
+
+<section class="section reserve">
+
+<h2>Reserve Sua Estadia</h2>
+
+<p style="margin-bottom:30px;">
+
+Consulte disponibilidade e faça sua reserva diretamente no Airbnb ou entre em contato pelo WhatsApp.
+
+</p>
+
+<div class="buttons">
+
+<a
+class="btn airbnb"
+href="https://www.airbnb.com.br/rooms/30561403"
+target="_blank">
+Reservar Agora
+</a>
+
+<a
+class="btn whatsapp"
+href="https://wa.me//div>
+
+</section>
+
+<footer class="footer">
+
+<h3>Village Paganayoh</h3>
+
+<p>Guarajuba • Bahia</p>
+
+<p>WhatsApp: (71) 99912‑3532</p>
+
+</footer>
+
+</body>
+</html>
