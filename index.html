@@ -106,4 +106,186 @@ body{
 
 .gallery{
     display:grid;
-    grid-template-
+    grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+    gap:20px;
+}
+
+.gallery img{
+    width:100%;
+    height:250px;
+    object-fit:cover;
+    border-radius:15px;
+    transition:.3s;
+}
+
+.gallery img:hover{
+    transform:scale(1.03);
+}
+
+.reserve{
+    background:#f2f2f2;
+    text-align:center;
+}
+
+.reserve p{
+    max-width:800px;
+    margin:0 auto 25px auto;
+}
+
+footer{
+    background:#111;
+    color:white;
+    text-align:center;
+    padding:40px;
+}
+
+.whatsapp-float{
+    position:fixed;
+    bottom:20px;
+    right:20px;
+    background:#25D366;
+    color:white;
+    width:60px;
+    height:60px;
+    border-radius:50%;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    text-decoration:none;
+    font-size:28px;
+    box-shadow:0 4px 10px rgba(0,0,0,.3);
+}
+
+@media(max-width:768px){
+
+.hero h1{
+    font-size:2.5rem;
+}
+
+.hero p{
+    font-size:1rem;
+}
+
+.section h2{
+    font-size:2rem;
+}
+
+}
+
+</style>
+
+</head>
+<body>
+
+<section class="hero">
+    <div class="hero-content">
+
+        <h1>Village Paganayoh</h1>
+
+        <p>
+            Seu refúgio em Guarajuba - Bahia
+        </p>
+
+        https://wa.me/5571999123532
+           Consultar Disponibilidade
+        </a>
+
+    </div>
+</section>
+
+<section class="section">
+
+    <h2>Sobre o Village Paganayoh</h2>
+
+    <p class="description">
+        Viva momentos inesquecíveis em Guarajuba.
+        Conforto, lazer, segurança e contato com a natureza em um ambiente ideal para famílias e grupos.
+    </p>
+
+    <div class="features">
+
+        <div class="card">
+            <div class="icon">🏊</div>
+            Piscina
+        </div>
+
+        <div class="card">
+            <div class="icon">📶</div>
+            Wi‑Fi
+        </div>
+
+        <div class="card">
+            <div class="icon">🚗</div>
+            Estacionamento
+        </div>
+
+        <div class="card">
+            <div class="icon">🍳</div>
+            Cozinha Completa
+        </div>
+
+        <div class="card">
+            <div class="icon">🌴</div>
+            Área de Lazer
+        </div>
+
+        <div class="card">
+            <div class="icon">🏖️</div>
+            Próximo da Praia
+        </div>
+
+    </div>
+
+</section>
+
+<section class="section">
+
+    <h2>Galeria do Imóvel</h2>
+
+    <div class="gallery">
+
+        fachada.png
+        sala.png
+        cozinha.png
+        suite-principal.png
+        quarto-terreo.png
+        area-externa.png
+        piscina.png
+        lagoa-cond.png
+        praia.png
+
+    </div>
+
+</section>
+
+<section class="section reserve">
+
+    <h2>Reservas</h2>
+
+    <p>
+        Consulte disponibilidade e valores diretamente pelo WhatsApp.
+        Em breve este site terá calendário sincronizado com a agenda de reservas para evitar conflitos de datas.
+    </p>
+
+    https://wa.me/5571999123532
+       Reservar Agora
+    </a>
+
+</section>
+
+<footer>
+
+    <h3>Village Paganayoh</h3>
+
+    <p>Guarajuba • Bahia</p>
+
+    <p>WhatsApp: (71) 99912‑3532</p>
+
+</footer>
+
+https://wa.me/5571999123532
+   💬
+</a>
+
+</body>
+</html>
