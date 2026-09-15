@@ -22,11 +22,12 @@
             background-color: #f8f9fa;
         }
 
-        /* Hero Section */
+        /* Hero Section Ajustada */
         .hero {
             min-height: 100vh;
+            padding: 60px 20px;
             background: 
-                linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)),
+                linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.55)),
                 url("por_do_sol.png");
             background-size: cover;
             background-position: center;
@@ -35,32 +36,38 @@
             align-items: center;
             text-align: center;
             color: white;
-            padding: 40px 20px;
         }
 
         .hero-content {
             max-width: 800px;
             width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
         .hero h1 {
-            font-size: 3.8rem;
+            font-size: 3.5rem;
             margin-bottom: 10px;
-            text-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
+            line-height: 1.2;
         }
 
         .hero p {
             font-size: 1.3rem;
             margin-bottom: 25px;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
         }
 
+        /* Imagem da Fachada Organizada */
         .hero img {
             width: 100%;
-            max-width: 500px;
+            max-width: 420px;
+            height: auto;
             border-radius: 15px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.5);
             transition: transform 0.3s ease;
+            margin-top: 10px;
         }
 
         .hero img:hover {
@@ -72,7 +79,7 @@
             display: flex;
             justify-content: center;
             gap: 15px;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
             flex-wrap: wrap;
         }
 
@@ -84,7 +91,7 @@
             text-decoration: none;
             border-radius: 30px;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
         }
 
         .btn-whatsapp {
@@ -99,10 +106,10 @@
 
         .btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
         }
 
-        /* Seção de Disponibilidade */
+        /* Seção do Calendário */
         .availability-section {
             max-width: 900px;
             margin: 60px auto;
@@ -130,10 +137,10 @@
             justify-content: center;
         }
 
-        /* Ajustes Responsivos para Celular */
+        /* Responsividade para Celulares */
         @media (max-width: 600px) {
             .hero h1 {
-                font-size: 2.3rem;
+                font-size: 2.2rem;
             }
             .hero p {
                 font-size: 1.1rem;
@@ -154,11 +161,9 @@
             <p>Seu refúgio em Guarajuba - Bahia</p>
 
             <div class="cta-buttons">
-                <!-- Altere o número do telefone abaixo -->
-                <a href="https://wa.me/5571999999999?text=Olá!%20Gostaria%20de%20saber%20mais%20sobre%20a%20reserva%20do%20Village%20Paganayoh." target="_blank" class="btn btn-whatsapp">
+                <a href="https://wa.me/5571999123532?text=Olá!%20Gostaria%20de%20saber%20mais%20sobre%20a%20reserva%20do%20Village%20Paganayoh." target="_blank" class="btn btn-whatsapp">
                     Reservar Direto (WhatsApp)
                 </a>
-                <!-- Altere o link para o seu anúncio no Airbnb -->
                 <a href="https://www.airbnb.com.br" target="_blank" class="btn btn-airbnb">
                     Ver no Airbnb
                 </a>
@@ -178,30 +183,27 @@
         </div>
     </section>
 
-    <!-- Script do Calendário (Flatpickr e Tradução em PT-BR) -->
+    <!-- Scripts do Calendário -->
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/pt.js"></script>
     
     <script>
-        // 1. Defina aqui as datas reservadas (Formato: "AAAA-MM-DD")
-        // No futuro, você pode atualizar esta lista ou sincronizar automaticamente via iCal/Backend.
         const datasOcupadas = [
             "2026-10-10",
             "2026-10-11",
             "2026-10-12",
-            { from: "2026-12-20", to: "2026-12-28" }, // Período reservado (ex: Natal)
-            { from: "2026-12-30", to: "2027-01-05" }  // Período reservado (ex: Réveillon)
+            { from: "2026-12-20", to: "2026-12-28" },
+            { from: "2026-12-30", to: "2027-01-05" }
         ];
 
-        // 2. Inicializa o calendário na tela
         flatpickr("#inline-calendar", {
-            inline: true,             // Exibe o calendário fixo na página
-            mode: "range",            // Permite ao usuário simular a seleção de período
-            locale: "pt",             // Idioma em Português
-            minDate: "today",         // Não permite selecionar datas no passado
-            disable: datasOcupadas,   // Desabilita as datas que você definiu acima
+            inline: true,
+            mode: "range",
+            locale: "pt",
+            minDate: "today",
+            disable: datasOcupadas,
             dateFormat: "Y-m-d",
-            showMonths: window.innerWidth > 768 ? 2 : 1, // Exibe 2 meses no PC e 1 no Celular
+            showMonths: window.innerWidth > 768 ? 2 : 1,
         });
     </script>
 
