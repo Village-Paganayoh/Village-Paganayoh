@@ -4,365 +4,125 @@
 <head>
 
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
-<title>Village Paganayoh | Guarajuba - Bahia</title>
+<title>Village Paganayoh | Guarajuba</title>
 
 <style>
 
 *{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-}
-
-html{
-    scroll-behavior:smooth;
+margin:0;
+padding:0;
+box-sizing:border-box;
 }
 
 body{
-    font-family:Arial, Helvetica, sans-serif;
-    color:#222;
-    background:#fafafa;
+font-family:Arial, Helvetica, sans-serif;
+background:#fafafa;
+color:#222;
 }
 
-/* HERO */
-
 .hero{
-    height:100vh;
-
-    background:
-    linear-gradient(
-        rgba(0,0,0,0.40),
-        rgba(0,0,0,0.50)
-    ),
-    url('por_do_sol.png');
-
-    background-size:cover;
-    background-position:center;
-
-    display:flex;
-    align-items:center;
-    justify-content:center;
-
-    text-align:center;
+height:100vh;
+background:
+linear-gradient(rgba(0,0,0,.45),rgba(0,0,0,.45)),
+url("por_do_sol.png");
+background-size:cover;
+background-position:center;
+display:flex;
+align-items:center;
+justify-content:center;
+text-align:center;
+color:white;
 }
 
 .hero-content{
-    color:white;
-    padding:20px;
+padding:20px;
 }
 
 .hero h1{
-    font-size:5rem;
-    margin-bottom:20px;
+font-size:4rem;
+margin-bottom:20px;
 }
 
 .hero p{
-    font-size:1.5rem;
-    margin-bottom:30px;
+font-size:1.3rem;
+margin-bottom:30px;
 }
 
 .btn{
-    display:inline-block;
-
-    background:#C6A76A;
-
-    color:white;
-
-    text-decoration:none;
-
-    padding:15px 30px;
-
-    border-radius:50px;
-
-    font-weight:bold;
-
-    transition:0.3s;
+display:inline-block;
+padding:15px 30px;
+background:#c6a76a;
+color:white;
+text-decoration:none;
+border-radius:40px;
+font-weight:bold;
 }
-
-.btn:hover{
-    transform:translateY(-2px);
-    background:#b08f54;
-}
-
-/* SEÇÕES */
 
 .section{
-    padding:80px 8%;
+padding:80px 8%;
 }
 
 .section h2{
-    text-align:center;
-    margin-bottom:20px;
-    font-size:2.5rem;
+text-align:center;
+font-size:2.4rem;
+margin-bottom:30px;
 }
 
 .description{
-    text-align:center;
-    max-width:900px;
-    margin:auto;
-    font-size:1.1rem;
-    line-height:1.8;
+max-width:900px;
+margin:auto;
+text-align:center;
+font-size:1.1rem;
+line-height:1.8;
 }
 
-/* DIFERENCIAIS */
-
 .features{
-
-    margin-top:50px;
-
-    display:grid;
-
-    grid-template-columns:
-    repeat(auto-fit,minmax(180px,1fr));
-
-    gap:20px;
+margin-top:40px;
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+gap:20px;
 }
 
 .card{
-
-    background:white;
-
-    padding:20px;
-
-    text-align:center;
-
-    border-radius:12px;
-
-    box-shadow:0 5px 15px rgba(0,0,0,0.08);
+background:white;
+padding:20px;
+border-radius:12px;
+text-align:center;
+box-shadow:0 5px 15px rgba(0,0,0,0.08);
 }
 
-.card span{
-
-    display:block;
-
-    font-size:1.8rem;
-
-    margin-bottom:10px;
+.card .icon{
+font-size:28px;
+margin-bottom:10px;
 }
-
-.card h3{
-
-    font-size:1rem;
-}
-
-/* GALERIA */
 
 .gallery{
-
-    display:grid;
-
-    grid-template-columns:
-    repeat(auto-fit,minmax(300px,1fr));
-
-    gap:20px;
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+gap:20px;
 }
 
 .gallery img{
-
-    width:100%;
-    height:260px;
-
-    object-fit:cover;
-
-    border-radius:15px;
-
-    transition:0.4s;
+width:100%;
+height:250px;
+object-fit:cover;
+border-radius:15px;
 }
-
-.gallery img:hover{
-
-    transform:scale(1.03);
-}
-
-/* RESERVA */
 
 .reserve{
-
-    text-align:center;
-
-    background:#f5f5f5;
+background:#f2f2f2;
+text-align:center;
 }
 
 .reserve p{
-
-    margin:20px auto 30px auto;
-
-    max-width:700px;
-
-    font-size:1.1rem;
+max-width:800px;
+margin:auto;
+margin-bottom:25px;
 }
-
-/* RODAPÉ */
 
 footer{
-
-    background:#111;
-
-    color:white;
-
-    text-align:center;
-
-    padding:40px 20px;
-}
-
-/* MOBILE */
-
-@media(max-width:768px){
-
-.hero h1{
-
-    font-size:2.8rem;
-}
-
-.hero p{
-
-    font-size:1.1rem;
-}
-
-.section h2{
-
-    font-size:2rem;
-}
-
-}
-
-</style>
-
-</head>
-
-<body>
-
-<!-- HERO -->
-
-<section class="hero">
-
-<div class="hero-content">
-
-<h1>Village Paganayoh</h1>
-
-<p>
-Seu refúgio em Guarajuba, Bahia
-</p>
-
-<a
-class="btn"
-href="https://wa.me/5571999123532"
-target="_blank">
-
-Consultar Disponibilidade
-
-</a>
-
-</div>
-
-</section>
-
-<!-- SOBRE -->
-
-<section class="section">
-
-<h2>Sobrescription">
-
-Viva momentos inesquecíveis em Guarajuba, um dos destinos mais desejados do litoral baiano.
-
-Conforto, lazer, segurança e contato com a natureza em uma hospedagem pensada para famílias e grupos que desejam desfrutar da Bahia com tranquilidade.
-
-</p>
-
-<div class="features">
-
-<div class="card">
-<span>🏊</span>
-<h3>Piscina</h3>
-</div>
-
-<div class="card">
-<span>📶</span>
-<h3>Wi‑Fi</h3>
-</div>
-
-<div class="card">
-<span>🚗</span>
-<h3>Estacionamento</h3>
-</div>
-
-<div class="card">
-<span>🍳</span>
-<h3>Cozinha Completa</h3>
-</div>
-
-<div class="card">
-<span>🌴</span>
-<h3>Área de Lazer</h3>
-</div>
-
-<div class="card">
-<span>🏖️</span>
-<h3>Próximo da Praia</h3>
-</div>
-
-</div>
-
-</section>
-
-<!-- GALERIA -->
-
-<section class="section">
-
-<h2>Galeria do Imóvel</h2>
-
-<div class="gallery">
-
-<achada.png
-
-<img src="piscina.png" sala.png" alt="ha.png" alt="Cozinha">
-
- src="suite q principal.png" alt="Su
-
-<imgrasqueira.png
-
-<img srcpng
-
-<img src="lagoa cond.png" alt="Lagoa
-
-</div>
-
-</section>
-
-<!-- RESERVAS -->
-
-<section class="section reserve">
-
-<h2>Reservas</h2>
-
-<p>
-
-Consulte disponibilidade e valores diretamente pelo WhatsApp.
-
-Em breve este site contará com calendário sincronizado automaticamente com o Airbnb para evitar conflitos de reserva.
-
-</p>
-
-<a
-class="btn"
-href="https://wa.me/5571999123532"
-target="_blank">
-
-Reservar Agora
-
-</a>
-
-</section>
-
-<footer>
-
-<h3>Village Paganayoh</h3>
-
-<p>Gu99912‑3532</p>
-
-</footer>
-
-</body>
-</html>
+background:#111;
+color:white;
+text-
