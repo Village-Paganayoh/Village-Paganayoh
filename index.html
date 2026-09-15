@@ -1,73 +1,209 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Village Paganayoh</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Village Paganayoh | Guarajuba - Bahia</title>
 
-<style>
+    <!-- Estilos do Calendário (Flatpickr) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/material_blue.css">
 
-body{
-    margin:0;
-    font-family:Arial, Helvetica, sans-serif;
-}
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
-.hero{
-    height:100vh;
-    background:
-    linear-gradient(rgba(0,0,0,.45),rgba(0,0,0,.45)),
-    url("por_do_sol.png");
-    background-size:cover;
-    background-position:center;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    text-align:center;
-    color:white;
-}
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #333;
+            background-color: #f8f9fa;
+        }
 
-.hero-content{
-    padding:20px;
-}
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            background: 
+                linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)),
+                url("por_do_sol.png");
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: white;
+            padding: 40px 20px;
+        }
 
-.hero h1{
-    font-size:4rem;
-    margin-bottom:10px;
-}
+        .hero-content {
+            max-width: 800px;
+            width: 100%;
+        }
 
-.hero p{
-    font-size:1.3rem;
-}
+        .hero h1 {
+            font-size: 3.8rem;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+        }
 
-</style>
+        .hero p {
+            font-size: 1.3rem;
+            margin-bottom: 25px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
 
+        .hero img {
+            width: 100%;
+            max-width: 500px;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+            transition: transform 0.3s ease;
+        }
+
+        .hero img:hover {
+            transform: scale(1.02);
+        }
+
+        /* Botões de Ação (CTAs) */
+        .cta-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 28px;
+            font-size: 1rem;
+            font-weight: bold;
+            text-decoration: none;
+            border-radius: 30px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-whatsapp {
+            background-color: #25D366;
+            color: white;
+        }
+
+        .btn-airbnb {
+            background-color: #FF5A5F;
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Seção de Disponibilidade */
+        .availability-section {
+            max-width: 900px;
+            margin: 60px auto;
+            padding: 0 20px;
+            text-align: center;
+        }
+
+        .availability-section h2 {
+            font-size: 2.2rem;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .availability-section p {
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .calendar-container {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            display: flex;
+            justify-content: center;
+        }
+
+        /* Ajustes Responsivos para Celular */
+        @media (max-width: 600px) {
+            .hero h1 {
+                font-size: 2.3rem;
+            }
+            .hero p {
+                font-size: 1.1rem;
+            }
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
 </head>
 
 <body>
 
-<section class="hero">
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Village Paganayoh</h1>
+            <p>Seu refúgio em Guarajuba - Bahia</p>
 
-<div class="hero-content">
+            <div class="cta-buttons">
+                <!-- Altere o número do telefone abaixo -->
+                <a href="https://wa.me/5571999999999?text=Olá!%20Gostaria%20de%20saber%20mais%20sobre%20a%20reserva%20do%20Village%20Paganayoh." target="_blank" class="btn btn-whatsapp">
+                    Reservar Direto (WhatsApp)
+                </a>
+                <!-- Altere o link para o seu anúncio no Airbnb -->
+                <a href="https://www.airbnb.com.br" target="_blank" class="btn btn-airbnb">
+                    Ver no Airbnb
+                </a>
+            </div>
 
-<h1>Village Paganayoh</h1>
+            <img src="fachada.png" alt="Fachada do Village Paganayoh">
+        </div>
+    </section>
 
-<p>Seu refúgio em Guarajuba - Bahia</p>
+    <!-- Seção do Calendário de Disponibilidade -->
+    <section class="availability-section">
+        <h2>Consulte a Disponibilidade</h2>
+        <p>As datas marcadas como indisponíveis já foram reservadas no Airbnb ou por contato direto.</p>
+        
+        <div class="calendar-container">
+            <div id="inline-calendar"></div>
+        </div>
+    </section>
 
-    <br><br>
+    <!-- Script do Calendário (Flatpickr e Tradução em PT-BR) -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/pt.js"></script>
+    
+    <script>
+        // 1. Defina aqui as datas reservadas (Formato: "AAAA-MM-DD")
+        // No futuro, você pode atualizar esta lista ou sincronizar automaticamente via iCal/Backend.
+        const datasOcupadas = [
+            "2026-10-10",
+            "2026-10-11",
+            "2026-10-12",
+            { from: "2026-12-20", to: "2026-12-28" }, // Período reservado (ex: Natal)
+            { from: "2026-12-30", to: "2027-01-05" }  // Período reservado (ex: Réveillon)
+        ];
 
-<img
-src="fachada.png"
-alt="Fachada"
-style="
-width:500px;
-max-width:90%;
-border-radius:15px;
-box-shadow:0 5px 15px rgba(0,0,0,.3);
-">
-
-</div>
-
-</section>
+        // 2. Inicializa o calendário na tela
+        flatpickr("#inline-calendar", {
+            inline: true,             // Exibe o calendário fixo na página
+            mode: "range",            // Permite ao usuário simular a seleção de período
+            locale: "pt",             // Idioma em Português
+            minDate: "today",         // Não permite selecionar datas no passado
+            disable: datasOcupadas,   // Desabilita as datas que você definiu acima
+            dateFormat: "Y-m-d",
+            showMonths: window.innerWidth > 768 ? 2 : 1, // Exibe 2 meses no PC e 1 no Celular
+        });
+    </script>
 
 </body>
 </html>
