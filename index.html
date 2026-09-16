@@ -3,11 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Casa 01 do Village Paganayoh em Guarajuba, Bahia. Consulte disponibilidade e faça sua reserva diretamente pelo WhatsApp.">
+<meta name="description" content="Casa 01 do Village Paganayoh em Guarajuba, Bahia. Veja fotos, consulte disponibilidade e fale diretamente com o proprietário pelo WhatsApp.">
 <title>Casa 01 | Village Paganayoh — Guarajuba, Bahia</title>
-    <meta name="description" content="Conheça a Casa 01 do Village Paganayoh em Guarajuba, Bahia. Veja fotos, consulte disponibilidade e fale diretamente com o proprietário.">
-    <meta property="og:title" content="Casa 01 | Village Paganayoh — Guarajuba">
+
+    <!-- Meta Tags para Prévia no WhatsApp e Redes Sociais (Open Graph) -->
+    <meta property="og:title" content="Casa 01 | Village Paganayoh — Guarajuba, Bahia">
     <meta property="og:description" content="Seu refúgio em Guarajuba, Bahia. Consulte disponibilidade e reserve diretamente.">
+    <meta property="og:image" content="https://village-paganayoh.github.io/Village-Paganayoh/pordosol.png">
+    <meta property="og:url" content="https://village-paganayoh.github.io/Village-Paganayoh/">
     <meta property="og:type" content="website">
 
 <style>
@@ -474,6 +477,43 @@ img{max-width:100%;display:block}
 }
 .whatsapp-float:hover{transform:scale(1.07)}
 
+.faq-box{
+    max-width:900px;
+    margin:auto;
+    background:#fff;
+    border-radius:18px;
+    box-shadow:0 8px 28px rgba(0,0,0,.07);
+    overflow:hidden;
+}
+.faq-item{border-bottom:1px solid #eee;}
+.faq-item:last-child{border-bottom:0;}
+.faq-question{
+    width:100%;
+    border:0;
+    background:#fff;
+    padding:21px 24px;
+    text-align:left;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    font-weight:700;
+    color:#222;
+    cursor:pointer;
+}
+.faq-question span{
+    width:30px;height:30px;border-radius:50%;
+    background:#f4efe4;color:#b18c4e;
+    display:flex;align-items:center;justify-content:center;
+    font-size:1.2rem;flex:none;
+}
+.faq-answer{
+    display:none;
+    padding:0 24px 21px;
+    color:#666;
+    font-size:.92rem;
+}
+.faq-item.open .faq-answer{display:block;}
+
 @media(max-width:900px){
     .nav-links{display:none}
     .info-strip{grid-template-columns:repeat(3,1fr);margin:0 4% 0}
@@ -520,76 +560,34 @@ img{max-width:100%;display:block}
     .rules{grid-template-columns:1fr}
     .lightbox img{max-width:96vw;max-height:80vh}
     .lb-prev{left:8px}.lb-next{right:8px}
-}
-
-        .faq-box{
-            max-width:900px;
-            margin:auto;
-            background:#fff;
-            border-radius:18px;
-            box-shadow:0 8px 28px rgba(0,0,0,.07);
-            overflow:hidden;
-        }
-        .faq-item{border-bottom:1px solid #eee;}
-        .faq-item:last-child{border-bottom:0;}
-        .faq-question{
-            width:100%;
-            border:0;
-            background:#fff;
-            padding:21px 24px;
-            text-align:left;
-            display:flex;
-            justify-content:space-between;
-            align-items:center;
-            font-weight:700;
-            color:#222;
-            cursor:pointer;
-        }
-        .faq-question span{
-            width:30px;height:30px;border-radius:50%;
-            background:#f4efe4;color:#b18c4e;
-            display:flex;align-items:center;justify-content:center;
-            font-size:1.2rem;flex:none;
-        }
-        .faq-answer{
-            display:none;
-            padding:0 24px 21px;
-            color:#666;
-            font-size:.92rem;
-        }
-        .faq-item.open .faq-answer{display:block;}
-
-    
-        @media(max-width:600px){
-            .whatsapp-float{
-                width:58px;height:58px;right:16px;bottom:16px;
-            }
-            .faq-question{padding:18px 17px;font-size:.94rem;}
-            .faq-answer{padding:0 17px 18px;font-size:.88rem;}
-        }
-
-    </style>
-
-    <script type="application/ld+json">
-    {
-      "@context":"https://schema.org",
-      "@type":"VacationRental",
-      "name":"Casa 01 do Village Paganayoh",
-      "description":"Casa para temporada no Village Paganayoh, em Guarajuba, Camaçari, Bahia.",
-      "address":{
-        "@type":"PostalAddress",
-        "addressLocality":"Guarajuba",
-        "addressRegion":"BA",
-        "addressCountry":"BR"
-      },
-      "geo":{
-        "@type":"GeoCoordinates",
-        "latitude":-12.663863,
-        "longitude":-38.085370
-      },
-      "telephone":"+55 71 99912-3532"
+    .whatsapp-float{
+        width:58px;height:58px;right:16px;bottom:16px;
     }
-    </script>
+    .faq-question{padding:18px 17px;font-size:.94rem;}
+    .faq-answer{padding:0 17px 18px;font-size:.88rem;}
+}
+</style>
+
+<script type="application/ld+json">
+{
+  "@context":"https://schema.org",
+  "@type":"VacationRental",
+  "name":"Casa 01 do Village Paganayoh",
+  "description":"Casa para temporada no Village Paganayoh, em Guarajuba, Camaçari, Bahia.",
+  "address":{
+    "@type":"PostalAddress",
+    "addressLocality":"Guarajuba",
+    "addressRegion":"BA",
+    "addressCountry":"BR"
+  },
+  "geo":{
+    "@type":"GeoCoordinates",
+    "latitude":-12.663863,
+    "longitude":-38.085370
+  },
+  "telephone":"+55 71 99912-3532"
+}
+</script>
 
 </head>
 
@@ -825,62 +823,61 @@ img{max-width:100%;display:block}
     </div>
 </section>
 
+<section class="section" id="faq">
+    <div class="section-header">
+        <div style="color:#245e4e;font-size:.76rem;font-weight:800;letter-spacing:3px;text-transform:uppercase;">Antes de reservar</div>
+        <h2 class="section-title">Dúvidas frequentes</h2>
+        <p class="text" style="max-width:760px;margin:auto;">
+            Algumas informações para tornar sua consulta mais rápida.
+        </p>
+    </div>
 
-    <section class="section" id="faq">
-        <div class="section-header">
-            <div style="color:#245e4e;font-size:.76rem;font-weight:800;letter-spacing:3px;text-transform:uppercase;">Antes de reservar</div>
-            <h2 class="section-title">Dúvidas frequentes</h2>
-            <p class="section-text" style="max-width:760px;">
-                Algumas informações para tornar sua consulta mais rápida.
-            </p>
-        </div>
-
-        <div class="faq-box">
-            <div class="faq-item">
-                <button class="faq-question" type="button">
-                    Como faço para consultar uma data?
-                    <span>+</span>
-                </button>
-                <div class="faq-answer">
-                    Escolha a data de entrada e a data de saída no calendário. Depois, clique em
-                    “Consultar este período”. O WhatsApp será aberto com as datas preenchidas.
-                </div>
-            </div>
-
-            <div class="faq-item">
-                <button class="faq-question" type="button">
-                    A data fica reservada automaticamente?
-                    <span>+</span>
-                </button>
-                <div class="faq-answer">
-                    Não. O calendário serve para consulta. A reserva somente é confirmada após
-                    o contato e a confirmação do proprietário.
-                </div>
-            </div>
-
-            <div class="faq-item">
-                <button class="faq-question" type="button">
-                    Onde fica o Village Paganayoh?
-                    <span>+</span>
-                </button>
-                <div class="faq-answer">
-                    O Village Paganayoh fica em Guarajuba, Camaçari, Bahia. O mapa desta página
-                    mostra a localização indicada pelo proprietário.
-                </div>
-            </div>
-
-            <div class="faq-item">
-                <button class="faq-question" type="button">
-                    Como saber valores e condições?
-                    <span>+</span>
-                </button>
-                <div class="faq-answer">
-                    Os valores e condições podem variar conforme o período. Envie suas datas
-                    pelo WhatsApp para receber a informação atualizada.
-                </div>
+    <div class="faq-box">
+        <div class="faq-item">
+            <button class="faq-question" type="button">
+                Como faço para consultar uma data?
+                <span>+</span>
+            </button>
+            <div class="faq-answer">
+                Escolha a data de entrada e a data de saída no calendário. Depois, clique em
+                “Consultar este período”. O WhatsApp será aberto com as datas preenchidas.
             </div>
         </div>
-    </section>
+
+        <div class="faq-item">
+            <button class="faq-question" type="button">
+                A data fica reservada automaticamente?
+                <span>+</span>
+            </button>
+            <div class="faq-answer">
+                Não. O calendário serve para consulta. A reserva somente é confirmada após
+                o contato e a confirmação do proprietário.
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <button class="faq-question" type="button">
+                Onde fica o Village Paganayoh?
+                <span>+</span>
+            </button>
+            <div class="faq-answer">
+                O Village Paganayoh fica em Guarajuba, Camaçari, Bahia. O mapa desta página
+                mostra a localização indicada pelo proprietário.
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <button class="faq-question" type="button">
+                Como saber valores e condições?
+                <span>+</span>
+            </button>
+            <div class="faq-answer">
+                Os valores e condições podem variar conforme o período. Envie suas datas
+                pelo WhatsApp para receber a informação atualizada.
+            </div>
+        </div>
+    </div>
+</section>
 
 <section class="section final-cta" id="reservas">
     <div class="section-header">
@@ -914,7 +911,6 @@ img{max-width:100%;display:block}
 <script>
 /* =========================================================
    FOTOS
-   Mantidos os nomes dos arquivos que você já utiliza.
 ========================================================= */
 const photos = [
     {src:"fachada.png", cat:"casa", label:"Fachada"},
@@ -1032,10 +1028,6 @@ document.addEventListener("keydown",e=>{
 
 /* =========================================================
    CALENDÁRIO
-   IMPORTANTE:
-   Para bloquear períodos reservados, coloque abaixo as datas.
-   Exemplo:
-   {start:"2026-10-10", end:"2026-10-15"}
 ========================================================= */
 const reservedPeriods = [
     /* Exemplo:
@@ -1126,7 +1118,6 @@ function selectDate(date){
             checkin=new Date(date);
             checkout=null;
         }else{
-            /* Não permite selecionar um período que atravesse datas reservadas */
             let blocked=false;
             const test=new Date(checkin);
             test.setDate(test.getDate()+1);
@@ -1193,26 +1184,28 @@ document.getElementById("whatsappBooking").onclick=()=>{
     );
 };
 
+/* =========================================================
+   FAQ ACCORDION
+========================================================= */
+document.querySelectorAll(".faq-question").forEach(function(button){
+    button.addEventListener("click", function(){
+        var item = button.parentElement;
+        var isOpen = item.classList.contains("open");
+        document.querySelectorAll(".faq-item").forEach(function(other){
+            other.classList.remove("open");
+            var s = other.querySelector(".faq-question span");
+            if(s) s.textContent = "+";
+        });
+        if(!isOpen){
+            item.classList.add("open");
+            button.querySelector("span").textContent = "−";
+        }
+    });
+});
+
 document.getElementById("year").textContent=new Date().getFullYear();
 renderCalendar();
-
-        document.querySelectorAll(".faq-question").forEach(function(button){
-            button.addEventListener("click", function(){
-                var item = button.parentElement;
-                var isOpen = item.classList.contains("open");
-                document.querySelectorAll(".faq-item").forEach(function(other){
-                    other.classList.remove("open");
-                    var s = other.querySelector(".faq-question span");
-                    if(s) s.textContent = "+";
-                });
-                if(!isOpen){
-                    item.classList.add("open");
-                    button.querySelector("span").textContent = "−";
-                }
-            });
-        });
-
-    </script>
+</script>
 
 </body>
 </html>
