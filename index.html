@@ -23,17 +23,26 @@
             color: #333;
         }
 
-        .hero {
-            min-height: 100vh;
-            background: linear-gradient(rgba(0,0,0,.35), rgba(0,0,0,.35)), url("por_do_sol.png");
-            background-size: cover;
-            background-position: center;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            color: white;
-        }
+       .hero {
+    min-height: 100vh;
+    /* Usa um gradiente mais suave e um filtro para reduzir o contraste artificial */
+    background: 
+        linear-gradient(180deg, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0.6) 100%),
+        url("por_do_sol.png");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    
+    /* Filtros para deixar as cores mais naturais e suavizar o tom da foto */
+    backdrop-filter: blur(2px);
+    filter: brightness(0.95) contrast(0.95);
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    color: white;
+}
 
         .hero-content {
             max-width: 900px;
