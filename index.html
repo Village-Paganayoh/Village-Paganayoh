@@ -591,6 +591,50 @@ img{max-width:100%;display:block}
     }
     </script>
 
+
+<script>
+(function () {
+  var nav = performance.getEntriesByType && performance.getEntriesByType("navigation")[0];
+  if (nav && nav.type === "reload" && location.hash) {
+    history.replaceState(null, "", location.pathname + location.search);
+    window.scrollTo(0, 0);
+  }
+  document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll('a[href^="#"]').forEach(function(a){
+      a.addEventListener("click", function(e){
+        var id=a.getAttribute("href");
+        var target=id && id!="#" ? document.querySelector(id) : null;
+        if(!target) return;
+        e.preventDefault();
+        target.scrollIntoView({behavior:"smooth",block:"start"});
+        setTimeout(function(){
+          history.replaceState(null,"",location.pathname+location.search);
+        },700);
+      });
+    });
+  });
+})();
+</script>
+
+
+<style>
+.real-grid{max-width:1100px;margin:34px auto 20px;display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.real-card{background:#fff;border:1px solid #e8e6df;border-radius:17px;padding:25px;box-shadow:0 8px 24px rgba(0,0,0,.05)}
+.real-card b{color:#14523d;font-size:1.08rem}.real-card p{color:#666;margin-top:8px;font-size:.92rem}
+.amenity-grid{max-width:1100px;margin:auto;display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.amenity-grid span{background:#f7f7f4;border-radius:12px;padding:14px;text-align:center;font-size:.88rem}
+.condo-grid{max-width:1100px;margin:auto;display:grid;grid-template-columns:repeat(4,1fr);gap:13px}
+.condo-grid div{background:#fff;border:1px solid #e8e6df;border-radius:15px;padding:20px;text-align:center;font-size:1.6rem}
+.condo-grid b{display:block;font-size:.86rem;margin-top:6px}
+.access-note{max-width:900px;margin:25px auto 0;text-align:center;background:#f2f7f4;color:#65706b;padding:17px;border-radius:13px}
+.important-grid{max-width:1050px;margin:auto;display:grid;grid-template-columns:1fr 1fr;gap:15px}
+.important-card{display:flex;gap:14px;background:#fff;border:1px solid #e8e6df;border-radius:16px;padding:21px;box-shadow:0 6px 20px rgba(0,0,0,.04)}
+.important-card>span{font-size:1.5rem}.important-card b{color:#14523d}.important-card p{color:#666;font-size:.88rem;margin-top:5px}
+.important-card.energy{grid-column:1/-1;border-left:4px solid #c9a45c}
+@media(max-width:900px){.real-grid{grid-template-columns:1fr}.amenity-grid{grid-template-columns:1fr 1fr}.condo-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:600px){.amenity-grid,.important-grid{grid-template-columns:1fr}.important-card.energy{grid-column:auto}}
+</style>
+
 </head>
 
 <body>
@@ -625,31 +669,11 @@ img{max-width:100%;display:block}
 </section>
 
 <div class="info-strip">
-    <div class="info-item">
-        <div class="info-icon">🏡</div>
-        <strong>Casa inteira</strong>
-        <span>Exclusividade e conforto</span>
-    </div>
-    <div class="info-item">
-        <div class="info-icon">🛏️</div>
-        <strong>Quartos e suítes</strong>
-        <span>Para acomodar sua família</span>
-    </div>
-    <div class="info-item">
-        <div class="info-icon">🏊</div>
-        <strong>Piscina</strong>
-        <span>Área de lazer</span>
-    </div>
-    <div class="info-item">
-        <div class="info-icon">🌴</div>
-        <strong>Guarajuba</strong>
-        <span>Litoral da Bahia</span>
-    </div>
-    <div class="info-item">
-        <div class="info-icon">💬</div>
-        <strong>Reserva direta</strong>
-        <span>Atendimento pelo WhatsApp</span>
-    </div>
+    <div class="info-item"><div class="info-icon">👥</div><strong>Até 8 hóspedes</strong><span>Famílias e grupos</span></div>
+    <div class="info-item"><div class="info-icon">🛏️</div><strong>3 suítes</strong><span>Todas climatizadas</span></div>
+    <div class="info-item"><div class="info-icon">🏊</div><strong>Piscina</strong><span>Lazer privativo</span></div>
+    <div class="info-item"><div class="info-icon">🔥</div><strong>Churrasqueira</strong><span>Área gourmet</span></div>
+    <div class="info-item"><div class="info-icon">📶</div><strong>Wi-Fi + SKY</strong><span>TV LED 42”</span></div>
 </div>
 
 <section class="section" id="casa">
@@ -658,9 +682,9 @@ img{max-width:100%;display:block}
         <p class="section-subtitle">Conforto, lazer e tranquilidade para aproveitar a Bahia.</p>
     </div>
     <p class="text">
-        A Casa 01 do Village Paganayoh é uma opção para quem procura uma estadia confortável
-        em Guarajuba, com espaço para família e amigos e acesso à estrutura de lazer do condomínio.
-        Explore as fotos, consulte o calendário e escolha seu período.
+        A Casa 01 acomoda até 8 hóspedes em 3 suítes climatizadas, duas delas com varanda.
+        Localizada no Condomínio Costa Smeralda, combina piscina, área gourmet privativa, natureza,
+        segurança 24 horas e fácil acesso aos atrativos de Guarajuba.
     </p>
 
     <div class="features">
@@ -680,6 +704,43 @@ img{max-width:100%;display:block}
             <p>Um dos destinos mais conhecidos do litoral norte da Bahia.</p>
         </div>
     </div>
+</section>
+
+
+<section class="section alt" id="detalhes">
+  <div class="section-header">
+    <h2 class="section-title">A Casa 01 em detalhes</h2>
+    <p class="section-subtitle">Village Paganayoh • Condomínio Costa Smeralda • Guarajuba</p>
+  </div>
+  <p class="section-text">
+    O Village está no Condomínio Costa Smeralda, em Guarajuba, próximo a Itacimirim e Praia do Forte.
+    Cercado por natureza e pelo canto dos pássaros, possui piscina, churrasqueira e área verde à margem
+    da lagoa, um lugar especial para contemplar o pôr do sol. O condomínio é fechado e conta com segurança 24 horas.
+  </p>
+  <div class="real-grid">
+    <article class="real-card"><b>Suíte 01 • Térreo</b><p>Cama de casal e ar-condicionado.</p></article>
+    <article class="real-card"><b>Suíte 02 • Superior</b><p>Varanda, cama de casal, 1 cama de solteiro e ar-condicionado.</p></article>
+    <article class="real-card"><b>Suíte 03 • Superior</b><p>Varanda, cama queen, 1 cama de solteiro e ar-condicionado.</p></article>
+  </div>
+  <div class="amenity-grid">
+    <span>🚿 Banheiro de serviço</span><span>🔥 Churrasqueira privativa</span>
+    <span>📺 TV LED 42” + SKY</span><span>📶 Wi-Fi</span>
+    <span>💧 Purificador de água</span><span>🔥 Gás de cozinha incluído</span>
+  </div>
+</section>
+
+<section class="section" id="lazer-condominio">
+  <div class="section-header">
+    <h2 class="section-title">Condomínio & lazer</h2>
+    <p class="section-subtitle">Estrutura para aproveitar esporte, natureza e descanso.</p>
+  </div>
+  <div class="condo-grid">
+    <div>🎾<b>Tênis</b></div><div>🏐<b>Vôlei de praia</b></div>
+    <div>🏖️<b>Beach tennis</b></div><div>⚽<b>Campo de futebol</b></div>
+    <div>🚲<b>Ciclovia</b></div><div>🚶<b>Pista de caminhada</b></div>
+    <div>🌳<b>Praças e áreas verdes</b></div><div>🔒<b>Segurança 24h</b></div>
+  </div>
+  <p class="access-note">Os hóspedes podem utilizar as áreas comuns liberadas pelo condomínio. O acesso à academia segue as normas da administração e o limite de usuários definido por casa.</p>
 </section>
 
 <section class="section alt" id="galeria">
@@ -763,14 +824,14 @@ img{max-width:100%;display:block}
         <div class="location-card">
             <h3>📍 Village Paganayoh</h3>
             <p>
-                Localizado em Guarajuba, no município de Camaçari, Bahia.
-                Use o mapa para visualizar a localização e planejar sua chegada.
+                Localizado em Guarajuba, próximo a Itacimirim e Praia do Forte. A região conta com restaurantes,
+                bares e pizzarias. Para mercados e restaurantes próximos, recomenda-se o uso de carro.
             </p>
 
             <ul class="location-list">
                 <li>🌴 <strong>Guarajuba, Bahia</strong></li>
                 <li>📌 <strong>Coordenadas:</strong> -12.663863, -38.085370</li>
-                <li>🏖️ Região do litoral norte da Bahia</li>
+                <li>🏖️ Região do litoral norte da Bahia</li><li>✈️ Aproximadamente 45 km do Aeroporto Internacional de Salvador</li><li>🚗 Recomenda-se carro para mercados e restaurantes</li>
             </ul>
 
             <a class="btn btn-dark" target="_blank"
@@ -792,37 +853,14 @@ img{max-width:100%;display:block}
 </section>
 
 <section class="section" id="informacoes">
-    <div class="section-header">
-        <h2 class="section-title">Informações importantes</h2>
-        <p class="section-subtitle">Alguns detalhes podem ser personalizados conforme suas regras de hospedagem.</p>
-    </div>
-
-    <div class="rules">
-        <div class="rule">
-            <strong>🕐 Check-in</strong>
-            <span>Defina aqui o horário de entrada.</span>
-        </div>
-        <div class="rule">
-            <strong>🕐 Check-out</strong>
-            <span>Defina aqui o horário de saída.</span>
-        </div>
-        <div class="rule">
-            <strong>👨‍👩‍👧‍👦 Capacidade</strong>
-            <span>Informe aqui o número máximo de hóspedes.</span>
-        </div>
-        <div class="rule">
-            <strong>🐶 Animais</strong>
-            <span>Informe sua política para animais de estimação.</span>
-        </div>
-        <div class="rule">
-            <strong>🎉 Eventos</strong>
-            <span>Informe se festas ou eventos são permitidos.</span>
-        </div>
-        <div class="rule">
-            <strong>📞 Atendimento</strong>
-            <span>Reservas e dúvidas diretamente pelo WhatsApp.</span>
-        </div>
-    </div>
+  <div class="section-header"><h2 class="section-title">Antes de reservar</h2><p class="section-subtitle">Informações importantes para sua estadia.</p></div>
+  <div class="important-grid">
+    <div class="important-card"><span>🧹</span><div><b>Check-in e check-out</b><p>A casa é entregue limpa e organizada. Pedimos a gentileza de entregá-la nas mesmas condições no check-out.</p></div></div>
+    <div class="important-card"><span>💰</span><div><b>Valores e estadia mínima</b><p>Os valores variam conforme o período e a quantidade de diárias. Feriados e datas festivas podem exigir número mínimo de noites.</p></div></div>
+    <div class="important-card energy"><span>⚡</span><div><b>Energia elétrica</b><p>A diária não inclui energia. O consumo é calculado pela diferença do medidor entre entrada e saída, multiplicada por <strong>R$ 1,20/kWh</strong>, conforme fotos do medidor. Pagamento no check-out em dinheiro, PIX ou transferência.</p></div></div>
+    <div class="important-card"><span>🐶</span><div><b>Animais</b><p>Animais de estimação de pequeno porte são aceitos sob consulta prévia.</p></div></div>
+    <div class="important-card"><span>🛏️</span><div><b>Roupa de cama e banho</b><p>Para hóspedes provenientes de outras cidades ou estados, disponibilizamos roupa de cama e banho.</p></div></div>
+  </div>
 </section>
 
 
