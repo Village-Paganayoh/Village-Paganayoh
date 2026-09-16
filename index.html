@@ -1,58 +1,287 @@
-<section class="section">
-    <h2 class="section-title">O Imóvel & Estrutura</h2>
-    <div class="gallery">
-        <!-- Áreas Sociais e Fachada -->
-        <img src="fachada.png" alt="Fachada">
-        <img src="sala.png" alt="Sala de Estar">
-        <img src="sala2.png" alt="Sala de Estar">
-        <img src="sala3.png" alt="Sala de Estar">
-        <img src="cozinha.png" alt="Cozinha">
-        <img src="cozinha2.png" alt="Cozinha">
-        <img src="cozinha3.png" alt="Cozinha">
-        <img src="cozinha4.png" alt="Cozinha">
-        <img src="m%C3%A1quina%20lavar.png" alt="Área de Serviço">
+<!DOCTYPE html>
+<html lang="pt-BR">
 
-        <!-- Acomodações -->
-        <img src="suite-principal.png" alt="Suíte Principal">
-        <img src="quarto-principal.png" alt="Quarto Principal">
-        <img src="quarto-principal2.png" alt="Quarto Principal">
-        <img src="quarto-terreo.png" alt="Quarto Térreo">
-        <img src="quarto-terreo2.png" alt="Quarto Térreo">
-        <img src="suite-quarto-terreo.png" alt="Suíte Quarto Térreo">
-        <img src="quarto-hospedes-superior.png" alt="Quarto Hóspedes Superior">
-        <img src="chuveiro-quarto-t%C3%A9rreo.png" alt="Banheiro Térreo">
-        <img src="hall%20andar%20superior.png" alt="Hall Superior">
-        <img src="varanda-quarto-superior-hospede.avif" alt="Varanda Superior">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Village Paganayoh | Guarajuba - Bahia</title>
 
-        <!-- Área Externa e Lazer -->
-        <img src="area-externa.png" alt="Área Externa">
-        <img src="piscina.png" alt="Piscina">
-        <img src="piscina3.png" alt="Piscina">
-        <img src="piscina4.png" alt="Piscina">
-        <img src="piscina5.png" alt="Piscina">
-        <img src="piscina6.png" alt="Piscina">
-        <img src="piscina7.png" alt="Piscina">
-        <img src="piscina8.png" alt="Piscina">
-        <img src="churrasqueira.png" alt="Churrasqueira">
-        <img src="quintal.png" alt="Quintal">
-        <img src="quintal2.png" alt="Quintal">
-        <img src="quintal3.png" alt="Quintal">
-        <img src="quintal4.png" alt="Quintal">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-        <!-- Condomínio e Região -->
-        <img src="area-gourmet-cond.png" alt="Área Gourmet Condomínio">
-        <img src="quadra-cond.png" alt="Quadra Condomínio">
-        <img src="tenis.png" alt="Quadra de Tênis">
-        <img src="campo.png" alt="Campo de Futebol">
-        <img src="lagoa-cond.png" alt="Lagoa Condomínio">
-        <img src="lagoa2.png" alt="Lagoa">
-        <img src="lagoa3.png" alt="Lagoa">
-        <img src="lagoa4.png" alt="Lagoa">
-        <img src="orla.png" alt="Orla de Guarajuba">
-        <img src="orla2.png" alt="Orla">
-        <img src="orla3.png" alt="Orla">
-        <img src="praia.png" alt="Praia de Guarajuba">
-        <img src="praia2.png" alt="Praia">
-        <img src="praia3.png" alt="Praia">
-    </div>
-</section>
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #fafafa;
+            color: #333;
+        }
+
+        .hero {
+            min-height: 100vh;
+            background: linear-gradient(rgba(0,0,0,.35), rgba(0,0,0,.35)), url("por_do_sol.png");
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: white;
+        }
+
+        .hero-content {
+            max-width: 900px;
+            padding: 20px;
+        }
+
+        .hero h1 {
+            font-size: 4rem;
+            margin-bottom: 15px;
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            margin-bottom: 30px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 18px 40px;
+            background: #25D366;
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: bold;
+            transition: .3s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            background: #1ebc57;
+        }
+
+        .section {
+            padding: 100px 8%;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.7rem;
+            margin-bottom: 25px;
+        }
+
+        .section-text {
+            max-width: 900px;
+            margin: auto;
+            text-align: center;
+            line-height: 1.8;
+            color: #555;
+        }
+
+        .gallery {
+            margin-top: 40px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .gallery img {
+            width: 100%;
+            height: 260px;
+            object-fit: cover;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,.15);
+            transition: .3s;
+        }
+
+        .gallery img:hover {
+            transform: scale(1.03);
+        }
+
+        .availability {
+            background: #f3f3f3;
+        }
+
+        .calendar-box {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,.1);
+            max-width: 800px;
+            margin: auto;
+            text-align: center;
+            line-height: 1.8;
+        }
+
+        .footer {
+            background: #111;
+            color: white;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .footer h3 {
+            margin-bottom: 10px;
+        }
+
+        .footer p {
+            margin: 5px 0;
+            color: #aaa;
+        }
+
+        .whatsapp-float {
+            position: fixed;
+            right: 20px;
+            bottom: 20px;
+            width: 60px;
+            height: 60px;
+            background: #25D366;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-decoration: none;
+            font-size: 28px;
+            box-shadow: 0 4px 15px rgba(0,0,0,.3);
+            z-index: 1000;
+        }
+
+        @media(max-width:768px) {
+            .hero h1 {
+                font-size: 2.6rem;
+            }
+
+            .hero p {
+                font-size: 1rem;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Village Paganayoh</h1>
+            <p>Seu refúgio em Guarajuba • Bahia</p>
+            <a class="btn" href="https://wa.me/5571999123532?text=Olá!%20Gostaria%20de%20consultar%20a%20disponibilidade%20do%20Village%20Paganayoh." target="_blank">
+                Consultar Disponibilidade
+            </a>
+        </div>
+    </section>
+
+    <section class="section">
+        <h2 class="section-title">O Village Paganayoh</h2>
+        <p class="section-text">
+            Um refúgio exclusivo em Guarajuba, cercado por natureza, lazer, conforto e segurança.
+            Ideal para famílias e grupos que procuram tranquilidade em um dos destinos mais procurados do litoral baiano.
+        </p>
+    </section>
+
+    <section class="section">
+        <h2 class="section-title">O Imóvel & Estrutura</h2>
+        <div class="gallery">
+            <!-- Áreas Sociais e Fachada -->
+            <img src="fachada.png" alt="Fachada">
+            <img src="sala.png" alt="Sala de Estar">
+            <img src="sala2.png" alt="Sala de Estar">
+            <img src="sala3.png" alt="Sala de Estar">
+            <img src="cozinha.png" alt="Cozinha">
+            <img src="cozinha2.png" alt="Cozinha">
+            <img src="cozinha3.png" alt="Cozinha">
+            <img src="cozinha4.png" alt="Cozinha">
+            <img src="m%C3%A1quina%20lavar.png" alt="Área de Serviço">
+
+            <!-- Acomodações -->
+            <img src="suite-principal.png" alt="Suíte Principal">
+            <img src="quarto-principal.png" alt="Quarto Principal">
+            <img src="quarto-principal2.png" alt="Quarto Principal">
+            <img src="quarto-terreo.png" alt="Quarto Térreo">
+            <img src="quarto-terreo2.png" alt="Quarto Térreo">
+            <img src="suite-quarto-terreo.png" alt="Suíte Quarto Térreo">
+            <img src="quarto-hospedes-superior.png" alt="Quarto Hóspedes Superior">
+            <img src="chuveiro-quarto-t%C3%A9rreo.png" alt="Banheiro Térreo">
+            <img src="hall%20andar%20superior.png" alt="Hall Superior">
+            <img src="varanda-quarto-superior-hospede.avif" alt="Varanda Superior">
+
+            <!-- Área Externa e Lazer -->
+            <img src="area-externa.png" alt="Área Externa">
+            <img src="piscina.png" alt="Piscina">
+            <img src="piscina3.png" alt="Piscina">
+            <img src="piscina4.png" alt="Piscina">
+            <img src="piscina5.png" alt="Piscina">
+            <img src="piscina6.png" alt="Piscina">
+            <img src="piscina7.png" alt="Piscina">
+            <img src="piscina8.png" alt="Piscina">
+            <img src="churrasqueira.png" alt="Churrasqueira">
+            <img src="quintal.png" alt="Quintal">
+            <img src="quintal2.png" alt="Quintal">
+            <img src="quintal3.png" alt="Quintal">
+            <img src="quintal4.png" alt="Quintal">
+
+            <!-- Condomínio e Região -->
+            <img src="area-gourmet-cond.png" alt="Área Gourmet Condomínio">
+            <img src="quadra-cond.png" alt="Quadra Condomínio">
+            <img src="tenis.png" alt="Quadra de Tênis">
+            <img src="campo.png" alt="Campo de Futebol">
+            <img src="lagoa-cond.png" alt="Lagoa Condomínio">
+            <img src="lagoa2.png" alt="Lagoa">
+            <img src="lagoa3.png" alt="Lagoa">
+            <img src="lagoa4.png" alt="Lagoa">
+            <img src="orla.png" alt="Orla de Guarajuba">
+            <img src="orla2.png" alt="Orla">
+            <img src="orla3.png" alt="Orla">
+            <img src="praia.png" alt="Praia de Guarajuba">
+            <img src="praia2.png" alt="Praia">
+            <img src="praia3.png" alt="Praia">
+        </div>
+    </section>
+
+    <section class="section availability">
+        <h2 class="section-title">Disponibilidade</h2>
+        <div class="calendar-box">
+            <p>
+                Em breve o calendário será sincronizado automaticamente com as reservas existentes.<br><br>
+                ✅ Reserva direta pelo WhatsApp<br>
+                ✅ Sem taxas do Airbnb<br>
+                ✅ Atendimento direto com o proprietário
+            </p>
+        </div>
+    </section>
+
+    <section class="section">
+        <h2 class="section-title">Reservas</h2>
+        <p class="section-text">
+            Entre em contato pelo WhatsApp para consultar datas, valores e condições especiais.
+        </p>
+        <br><br>
+        <div style="text-align:center;">
+            <a class="btn" href="https://wa.me/5571999123532?text=Olá!%20Gostaria%20de%20reservar%20o%20Village%20Paganayoh." target="_blank">
+                Reservar Agora
+            </a>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <h3>Village Paganayoh</h3>
+        <p>Guarajuba • Bahia</p>
+        <p>WhatsApp: (71) 99912-3532</p>
+    </footer>
+
+    <a class="whatsapp-float" href="https://wa.me/5571999123532" target="_blank" aria-label="Contato via WhatsApp">
+        💬
+    </a>
+
+</body>
+</html>
