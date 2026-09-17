@@ -639,6 +639,10 @@ img{max-width:100%;display:block}
 <style id="AIRBNB_CALENDAR_SYNC_V1">
 .day.holiday:not(.reserved):not(.selected){border-color:#d3aa57;box-shadow:inset 0 -3px 0 #d3aa57}
 .day.holiday:not(.reserved):not(.selected)::after{content:"";position:absolute;top:5px;right:5px;width:6px;height:6px;border-radius:50%;background:#d3aa57}
+.day .holiday-name{display:block;font-size:.52rem;line-height:1.05;margin-top:2px;color:#9a742f;font-weight:700;white-space:normal}
+.day.reserved .holiday-name{color:#a43737}
+.day.selected .holiday-name{color:#fff}
+@media(max-width:600px){.day .holiday-name{font-size:.44rem;line-height:1}}
 .calendar-sync{margin-top:12px;text-align:center;color:#7b827f;font-size:.72rem}
 </style>
 </head>
@@ -1264,7 +1268,7 @@ renderCalendar();
  function add(d,n){const x=new Date(d);x.setDate(x.getDate()+n);return x}
  function iso(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
  function holidays(y){const e=easter(y),a=[[new Date(y,0,1),'Confraternização Universal'],[add(e,-2),'Paixão de Cristo'],[new Date(y,3,21),'Tiradentes'],[new Date(y,4,1),'Dia Mundial do Trabalho'],[new Date(y,6,2),'Independência da Bahia'],[new Date(y,8,7),'Independência do Brasil'],[new Date(y,9,12),'Nossa Senhora Aparecida'],[new Date(y,10,2),'Finados'],[new Date(y,10,15),'Proclamação da República'],[new Date(y,10,20),'Consciência Negra'],[new Date(y,11,25),'Natal']];return Object.fromEntries(a.map(x=>[iso(x[0]),x[1]]))}
- function decorate(){const title=document.querySelector('.month-title');if(!title)return;const txt=title.textContent.trim();const months=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];const parts=txt.toLowerCase().split(/\s+/);const mi=months.indexOf(parts[0]),y=Number(parts[1]);if(mi<0||!y)return;const hs=holidays(y);document.querySelectorAll('.days .day:not(.empty)').forEach(el=>{const d=Number(el.textContent.trim());const name=hs[`${y}-${String(mi+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`];if(name){el.classList.add('holiday');el.title=name}})}
+ function decorate(){const title=document.querySelector('.month-title');if(!title)return;const txt=title.textContent.trim();const months=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];const parts=txt.toLowerCase().split(/\s+/);const mi=months.indexOf(parts[0]),y=Number(parts[1]);if(mi<0||!y)return;const hs=holidays(y);document.querySelectorAll('.days .day:not(.empty)').forEach(el=>{const d=Number(el.textContent.trim());const name=hs[`${y}-${String(mi+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`];if(name){el.classList.add('holiday');el.title=name;let label=el.querySelector('.holiday-name');if(!label){label=document.createElement('span');label.className='holiday-name';el.appendChild(label)}label.textContent=name}})}
  async function sync(){try{const r=await fetch('disponibilidade.json?ts='+Date.now(),{cache:'no-store'});const data=await r.json();if(Array.isArray(data.periods)&&typeof reservedPeriods!=='undefined'){reservedPeriods.splice(0,reservedPeriods.length,...data.periods);if(typeof renderCalendar==='function')renderCalendar()}let st=document.getElementById('calendar-sync-status');if(!st){st=document.createElement('div');st.id='calendar-sync-status';st.className='calendar-sync';document.querySelector('.calendar-card')?.appendChild(st)}if(st&&data.updated_at)st.textContent='Disponibilidade sincronizada com o Airbnb • '+new Date(data.updated_at).toLocaleString('pt-BR');decorate()}catch(e){console.warn('Sincronização do calendário:',e)}}
  const obs=new MutationObserver(()=>decorate());document.addEventListener('DOMContentLoaded',()=>{const days=document.querySelector('.days');if(days)obs.observe(days,{childList:true});decorate();sync()});
 })();
