@@ -359,6 +359,7 @@ img{max-width:100%;display:block}
     border-color:#c4e2d6;
     color:#14523d;
 }
+ .calendar-hint{margin:0 0 14px;padding:10px 12px;border-radius:10px;background:#f5f8f6;color:#14523d;text-align:center;font-size:.82rem;font-weight:700}
 .calendar-legend{
     display:flex;
     justify-content:center;
@@ -779,7 +780,8 @@ img{max-width:100%;display:block}
 
     <div class="calendar-wrap">
         <div class="calendar-card">
-            <div class="calendar-head">
+            <div id="calendarHint" class="calendar-hint">Informe ou clique na data inicial</div>
+                <div class="calendar-head">
                 <button id="prevMonth" aria-label="Mês anterior">‹</button>
                 <div class="month-title" id="monthTitle"></div>
                 <button id="nextMonth" aria-label="Próximo mês">›</button>
@@ -1200,6 +1202,8 @@ function formatDate(date){
 }
 
 function updateBooking(){
+    const hint=document.getElementById("calendarHint");
+    if(hint) hint.textContent=!checkin ? "Informe ou clique na data inicial" : (!checkout ? "Informe ou clique na data final" : "Período selecionado — clique em outra data para alterar");
     document.getElementById("checkin").textContent=formatDate(checkin);
     document.getElementById("checkout").textContent=formatDate(checkout);
 
