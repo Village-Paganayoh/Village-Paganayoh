@@ -359,7 +359,7 @@ img{max-width:100%;display:block}
     border-color:#c4e2d6;
     color:#14523d;
 }
- .calendar-hint{margin:0 0 14px;padding:10px 12px;border-radius:10px;background:#f5f8f6;color:#14523d;text-align:center;font-size:.82rem;font-weight:700}
+ .calendar-hint{margin:0 0 14px;padding:10px 12px;border-radius:10px;background:#f5f8f6;color:#14523d;text-align:center;font-size:.82rem;font-weight:700}.calendar-pointer-hint{position:fixed;z-index:5000;pointer-events:none;background:#17201d;color:#fff;padding:7px 10px;border-radius:8px;font-size:.72rem;font-weight:700;box-shadow:0 6px 18px rgba(0,0,0,.18);opacity:0;transform:translate(12px,14px);transition:opacity .12s}.calendar-pointer-hint.show{opacity:1}@media(hover:none),(pointer:coarse){.calendar-pointer-hint{display:none}}
 .calendar-legend{
     display:flex;
     justify-content:center;
@@ -780,7 +780,7 @@ img{max-width:100%;display:block}
 
     <div class="calendar-wrap">
         <div class="calendar-card">
-            <div id="calendarHint" class="calendar-hint">Informe ou clique na data inicial</div>
+            <div id="calendarHint" class="calendar-hint">Informe ou clique na data inicial</div><div id="calendarPointerHint" class="calendar-pointer-hint" role="tooltip"></div>
                 <div class="calendar-head">
                 <button id="prevMonth" aria-label="Mês anterior">‹</button>
                 <div class="month-title" id="monthTitle"></div>
@@ -1157,6 +1157,9 @@ function renderCalendar(){
 
         if(!isPast(date) && !isReserved(date)){
             el.addEventListener("click",()=>selectDate(date));
+            el.addEventListener("mouseenter",e=>showCalendarPointerHint(e));
+            el.addEventListener("mousemove",e=>moveCalendarPointerHint(e));
+            el.addEventListener("mouseleave",hideCalendarPointerHint);
         }else{
             el.disabled=true;
         }
@@ -1165,7 +1168,13 @@ function renderCalendar(){
     }
 }
 
+function pointerHintText(){return !checkin?"Informe ou clique na data inicial":(!checkout?"Informe ou clique na data final":"Clique para iniciar um novo período")}
+function showCalendarPointerHint(e){const t=document.getElementById("calendarPointerHint");if(!t)return;t.textContent=pointerHintText();moveCalendarPointerHint(e);t.classList.add("show")}
+function moveCalendarPointerHint(e){const t=document.getElementById("calendarPointerHint");if(!t)return;t.style.left=e.clientX+"px";t.style.top=e.clientY+"px"}
+function hideCalendarPointerHint(){document.getElementById("calendarPointerHint")?.classList.remove("show")}
+
 function selectDate(date){
+    hideCalendarPointerHint();
     if(!checkin || checkout){
         checkin=new Date(date);
         checkout=null;
