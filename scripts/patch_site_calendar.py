@@ -33,20 +33,13 @@ if 'AIRBNB_CALENDAR_SYNC_V1' not in s:
     changed = True
 
 # Reservas diretas: combina Airbnb + Cloudflare D1 em uma única lista.
-# O checkout de reserva direta permanece disponível (bloqueamos até a véspera).
-if 'DIRECT_RESERVATIONS_SYNC_V1' not in s:
+# Regra operacional: o próprio dia do checkout também fica bloqueado para vistoria/faxina.
+if 'DIRECT_RESERVATIONS_SYNC_V2' not in s:
     direct_js = '''
-<script id="DIRECT_RESERVATIONS_SYNC_V1">
-/* Reservas diretas Cloudflare D1 + Airbnb */
+<script id="DIRECT_RESERVATIONS_SYNC_V2">
+/* Reservas diretas Cloudflare D1 + Airbnb; checkout bloqueado para vistoria/faxina */
 (function(){
  const API='https://village-paganayoh-api.dario-cdao.workers.dev/reservas';
- function previousDay(iso){
-   const p=String(iso||'').split('-').map(Number);
-   if(p.length!==3||p.some(Number.isNaN)) return null;
-   const d=new Date(p[0],p[1]-1,p[2]);
-   d.setDate(d.getDate()-1);
-   return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
- }
  function validPeriod(p){return p&&/^\\d{4}-\\d{2}-\\d{2}$/.test(p.start||'')&&/^\\d{4}-\\d{2}-\\d{2}$/.test(p.end||'')&&p.start<=p.end}
  function mergePeriods(periods){
    const list=periods.filter(validPeriod).sort((a,b)=>a.start.localeCompare(b.start));
@@ -68,7 +61,7 @@ if 'DIRECT_RESERVATIONS_SYNC_V1' not in s:
      ]);
      const airbnb=airbnbResult.status==='fulfilled'&&Array.isArray(airbnbResult.value.periods)?airbnbResult.value.periods:[];
      const rows=directResult.status==='fulfilled'&&Array.isArray(directResult.value.reservas)?directResult.value.reservas:[];
-     const direct=rows.filter(r=>String(r.status||'').toLowerCase()!=='cancelada').map(r=>({start:r.checkin,end:previousDay(r.checkout)})).filter(validPeriod);
+     const direct=rows.filter(r=>String(r.status||'').toLowerCase()!=='cancelada').map(r=>({start:r.checkin,end:r.checkout})).filter(validPeriod);
      const combined=mergePeriods([...airbnb,...direct]);
      if(typeof reservedPeriods!=='undefined'){reservedPeriods.splice(0,reservedPeriods.length,...combined);if(typeof renderCalendar==='function')renderCalendar()}
      let st=document.getElementById('calendar-sync-status');
@@ -80,7 +73,16 @@ if 'DIRECT_RESERVATIONS_SYNC_V1' not in s:
 })();
 </script>
 '''
-    s = s.replace('</body>', direct_js + '</body>', 1)
+    old_start = s.find('<script id="DIRECT_RESERVATIONS_SYNC_V1">')
+    if old_start >= 0:
+        old_end = s.find('</script>', old_start)
+        if old_end >= 0:
+            old_end += len('</script>')
+            s = s[:old_start] + direct_js.strip() + s[old_end:]
+        else:
+            s = s.replace('</body>', direct_js + '</body>', 1)
+    else:
+        s = s.replace('</body>', direct_js + '</body>', 1)
     changed = True
 
 if changed:
@@ -88,5 +90,3 @@ if changed:
     print('Integrações do calendário instaladas/atualizadas no index.html.')
 else:
     print('Integrações do calendário já estão instaladas.')
-
-# Atualização automática: Airbnb e reservas diretas permanecem combinados.
