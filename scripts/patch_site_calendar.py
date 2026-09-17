@@ -68,23 +68,12 @@ if 'DIRECT_RESERVATIONS_SYNC_V1' not in s:
      ]);
      const airbnb=airbnbResult.status==='fulfilled'&&Array.isArray(airbnbResult.value.periods)?airbnbResult.value.periods:[];
      const rows=directResult.status==='fulfilled'&&Array.isArray(directResult.value.reservas)?directResult.value.reservas:[];
-     const direct=rows
-       .filter(r=>String(r.status||'').toLowerCase()!=='cancelada')
-       .map(r=>({start:r.checkin,end:previousDay(r.checkout)}))
-       .filter(validPeriod);
+     const direct=rows.filter(r=>String(r.status||'').toLowerCase()!=='cancelada').map(r=>({start:r.checkin,end:previousDay(r.checkout)})).filter(validPeriod);
      const combined=mergePeriods([...airbnb,...direct]);
-     if(typeof reservedPeriods!=='undefined'){
-       reservedPeriods.splice(0,reservedPeriods.length,...combined);
-       if(typeof renderCalendar==='function')renderCalendar();
-     }
+     if(typeof reservedPeriods!=='undefined'){reservedPeriods.splice(0,reservedPeriods.length,...combined);if(typeof renderCalendar==='function')renderCalendar()}
      let st=document.getElementById('calendar-sync-status');
      if(!st){st=document.createElement('div');st.id='calendar-sync-status';st.className='calendar-sync';document.querySelector('.calendar-card')?.appendChild(st)}
-     if(st){
-       const sources=[];
-       if(airbnbResult.status==='fulfilled')sources.push('Airbnb');
-       if(directResult.status==='fulfilled')sources.push('reservas diretas');
-       st.textContent=sources.length?'Disponibilidade sincronizada: '+sources.join(' + '):'Não foi possível atualizar a disponibilidade agora.';
-     }
+     if(st){const sources=[];if(airbnbResult.status==='fulfilled')sources.push('Airbnb');if(directResult.status==='fulfilled')sources.push('reservas diretas');st.textContent=sources.length?'Disponibilidade sincronizada: '+sources.join(' + '):'Não foi possível atualizar a disponibilidade agora.'}
    }catch(e){console.warn('Sincronização de reservas diretas:',e)}
  }
  document.addEventListener('DOMContentLoaded',()=>{setTimeout(syncAll,250)});
@@ -99,3 +88,5 @@ if changed:
     print('Integrações do calendário instaladas/atualizadas no index.html.')
 else:
     print('Integrações do calendário já estão instaladas.')
+
+# Atualização automática: Airbnb e reservas diretas permanecem combinados.
