@@ -1271,5 +1271,49 @@ renderCalendar();
  const obs=new MutationObserver(()=>decorate());document.addEventListener('DOMContentLoaded',()=>{const days=document.querySelector('.days');if(days)obs.observe(days,{childList:true});decorate();sync()});
 })();
 </script>
+
+<script id="DIRECT_RESERVATIONS_SYNC_V1">
+/* Reservas diretas Cloudflare D1 + Airbnb */
+(function(){
+ const API='https://village-paganayoh-api.dario-cdao.workers.dev/reservas';
+ function previousDay(iso){
+   const p=String(iso||'').split('-').map(Number);
+   if(p.length!==3||p.some(Number.isNaN)) return null;
+   const d=new Date(p[0],p[1]-1,p[2]);
+   d.setDate(d.getDate()-1);
+   return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+ }
+ function validPeriod(p){return p&&/^\d{4}-\d{2}-\d{2}$/.test(p.start||'')&&/^\d{4}-\d{2}-\d{2}$/.test(p.end||'')&&p.start<=p.end}
+ function mergePeriods(periods){
+   const list=periods.filter(validPeriod).sort((a,b)=>a.start.localeCompare(b.start));
+   const out=[];
+   for(const p of list){
+     if(!out.length){out.push({start:p.start,end:p.end});continue}
+     const last=out[out.length-1];
+     const next=new Date(last.end+'T12:00:00'); next.setDate(next.getDate()+1);
+     const nextKey=`${next.getFullYear()}-${String(next.getMonth()+1).padStart(2,'0')}-${String(next.getDate()).padStart(2,'0')}`;
+     if(p.start<=nextKey){if(p.end>last.end)last.end=p.end}else out.push({start:p.start,end:p.end});
+   }
+   return out;
+ }
+ async function syncAll(){
+   try{
+     const [airbnbResult,directResult]=await Promise.allSettled([
+       fetch('disponibilidade.json?ts='+Date.now(),{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error('Airbnb '+r.status);return r.json()}),
+       fetch(API+'?ts='+Date.now(),{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error('Reservas diretas '+r.status);return r.json()})
+     ]);
+     const airbnb=airbnbResult.status==='fulfilled'&&Array.isArray(airbnbResult.value.periods)?airbnbResult.value.periods:[];
+     const rows=directResult.status==='fulfilled'&&Array.isArray(directResult.value.reservas)?directResult.value.reservas:[];
+     const direct=rows.filter(r=>String(r.status||'').toLowerCase()!=='cancelada').map(r=>({start:r.checkin,end:previousDay(r.checkout)})).filter(validPeriod);
+     const combined=mergePeriods([...airbnb,...direct]);
+     if(typeof reservedPeriods!=='undefined'){reservedPeriods.splice(0,reservedPeriods.length,...combined);if(typeof renderCalendar==='function')renderCalendar()}
+     let st=document.getElementById('calendar-sync-status');
+     if(!st){st=document.createElement('div');st.id='calendar-sync-status';st.className='calendar-sync';document.querySelector('.calendar-card')?.appendChild(st)}
+     if(st){const sources=[];if(airbnbResult.status==='fulfilled')sources.push('Airbnb');if(directResult.status==='fulfilled')sources.push('reservas diretas');st.textContent=sources.length?'Disponibilidade sincronizada: '+sources.join(' + '):'Não foi possível atualizar a disponibilidade agora.'}
+   }catch(e){console.warn('Sincronização de reservas diretas:',e)}
+ }
+ document.addEventListener('DOMContentLoaded',()=>{setTimeout(syncAll,250)});
+})();
+</script>
 </body>
 </html>
