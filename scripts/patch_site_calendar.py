@@ -34,12 +34,12 @@ if 'AIRBNB_CALENDAR_SYNC_V1' not in s:
 
 # Reservas diretas: combina Airbnb + Cloudflare D1 em uma única lista.
 # Regra operacional: o próprio dia do checkout também fica bloqueado para vistoria/faxina.
-if 'DIRECT_RESERVATIONS_SYNC_V2' not in s:
+if 'DIRECT_RESERVATIONS_SYNC_V3' not in s:
     direct_js = '''
-<script id="DIRECT_RESERVATIONS_SYNC_V2">
+<script id="DIRECT_RESERVATIONS_SYNC_V3">
 /* Reservas diretas Cloudflare D1 + Airbnb; checkout bloqueado para vistoria/faxina */
 (function(){
- const API='https://village-paganayoh-api.dario-cdao.workers.dev/reservas';
+ const API='https://village-paganayoh-api.dario-cdao.workers.dev/disponibilidade';
  function validPeriod(p){return p&&/^\\d{4}-\\d{2}-\\d{2}$/.test(p.start||'')&&/^\\d{4}-\\d{2}-\\d{2}$/.test(p.end||'')&&p.start<=p.end}
  function mergePeriods(periods){
    const list=periods.filter(validPeriod).sort((a,b)=>a.start.localeCompare(b.start));
@@ -60,8 +60,8 @@ if 'DIRECT_RESERVATIONS_SYNC_V2' not in s:
        fetch(API+'?ts='+Date.now(),{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error('Reservas diretas '+r.status);return r.json()})
      ]);
      const airbnb=airbnbResult.status==='fulfilled'&&Array.isArray(airbnbResult.value.periods)?airbnbResult.value.periods:[];
-     const rows=directResult.status==='fulfilled'&&Array.isArray(directResult.value.reservas)?directResult.value.reservas:[];
-     const direct=rows.filter(r=>String(r.status||'').toLowerCase()!=='cancelada').map(r=>({start:r.checkin,end:r.checkout})).filter(validPeriod);
+     const rows=directResult.status==='fulfilled'&&Array.isArray(directResult.value.periodos)?directResult.value.periodos:[];
+     const direct=rows.map(r=>({start:r.checkin,end:r.checkout})).filter(validPeriod);
      const combined=mergePeriods([...airbnb,...direct]);
      if(typeof reservedPeriods!=='undefined'){reservedPeriods.splice(0,reservedPeriods.length,...combined);if(typeof renderCalendar==='function')renderCalendar()}
      let st=document.getElementById('calendar-sync-status');
@@ -73,7 +73,9 @@ if 'DIRECT_RESERVATIONS_SYNC_V2' not in s:
 })();
 </script>
 '''
-    old_start = s.find('<script id="DIRECT_RESERVATIONS_SYNC_V1">')
+    old_start = s.find('<script id="DIRECT_RESERVATIONS_SYNC_V2">')
+    if old_start < 0:
+        old_start = s.find('<script id="DIRECT_RESERVATIONS_SYNC_V1">')
     if old_start >= 0:
         old_end = s.find('</script>', old_start)
         if old_end >= 0:
