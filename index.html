@@ -1057,13 +1057,14 @@ async function loadDynamicPhotos(){
         const data = await response.json();
         if(!data.ok || !Array.isArray(data.midias)) return;
         const dynamicPhotos = data.midias
-            .filter(m => m.ativo !== false && m.tipo === "foto" && m.url)
+            .filter(m => m.ativo !== false && (m.tipo === "foto" || m.tipo === "original") && m.url)
+            .sort((a,b)=>(Number(a.ordem)||0)-(Number(b.ordem)||0)||Number(a.id)-Number(b.id))
             .map(m => ({
                 src:m.url,
                 cat:String(m.categoria || "casa").toLowerCase(),
                 label:m.titulo || m.legenda || "Foto"
             }));
-        photos = [...staticPhotos, ...dynamicPhotos];
+        photos = dynamicPhotos.length ? dynamicPhotos : [...staticPhotos];
         renderGallery(activeGalleryFilter);
     }catch(error){
         console.warn("Galeria dinâmica indisponível; mantendo fotos locais.", error);
