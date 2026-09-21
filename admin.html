@@ -30,6 +30,7 @@
     <form id="loginForm">
       <div class="field"><label for="password">Senha administrativa</label><input id="password" type="password" autocomplete="current-password" required placeholder="Digite sua senha"></div>
       <button class="btn btn-primary wide" type="submit">Entrar no painel</button>
+      <button id="passkeyLoginBtn" class="btn btn-light wide" type="button" style="margin-top:10px;display:none">🔐 Entrar com biometria</button>
       <div id="loginMsg" class="msg"></div>
     </form>
   </div>
@@ -38,7 +39,7 @@
 <section id="app" class="app hidden">
   <header class="topbar">
     <div class="top-title"><strong>Village Paganayoh</strong><span>Administração de reservas</span></div>
-    <div class="actions"><a class="btn btn-light site-label" href="index.html">Ver site</a><button id="logout" class="btn btn-light">Sair</button></div>
+    <div class="actions"><button id="registerPasskeyBtn" class="btn btn-light" type="button">Cadastrar biometria</button><a class="btn btn-light site-label" href="index.html">Ver site</a><button id="logout" class="btn btn-light">Sair</button></div>
   </header>
   <main class="main">
     <div class="hero-row"><div><h2>Reservas</h2><p>Visão unificada das reservas diretas e períodos ocupados pelo Airbnb.</p></div><button id="newBtn" class="btn btn-primary">+ Nova reserva</button></div>
@@ -78,8 +79,63 @@ function brDate(v){if(!v)return '—';const [y,m,d]=v.split('-');return `${d}/${
 function toast(text){const el=$('#toast');el.textContent=text;el.classList.remove('hidden');setTimeout(()=>el.classList.add('hidden'),2800)}
 async function api(path,options={}){const r=await fetch(API+path,{...options,headers:{...headers(),...(options.headers||{})}});let data={};try{data=await r.json()}catch{}if(r.status===401){logout();throw new Error('Sessão não autorizada. Entre novamente.')}if(!r.ok)throw new Error(data.erro||'Não foi possível concluir a operação.');return data}
 function logout(){adminToken='';reservations=[];airbnbPeriods=[];$('#app').classList.add('hidden');$('#login').classList.remove('hidden');$('#password').value='';}
+function abToB64url(buffer){const bytes=new Uint8Array(buffer);let bin='';for(const b of bytes)bin+=String.fromCharCode(b);return btoa(bin).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/g,'')}
+function b64urlToU8(value){const s=value.replace(/-/g,'+').replace(/_/g,'/')+'='.repeat((4-value.length%4)%4);const bin=atob(s);const out=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)out[i]=bin.charCodeAt(i);return out}
+function passkeySupported(){return !!(window.PublicKeyCredential&&navigator.credentials&&window.isSecureContext)}
+async function platformPasskeyAvailable(){if(!passkeySupported())return false;try{return !PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable||await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable()}catch{return true}}
+async function refreshPasskeyLoginButton(){const btn=$('#passkeyLoginBtn');if(!btn)return;btn.style.display=(await platformPasskeyAvailable())?'block':'none'}
+async function registerPasskey(){
+  if(!passkeySupported()){toast('Este navegador não oferece suporte a passkeys.');return}
+  const btn=$('#registerPasskeyBtn');btn.disabled=true;
+  try{
+    const r=await fetch(API+'/admin/passkey/register/options',{method:'POST',headers:headers()});
+    const d=await r.json();if(!r.ok)throw new Error(d.erro||'Não foi possível iniciar o cadastro da biometria.');
+    const p=d.publicKey;
+    p.challenge=b64urlToU8(p.challenge);
+    p.user={...p.user,id:b64urlToU8(p.user.id)};
+    const cred=await navigator.credentials.create({publicKey:p});
+    const resp=cred.response;
+    if(typeof resp.getPublicKey!=='function'||typeof resp.getPublicKeyAlgorithm!=='function'||typeof resp.getAuthenticatorData!=='function')throw new Error('Este navegador não disponibiliza os dados necessários para cadastrar a passkey.');
+    const body={
+      credentialId:abToB64url(cred.rawId),
+      clientDataJSON:abToB64url(resp.clientDataJSON),
+      authenticatorData:abToB64url(resp.getAuthenticatorData()),
+      publicKey:abToB64url(resp.getPublicKey()),
+      algorithm:resp.getPublicKeyAlgorithm(),
+      label:/iPhone|iPad|iPod/i.test(navigator.userAgent)?'iPhone / iPad':/Android/i.test(navigator.userAgent)?'Celular Android':'Este aparelho'
+    };
+    const vr=await fetch(API+'/admin/passkey/register/verify',{method:'POST',headers:headers(),body:JSON.stringify(body)});
+    const vd=await vr.json();if(!vr.ok)throw new Error(vd.erro||'Não foi possível concluir o cadastro.');
+    toast('Biometria/passkey cadastrada com sucesso.');
+    await refreshPasskeyLoginButton();
+  }catch(err){if(err?.name==='NotAllowedError')toast('Cadastro da biometria cancelado.');else toast(err.message||'Não foi possível cadastrar a biometria.')}
+  finally{btn.disabled=false}
+}
+async function loginWithPasskey(){
+  const msg=$('#loginMsg');msg.textContent='';
+  if(!passkeySupported()){msg.textContent='Este navegador não oferece suporte a passkeys.';return}
+  const btn=$('#passkeyLoginBtn');btn.disabled=true;
+  try{
+    const r=await fetch(API+'/admin/passkey/login/options',{method:'POST',headers:{'Content-Type':'application/json'}});
+    const d=await r.json();if(!r.ok)throw new Error(d.erro||'Nenhuma biometria cadastrada para este painel.');
+    const p=d.publicKey;
+    p.challenge=b64urlToU8(p.challenge);
+    p.allowCredentials=(p.allowCredentials||[]).map(x=>({...x,id:b64urlToU8(x.id)}));
+    const cred=await navigator.credentials.get({publicKey:p});
+    const resp=cred.response;
+    const body={credentialId:abToB64url(cred.rawId),clientDataJSON:abToB64url(resp.clientDataJSON),authenticatorData:abToB64url(resp.authenticatorData),signature:abToB64url(resp.signature)};
+    const vr=await fetch(API+'/admin/passkey/login/verify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const vd=await vr.json();if(!vr.ok)throw new Error(vd.erro||'Não foi possível validar a biometria.');
+    adminToken=vd.token;$('#login').classList.add('hidden');$('#app').classList.remove('hidden');$('#password').value='';await Promise.all([loadReservations(),loadMedia()]);
+  }catch(err){if(err?.name==='NotAllowedError')msg.textContent='Autenticação biométrica cancelada.';else msg.textContent=err.message||'Não foi possível entrar com biometria.'}
+  finally{btn.disabled=false}
+}
+
 $('#loginForm').addEventListener('submit',async e=>{e.preventDefault();const msg=$('#loginMsg');msg.textContent='';const password=$('#password').value;;try{const r=await fetch(API+'/admin/login',{method:'POST',headers:{'Content-Type':'application/json','X-Admin-Password':password}});const d=await r.json();if(!r.ok)throw new Error(d.erro||'Senha incorreta.');adminToken=d.token;$('#login').classList.add('hidden');$('#app').classList.remove('hidden');$('#password').value='';await Promise.all([loadReservations(),loadMedia()])}catch(err){adminPassword='';msg.textContent=err.message}});
 $('#logout').onclick=logout;
+$('#registerPasskeyBtn').onclick=registerPasskey;
+$('#passkeyLoginBtn').onclick=loginWithPasskey;
+refreshPasskeyLoginButton();
 async function loadMedia(){const panel=$('#mediaPanel');panel.classList.add('loading');try{const r=await fetch(API+'/midias',{cache:'no-store'});const d=await r.json();if(!r.ok||d.ok===false)throw new Error(d.erro||'Não foi possível carregar as mídias.');mediaItems=[...(d.midias||[])].sort((a,b)=>(Number(a.ordem)||0)-(Number(b.ordem)||0)||Number(a.id)-Number(b.id));renderMedia(mediaItems)}catch(err){toast(err.message)}finally{panel.classList.remove('loading')}}
 function renderMedia(midias){const grid=$('#mediaGrid');grid.innerHTML='';$('#mediaEmpty').classList.toggle('hidden',midias.length>0);for(const m of midias){const card=document.createElement('article');card.draggable=false;card.dataset.mediaId=m.id;card.style.cssText='border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#fff;cursor:grab;transition:opacity .15s,transform .15s';const media=m.tipo==='video'?'<div style="aspect-ratio:4/3;display:grid;place-items:center;background:#17201d;color:#fff;font-size:2rem">▶</div>':`<div style="position:relative"><img src="${esc(m.url)}" alt="${esc(m.titulo||m.legenda||'Foto')}" style="width:100%;aspect-ratio:4/3;object-fit:cover;display:block" loading="lazy"><span title="Arraste para reordenar" style="position:absolute;top:8px;right:8px;background:rgba(23,32,29,.78);color:#fff;border-radius:8px;padding:5px 8px;font-size:.8rem;pointer-events:none">☰</span></div>`;card.innerHTML=media+`<div style="padding:12px"><span class="badge confirmada">${esc(m.categoria||'mídia')}</span><strong style="display:block;margin-top:9px">${esc(m.titulo||m.arquivo||'Sem título')}</strong>${m.legenda?'<div style="color:var(--muted);font-size:.8rem;margin-top:4px">'+esc(m.legenda)+'</div>':''}<div style="display:grid;gap:6px;margin-top:10px"><div style="display:flex;justify-content:center;gap:4px;flex-wrap:wrap"><button type="button" class="mini edit" style="width:32px;height:36px;padding:0;display:grid;place-items:center;font-size:1rem;touch-action:manipulation" title="Mover uma linha para cima" aria-label="Mover uma linha para cima" data-move-up="${m.id}">↑</button><button type="button" class="mini edit" style="width:32px;height:36px;padding:0;display:grid;place-items:center;font-size:1rem;touch-action:manipulation" title="Mover uma linha para baixo" aria-label="Mover uma linha para baixo" data-move-down="${m.id}">↓</button><button type="button" class="mini edit" style="width:32px;height:36px;padding:0;display:grid;place-items:center;font-size:1rem;touch-action:manipulation" title="Mover uma posição para a esquerda" aria-label="Mover uma posição para a esquerda" data-move-prev="${m.id}">←</button><button type="button" class="mini edit" style="width:32px;height:36px;padding:0;display:grid;place-items:center;font-size:1rem;touch-action:manipulation" title="Mover uma posição para a direita" aria-label="Mover uma posição para a direita" data-move-next="${m.id}">→</button><button type="button" class="mini edit" style="width:34px;height:36px;padding:0;display:grid;place-items:center;font-size:1rem;touch-action:manipulation" title="Ir para o início da linha" aria-label="Ir para o início da linha" data-move-row-start="${m.id}">⇤</button><button type="button" class="mini edit" style="width:34px;height:36px;padding:0;display:grid;place-items:center;font-size:1rem;touch-action:manipulation" title="Ir para o fim da linha" aria-label="Ir para o fim da linha" data-move-row-end="${m.id}">⇥</button></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:7px"><button type="button" class="mini edit" style="white-space:nowrap" data-edit-media="${m.id}">Editar</button><button type="button" class="mini cancel" style="white-space:nowrap" data-delete-media="${m.id}">Excluir</button></div></div></div>`;grid.appendChild(card)}grid.querySelectorAll('[data-edit-media]').forEach(b=>b.onclick=()=>openMediaEdit(Number(b.dataset.editMedia)));grid.querySelectorAll('[data-delete-media]').forEach(b=>b.onclick=()=>deleteMedia(Number(b.dataset.deleteMedia)));grid.querySelectorAll('[data-move-prev]').forEach(b=>b.onclick=async e=>{e.preventDefault();e.stopPropagation();await moveMedia(Number(b.dataset.movePrev),-1)});grid.querySelectorAll('[data-move-next]').forEach(b=>b.onclick=async e=>{e.preventDefault();e.stopPropagation();await moveMedia(Number(b.dataset.moveNext),1)});grid.querySelectorAll('[data-move-up]').forEach(b=>b.onclick=async e=>{e.preventDefault();e.stopPropagation();await moveMediaRow(Number(b.dataset.moveUp),-1)});grid.querySelectorAll('[data-move-down]').forEach(b=>b.onclick=async e=>{e.preventDefault();e.stopPropagation();await moveMediaRow(Number(b.dataset.moveDown),1)});grid.querySelectorAll('[data-move-row-start]').forEach(b=>b.onclick=async e=>{e.preventDefault();e.stopPropagation();await moveMediaRowEdge(Number(b.dataset.moveRowStart),'start')});grid.querySelectorAll('[data-move-row-end]').forEach(b=>b.onclick=async e=>{e.preventDefault();e.stopPropagation();await moveMediaRowEdge(Number(b.dataset.moveRowEnd),'end')});const mobileView=window.matchMedia('(max-width:700px)').matches;if(mobileView){grid.querySelectorAll('[data-move-prev],[data-move-next],[data-move-row-start],[data-move-row-end],[data-move-up],[data-move-down]').forEach(b=>b.style.display='none')}}
 async function moveMedia(id,direction){const grid=$('#mediaGrid');const cards=[...grid.querySelectorAll('[data-media-id]')];const index=cards.findIndex(c=>Number(c.dataset.mediaId)===Number(id));const target=index+direction;if(index<0||target<0||target>=cards.length)return;const card=cards[index],other=cards[target];if(direction<0){grid.insertBefore(card,other)}else{grid.insertBefore(card,other.nextSibling)}await saveMediaOrder()}
