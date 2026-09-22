@@ -77,6 +77,44 @@
 </section>
 
 <dialog id="mediaDialog"><form id="mediaForm" class="modal"><div class="modal-head"><h3>Adicionar foto</h3><button type="button" class="x" id="closeMediaModal">×</button></div><div class="field"><label>Imagem</label><input id="mediaFile" type="file" accept="image/jpeg,image/png,image/webp" required><div style="font-size:.75rem;color:var(--muted)">JPG, PNG ou WebP • até 10 MB</div></div><div class="field"><label>Categoria</label><select id="mediaCategory"><option value="casa">Casa</option><option value="quartos">Quartos</option><option value="lazer">Lazer</option><option value="condominio">Condomínio</option><option value="guarajuba">Guarajuba</option></select></div><div class="field"><label>Título</label><input id="mediaTitle" type="text" maxlength="120" placeholder="Ex.: Piscina da casa"></div><div class="field"><label>Legenda</label><textarea id="mediaCaption" rows="3" maxlength="300" placeholder="Descrição opcional da foto"></textarea></div><div id="mediaFormMsg" class="msg"></div><div class="modal-actions"><button type="button" class="btn btn-light" id="cancelMediaModal">Voltar</button><button type="submit" class="btn btn-primary" id="saveMediaBtn">Enviar foto</button></div></form></dialog>
+<dialog id="regionItemsDialog" style="width:min(980px,calc(100% - 28px))">
+  <div class="modal">
+    <div class="modal-head">
+      <div><h3 id="regionItemsTitle">Conteúdo do local</h3><div id="regionItemsSubtitle" style="color:var(--muted);font-size:.82rem;margin-top:4px"></div></div>
+      <button type="button" class="x" id="closeRegionItemsModal">×</button>
+    </div>
+    <div style="display:flex;justify-content:flex-end;margin:16px 0">
+      <button id="addRegionItemBtn" class="btn btn-primary" type="button">+ Adicionar item</button>
+    </div>
+    <div id="regionItemsGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px"></div>
+    <div id="regionItemsEmpty" class="empty hidden">Nenhum item cadastrado.</div>
+  </div>
+</dialog>
+
+<dialog id="regionItemDialog">
+  <form id="regionItemForm" class="modal">
+    <div class="modal-head"><h3 id="regionItemDialogTitle">Adicionar item</h3><button type="button" class="x" id="closeRegionItemModal">×</button></div>
+    <div class="grid2">
+      <div class="field"><label>Nome</label><input id="regionItemName" type="text" maxlength="120" required placeholder="Ex.: Projeto Tamar"></div>
+      <div class="field"><label>Tipo</label><input id="regionItemType" type="text" maxlength="80" placeholder="Ex.: Atração, Restaurante, Praia"></div>
+    </div>
+    <div class="field"><label>Descrição</label><textarea id="regionItemDescription" rows="3" maxlength="420" placeholder="Descrição curta para o hóspede"></textarea></div>
+    <div class="grid2">
+      <div class="field"><label>Distância do Village</label><input id="regionItemDistance" type="text" maxlength="80" placeholder="Ex.: 18 km"></div>
+      <div class="field"><label>Tempo de carro</label><input id="regionItemDriveTime" type="text" maxlength="80" placeholder="Ex.: 25 min"></div>
+    </div>
+    <div class="grid2">
+      <div class="field"><label>Faixa de preço</label><input id="regionItemPrice" type="text" maxlength="80" placeholder="Ex.: $"></div>
+      <div class="field"><label>Ordem</label><input id="regionItemOrder" type="number" min="0" step="1" value="0"></div>
+    </div>
+    <div class="field"><label>Link do Google Maps</label><input id="regionItemMapsUrl" type="url" placeholder="https://maps.google.com/..."></div>
+    <div class="field"><label>URL da foto</label><input id="regionItemImageUrl" type="url" placeholder="https://..."></div>
+    <div class="field"><label style="display:flex;align-items:center;gap:8px"><input id="regionItemActive" type="checkbox" checked style="width:auto"> Exibir este item no site</label></div>
+    <div id="regionItemFormMsg" class="msg"></div>
+    <div class="modal-actions"><button type="button" class="btn btn-light" id="cancelRegionItemModal">Voltar</button><button type="submit" class="btn btn-primary" id="saveRegionItemBtn">Salvar item</button></div>
+  </form>
+</dialog>
+
 <dialog id="regionDialog">
   <form id="regionForm" class="modal">
     <div class="modal-head"><h3 id="regionDialogTitle">Adicionar local</h3><button type="button" class="x" id="closeRegionModal">×</button></div>
@@ -107,6 +145,9 @@ let mediaItems=[];
 let editingMediaId=null;
 let regionItems=[];
 let editingRegionId=null;
+let regionDetailParent=null;
+let regionDetailItems=[];
+let editingRegionDetailId=null;
 let adminCalMonth=new Date();adminCalMonth.setDate(1);
 const $=s=>document.querySelector(s);
 function headers(){return {'Content-Type':'application/json',...(adminToken?{'Authorization':'Bearer '+adminToken}:{})}}
@@ -219,6 +260,7 @@ function renderRegions(){
         <div style="font-size:.8rem;color:var(--muted);margin-top:3px">${esc(r.categoria||'')}</div>
         ${r.distancia?'<div style="font-size:.78rem;margin-top:6px">📍 '+esc(r.distancia)+'</div>':''}
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:12px">
+          <button type="button" class="mini edit" data-manage-region="${r.id}" style="grid-column:1/-1;background:#e8f7ef;color:#18734e">Gerenciar conteúdo</button>
           <button type="button" class="mini edit" data-edit-region="${r.id}">Editar</button>
           <button type="button" class="mini cancel" data-delete-region="${r.id}">Excluir</button>
         </div>
@@ -229,10 +271,153 @@ function renderRegions(){
       </div>`;
     grid.appendChild(card);
   }
+  grid.querySelectorAll('[data-manage-region]').forEach(b=>b.onclick=()=>openRegionDetailManager(Number(b.dataset.manageRegion)));
   grid.querySelectorAll('[data-edit-region]').forEach(b=>b.onclick=()=>openRegionEdit(Number(b.dataset.editRegion)));
   grid.querySelectorAll('[data-delete-region]').forEach(b=>b.onclick=()=>deleteRegion(Number(b.dataset.deleteRegion)));
   grid.querySelectorAll('[data-region-up]').forEach(b=>b.onclick=()=>moveRegion(Number(b.dataset.regionUp),-1));
   grid.querySelectorAll('[data-region-down]').forEach(b=>b.onclick=()=>moveRegion(Number(b.dataset.regionDown),1));
+}
+
+
+async function openRegionDetailManager(parentId){
+  const parent=regionItems.find(x=>Number(x.id)===Number(parentId));
+  if(!parent)return;
+  regionDetailParent=parent;
+  $('#regionItemsTitle').textContent=parent.nome;
+  $('#regionItemsSubtitle').textContent='Itens exibidos quando o hóspede clicar neste card.';
+  $('#regionItemsDialog').showModal();
+  await loadRegionDetailItems();
+}
+
+async function loadRegionDetailItems(){
+  if(!regionDetailParent)return;
+  const grid=$('#regionItemsGrid');
+  grid.classList.add('loading');
+  try{
+    const d=await api('/admin/locais-regiao/'+regionDetailParent.id+'/itens');
+    regionDetailItems=[...(d.itens||[])].sort((a,b)=>(Number(a.ordem)||0)-(Number(b.ordem)||0)||Number(a.id)-Number(b.id));
+    renderRegionDetailItems();
+  }catch(err){toast(err.message)}
+  finally{grid.classList.remove('loading')}
+}
+
+function renderRegionDetailItems(){
+  const grid=$('#regionItemsGrid');
+  grid.innerHTML='';
+  $('#regionItemsEmpty').classList.toggle('hidden',regionDetailItems.length>0);
+
+  for(const item of regionDetailItems){
+    const card=document.createElement('article');
+    card.style.cssText='border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#fff';
+    const img=item.imagem_url
+      ? `<img src="${esc(item.imagem_url)}" alt="${esc(item.nome||'Item')}" style="width:100%;aspect-ratio:4/3;object-fit:cover;display:block" loading="lazy" referrerpolicy="no-referrer">`
+      : '<div style="aspect-ratio:4/3;display:grid;place-items:center;background:#eef2ef;color:var(--muted)">Sem foto</div>';
+
+    card.innerHTML=img+`
+      <div style="padding:12px">
+        <div style="display:flex;justify-content:space-between;gap:8px">
+          <span class="badge ${Number(item.ativo)===1?'confirmada':'cancelada'}">${Number(item.ativo)===1?'Ativo':'Oculto'}</span>
+          <span style="font-size:.75rem;color:var(--muted)">Ordem ${Number(item.ordem)||0}</span>
+        </div>
+        <strong style="display:block;margin-top:9px">${esc(item.nome||'Sem nome')}</strong>
+        <div style="font-size:.8rem;color:var(--muted);margin-top:3px">${esc(item.tipo||'local')}</div>
+        ${item.distancia?'<div style="font-size:.78rem;margin-top:6px">📍 '+esc(item.distancia)+'</div>':''}
+        ${item.tempo_carro?'<div style="font-size:.78rem;margin-top:4px">🚗 '+esc(item.tempo_carro)+'</div>':''}
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:12px">
+          <button type="button" class="mini edit" data-edit-region-item="${item.id}">Editar</button>
+          <button type="button" class="mini cancel" data-delete-region-item="${item.id}">Excluir</button>
+        </div>
+      </div>`;
+    grid.appendChild(card);
+  }
+
+  grid.querySelectorAll('[data-edit-region-item]').forEach(b=>b.onclick=()=>openRegionItemEdit(Number(b.dataset.editRegionItem)));
+  grid.querySelectorAll('[data-delete-region-item]').forEach(b=>b.onclick=()=>deleteRegionItem(Number(b.dataset.deleteRegionItem)));
+}
+
+function resetRegionItemForm(){
+  editingRegionDetailId=null;
+  $('#regionItemForm').reset();
+  $('#regionItemActive').checked=true;
+  $('#regionItemOrder').value=regionDetailItems.length+1;
+  $('#regionItemDialogTitle').textContent='Adicionar item';
+  $('#saveRegionItemBtn').textContent='Salvar item';
+  $('#regionItemFormMsg').textContent='';
+}
+
+function openRegionItemEdit(id){
+  const item=regionDetailItems.find(x=>Number(x.id)===Number(id));
+  if(!item)return;
+  editingRegionDetailId=id;
+  $('#regionItemName').value=item.nome||'';
+  $('#regionItemType').value=item.tipo||'local';
+  $('#regionItemDescription').value=item.descricao||'';
+  $('#regionItemDistance').value=item.distancia||'';
+  $('#regionItemDriveTime').value=item.tempo_carro||'';
+  $('#regionItemPrice').value=item.faixa_preco||'';
+  $('#regionItemOrder').value=Number(item.ordem)||0;
+  $('#regionItemMapsUrl').value=item.maps_url||'';
+  $('#regionItemImageUrl').value=item.imagem_url||'';
+  $('#regionItemActive').checked=Number(item.ativo)===1;
+  $('#regionItemDialogTitle').textContent='Editar item';
+  $('#saveRegionItemBtn').textContent='Salvar alterações';
+  $('#regionItemFormMsg').textContent='';
+  $('#regionItemDialog').showModal();
+}
+
+$('#closeRegionItemsModal').onclick=()=>$('#regionItemsDialog').close();
+$('#addRegionItemBtn').onclick=()=>{resetRegionItemForm();$('#regionItemDialog').showModal()};
+$('#closeRegionItemModal').onclick=()=>$('#regionItemDialog').close();
+$('#cancelRegionItemModal').onclick=()=>$('#regionItemDialog').close();
+
+$('#regionItemForm').addEventListener('submit',async e=>{
+  e.preventDefault();
+  if(!regionDetailParent)return;
+  const msg=$('#regionItemFormMsg'),btn=$('#saveRegionItemBtn');
+  msg.textContent='';
+  const payload={
+    nome:$('#regionItemName').value.trim(),
+    tipo:$('#regionItemType').value.trim()||'local',
+    descricao:$('#regionItemDescription').value.trim(),
+    distancia:$('#regionItemDistance').value.trim(),
+    tempo_carro:$('#regionItemDriveTime').value.trim(),
+    faixa_preco:$('#regionItemPrice').value.trim(),
+    maps_url:$('#regionItemMapsUrl').value.trim(),
+    imagem_url:$('#regionItemImageUrl').value.trim(),
+    ativo:$('#regionItemActive').checked?1:0,
+    ordem:Number($('#regionItemOrder').value||0)
+  };
+
+  btn.disabled=true;
+  try{
+    const path=editingRegionDetailId
+      ? '/admin/locais-regiao/itens/'+editingRegionDetailId
+      : '/admin/locais-regiao/'+regionDetailParent.id+'/itens';
+
+    await api(path,{
+      method:editingRegionDetailId?'PUT':'POST',
+      body:JSON.stringify(payload)
+    });
+
+    $('#regionItemDialog').close();
+    toast(editingRegionDetailId?'Item atualizado.':'Item cadastrado.');
+    editingRegionDetailId=null;
+    await loadRegionDetailItems();
+  }catch(err){msg.textContent=err.message}
+  finally{
+    btn.disabled=false;
+    btn.textContent=editingRegionDetailId?'Salvar alterações':'Salvar item';
+  }
+});
+
+async function deleteRegionItem(id){
+  const item=regionDetailItems.find(x=>Number(x.id)===Number(id));
+  if(!confirm('Excluir '+(item?.nome||'este item')+'?'))return;
+  try{
+    await api('/admin/locais-regiao/itens/'+id,{method:'DELETE'});
+    toast('Item excluído.');
+    await loadRegionDetailItems();
+  }catch(err){toast(err.message)}
 }
 
 function resetRegionForm(){
