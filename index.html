@@ -770,6 +770,40 @@ img{max-width:100%;display:block}
   .region-detail-gallery img{height:150px}
   .region-detail-gallery img:first-child{grid-column:1/-1;height:210px}
 }
+
+.faq-library-dialog{
+    border:0;
+    border-radius:22px;
+    padding:0;
+    width:min(900px,calc(100% - 28px));
+    max-height:88vh;
+    overflow:auto;
+    box-shadow:0 30px 90px rgba(0,0,0,.24);
+}
+.faq-library-dialog::backdrop{background:rgba(15,25,21,.58)}
+.faq-library-wrap{padding:28px}
+.faq-library-head{display:flex;justify-content:space-between;align-items:flex-start;gap:20px}
+.faq-library-head h3{font-size:clamp(1.6rem,3vw,2.15rem);margin:4px 0 7px}
+.faq-library-head p{margin:0;color:#6f7974;line-height:1.5}
+.faq-library-kicker{color:#245e4e;font-size:.72rem;font-weight:800;letter-spacing:2.5px;text-transform:uppercase}
+.faq-library-close{border:0;background:#f1f4f2;width:42px;height:42px;border-radius:50%;font-size:1.45rem;cursor:pointer;flex:none}
+.faq-library-search-wrap{display:flex;align-items:center;gap:10px;margin:22px 0 8px;padding:0 15px;border:1px solid #dfe6e2;border-radius:14px;background:#fff}
+.faq-library-search-wrap input{width:100%;border:0;outline:0;padding:15px 0;font:inherit;background:transparent}
+.faq-library-count{font-size:.78rem;color:#7b827f;margin:8px 2px 14px}
+.faq-library-list{border:1px solid #e5eae7;border-radius:16px;overflow:hidden;background:#fff}
+.faq-library-item{border-bottom:1px solid #edf0ee}
+.faq-library-item:last-child{border-bottom:0}
+.faq-library-question{width:100%;border:0;background:#fff;padding:18px 20px;text-align:left;display:flex;justify-content:space-between;align-items:center;gap:18px;font-weight:750;cursor:pointer;color:#202722}
+.faq-library-question span{width:28px;height:28px;border-radius:50%;background:#f4efe4;color:#b18c4e;display:grid;place-items:center;flex:none}
+.faq-library-answer{display:none;padding:0 20px 18px;color:#626d67;font-size:.92rem;line-height:1.6}
+.faq-library-item.open .faq-library-answer{display:block}
+.faq-library-empty{text-align:center;padding:30px;color:#718079}
+@media(max-width:600px){
+  .faq-library-wrap{padding:20px 16px}
+  .faq-library-head{gap:12px}
+  .faq-library-question{padding:16px}
+  .faq-library-answer{padding:0 16px 16px}
+}
 </style>
     <!-- Compartilhamento do site - WhatsApp / Facebook -->
 <meta property="og:type" content="website">
@@ -1072,6 +1106,9 @@ img{max-width:100%;display:block}
                 </div>
             </div>
         </div>
+        <div style="text-align:center;margin-top:20px">
+            <button class="btn btn-light" id="openFaqLibrary" type="button">Ver todas as dúvidas</button>
+        </div>
     </section>
 
 <section class="section" id="regiao">
@@ -1113,6 +1150,29 @@ img{max-width:100%;display:block}
 <a class="whatsapp-float"
    href="https://wa.me/5571999123532?text=Ol%C3%A1!%20Gostaria%20de%20consultar%20a%20disponibilidade%20da%20Casa%2001%20do%20Village%20Paganayoh."
    target="_blank" aria-label="Falar pelo WhatsApp">💬</a>
+
+
+<dialog id="faqLibraryDialog" class="faq-library-dialog">
+  <div class="faq-library-wrap">
+    <div class="faq-library-head">
+      <div>
+        <div class="faq-library-kicker">Central de dúvidas</div>
+        <h3>Perguntas e respostas</h3>
+        <p>Pesquise por uma palavra, como “cachorro”, “energia”, “Wi-Fi” ou “check-in”.</p>
+      </div>
+      <button type="button" class="faq-library-close" id="faqLibraryClose" aria-label="Fechar">×</button>
+    </div>
+
+    <div class="faq-library-search-wrap">
+      <span aria-hidden="true">🔎</span>
+      <input id="faqLibrarySearch" type="search" placeholder="O que você quer saber?" autocomplete="off">
+    </div>
+
+    <div id="faqLibraryCount" class="faq-library-count"></div>
+    <div id="faqLibraryList" class="faq-library-list"></div>
+    <div id="faqLibraryEmpty" class="faq-library-empty hidden">Nenhuma dúvida encontrada. Tente outra palavra.</div>
+  </div>
+</dialog>
 
 <div class="lightbox" id="lightbox">
     <button class="lb-close" id="lbClose" aria-label="Fechar">×</button>
@@ -1632,6 +1692,176 @@ document.getElementById("regionDetailDialog")?.addEventListener("click",e=>{
   if(e.target===e.currentTarget)e.currentTarget.close();
 });
 document.addEventListener("DOMContentLoaded", carregarLocaisRegiao);
+</script>
+
+
+<script>
+const FAQ_LIBRARY = [
+  {
+    q:"Como faço para consultar uma data?",
+    a:"Escolha a data de entrada e a data de saída no calendário e clique em “Consultar este período”. O WhatsApp será aberto com as datas preenchidas.",
+    k:"data datas calendário disponibilidade reserva whatsapp"
+  },
+  {
+    q:"A data fica reservada automaticamente?",
+    a:"Não. O calendário serve para consulta. A reserva só é confirmada após o contato e a confirmação do proprietário.",
+    k:"reserva confirmação pagamento calendário disponibilidade"
+  },
+  {
+    q:"Onde fica o Village Paganayoh?",
+    a:"O Village Paganayoh fica em Guarajuba, Camaçari, Bahia. O mapa do site mostra a localização indicada pelo proprietário.",
+    k:"endereço localização mapa guarajuba camaçari bahia"
+  },
+  {
+    q:"Como saber valores e condições?",
+    a:"Os valores variam conforme o período e a quantidade de diárias. Feriados e datas festivas podem ter condições e estadia mínima específicas. Consulte pelo WhatsApp para receber a informação atualizada.",
+    k:"valor preço diária preço feriado mínimo noites orçamento"
+  },
+  {
+    q:"Quantas pessoas a casa acomoda?",
+    a:"A casa acomoda até 8 hóspedes.",
+    k:"pessoas hóspedes capacidade lotação oito 8"
+  },
+  {
+    q:"Quantos quartos e suítes a casa possui?",
+    a:"A casa possui 3 suítes, distribuídas entre o térreo e o andar superior.",
+    k:"quarto quartos suíte suítes dormitórios 3"
+  },
+  {
+    q:"Os quartos possuem ar-condicionado?",
+    a:"Sim. As três suítes possuem ar-condicionado.",
+    k:"ar condicionado ar-condicionado climatização quarto suíte"
+  },
+  {
+    q:"A casa tem Wi-Fi?",
+    a:"Sim. A casa possui Wi-Fi disponível para os hóspedes.",
+    k:"wifi wi-fi internet conexão"
+  },
+  {
+    q:"A casa possui piscina?",
+    a:"Sim. A casa possui piscina e área externa para lazer.",
+    k:"piscina lazer banho área externa"
+  },
+  {
+    q:"Tem churrasqueira?",
+    a:"Sim. A casa possui churrasqueira privativa.",
+    k:"churrasqueira churrasco área gourmet"
+  },
+  {
+    q:"Posso levar cachorro ou outro animal de estimação?",
+    a:"Animais de estimação de pequeno porte são aceitos sob consulta prévia.",
+    k:"cachorro cão cães pet pets animal animais gato pequeno porte"
+  },
+  {
+    q:"A roupa de cama e banho está incluída?",
+    a:"Para hóspedes provenientes de outras cidades ou estados, disponibilizamos roupa de cama e banho.",
+    k:"lençol lençóis toalha toalhas roupa cama banho enxoval"
+  },
+  {
+    q:"A energia elétrica está incluída na diária?",
+    a:"Não. O consumo de energia é calculado pela diferença do medidor entre a entrada e a saída, conforme as condições informadas no site e na reserva.",
+    k:"energia luz elétrica eletricidade kwh medidor consumo taxa"
+  },
+  {
+    q:"Como funciona o pagamento da energia?",
+    a:"O consumo é conferido no check-out e pode ser pago em dinheiro, PIX ou transferência, conforme as condições informadas na reserva.",
+    k:"energia pagamento pix transferência dinheiro check-out kwh"
+  },
+  {
+    q:"Há TV na casa?",
+    a:"Sim. A casa possui TV LED de 42 polegadas com SKY.",
+    k:"tv televisão sky canais"
+  },
+  {
+    q:"A casa fica perto de Praia do Forte e Itacimirim?",
+    a:"Sim. Guarajuba fica no Litoral Norte da Bahia, com fácil acesso de carro a Itacimirim e Praia do Forte. A seção “Explore a Região” mostra opções próximas.",
+    k:"praia do forte itacimirim passeio distância região carro"
+  },
+  {
+    q:"O condomínio possui segurança?",
+    a:"Sim. O imóvel fica em condomínio fechado com segurança 24 horas.",
+    k:"segurança portaria condomínio fechado 24 horas"
+  },
+  {
+    q:"Quais opções de lazer existem no condomínio?",
+    a:"O condomínio oferece opções como quadras, campo, áreas de convivência e espaços de lazer. Algumas estruturas podem seguir regras próprias do condomínio.",
+    k:"condomínio lazer quadra tênis beach tennis vôlei futebol academia"
+  },
+  {
+    q:"É recomendável ir de carro?",
+    a:"Sim. Para aproveitar Guarajuba e os destinos próximos com mais comodidade, o carro é recomendado.",
+    k:"carro veículo transporte deslocamento praias região"
+  },
+  {
+    q:"Como falo com o proprietário?",
+    a:"Use os botões de WhatsApp disponíveis no site. Se você selecionar um período no calendário, a mensagem já será aberta com as datas escolhidas.",
+    k:"contato proprietário whatsapp mensagem telefone"
+  }
+];
+
+function normalizeFaqText(value){
+  return String(value||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase();
+}
+
+function renderFaqLibrary(){
+  const list=document.getElementById("faqLibraryList");
+  const empty=document.getElementById("faqLibraryEmpty");
+  const count=document.getElementById("faqLibraryCount");
+  const search=document.getElementById("faqLibrarySearch");
+  if(!list||!empty||!count||!search)return;
+
+  const term=normalizeFaqText(search.value.trim());
+  const filtered=FAQ_LIBRARY.filter(item=>{
+    const text=normalizeFaqText(item.q+" "+item.a+" "+item.k);
+    return !term||text.includes(term);
+  });
+
+  count.textContent=filtered.length===1?"1 resultado":filtered.length+" resultados";
+  empty.classList.toggle("hidden",filtered.length>0);
+  list.style.display=filtered.length?"block":"none";
+
+  list.innerHTML=filtered.map((item,i)=>`
+    <div class="faq-library-item">
+      <button class="faq-library-question" type="button">
+        ${item.q}
+        <span>+</span>
+      </button>
+      <div class="faq-library-answer">${item.a}</div>
+    </div>
+  `).join("");
+
+  list.querySelectorAll(".faq-library-question").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      const item=btn.closest(".faq-library-item");
+      const open=item.classList.contains("open");
+      list.querySelectorAll(".faq-library-item").forEach(x=>{
+        x.classList.remove("open");
+        const s=x.querySelector(".faq-library-question span");
+        if(s)s.textContent="+";
+      });
+      if(!open){
+        item.classList.add("open");
+        btn.querySelector("span").textContent="−";
+      }
+    });
+  });
+}
+
+document.getElementById("openFaqLibrary")?.addEventListener("click",()=>{
+  const dialog=document.getElementById("faqLibraryDialog");
+  const search=document.getElementById("faqLibrarySearch");
+  if(!dialog)return;
+  if(search)search.value="";
+  renderFaqLibrary();
+  dialog.showModal();
+  setTimeout(()=>search?.focus(),100);
+});
+
+document.getElementById("faqLibraryClose")?.addEventListener("click",()=>document.getElementById("faqLibraryDialog")?.close());
+document.getElementById("faqLibraryDialog")?.addEventListener("click",e=>{
+  if(e.target===e.currentTarget)e.currentTarget.close();
+});
+document.getElementById("faqLibrarySearch")?.addEventListener("input",renderFaqLibrary);
 </script>
 
 </body>
