@@ -1061,7 +1061,7 @@ img{max-width:100%;display:block}
             </p>
         </div>
 
-        <div class="faq-box">
+        <div class="faq-box" id="faqFeaturedList">
             <div class="faq-item">
                 <button class="faq-question" type="button">
                     Como faço para consultar uma data?
@@ -1696,6 +1696,63 @@ document.addEventListener("DOMContentLoaded", carregarLocaisRegiao);
 
 
 <script>
+
+const FAQ_API='https://village-paganayoh-api.dario-cdao.workers.dev';
+let FAQ_REMOTE=null;
+
+async function loadFaqsFromApi(){
+  try{
+    const r=await fetch(FAQ_API+'/faqs',{cache:'no-store'});
+    const d=await r.json();
+    if(!r.ok||d.ok===false||!Array.isArray(d.faqs))throw new Error('Falha ao carregar dúvidas');
+    FAQ_REMOTE=d.faqs;
+    renderFeaturedFaqsFromApi();
+    renderFaqLibrary();
+  }catch(err){
+    console.warn('Mantendo perguntas locais como contingência.',err);
+  }
+}
+
+function getFaqSource(){
+  return Array.isArray(FAQ_REMOTE)&&FAQ_REMOTE.length
+    ? FAQ_REMOTE.map(x=>({q:x.pergunta,a:x.resposta,k:x.palavras_chave||'',featured:Number(x.destaque)===1}))
+    : FAQ_LIBRARY.map(x=>({...x,featured:false}));
+}
+
+function renderFeaturedFaqsFromApi(){
+  const box=document.getElementById('faqFeaturedList');
+  if(!box||!Array.isArray(FAQ_REMOTE))return;
+  const featured=FAQ_REMOTE
+    .filter(x=>Number(x.destaque)===1)
+    .sort((a,b)=>(Number(a.ordem)||0)-(Number(b.ordem)||0)||Number(a.id)-Number(b.id))
+    .slice(0,4);
+
+  box.innerHTML=featured.map(item=>`
+    <div class="faq-item">
+      <button class="faq-question" type="button">
+        ${item.pergunta}
+        <span>+</span>
+      </button>
+      <div class="faq-answer">${item.resposta}</div>
+    </div>
+  `).join('');
+
+  box.querySelectorAll('.faq-question').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const item=btn.closest('.faq-item');
+      const open=item.classList.contains('open');
+      box.querySelectorAll('.faq-item').forEach(x=>{
+        x.classList.remove('open');
+        const s=x.querySelector('.faq-question span');if(s)s.textContent='+';
+      });
+      if(!open){
+        item.classList.add('open');
+        btn.querySelector('span').textContent='−';
+      }
+    });
+  });
+}
+
 const FAQ_LIBRARY = [
   {
     q:"Como faço para consultar uma data?",
@@ -1811,7 +1868,7 @@ function renderFaqLibrary(){
   if(!list||!empty||!count||!search)return;
 
   const term=normalizeFaqText(search.value.trim());
-  const filtered=FAQ_LIBRARY.filter(item=>{
+  const filtered=getFaqSource().filter(item=>{
     const text=normalizeFaqText(item.q+" "+item.a+" "+item.k);
     return !term||text.includes(term);
   });
@@ -1862,6 +1919,7 @@ document.getElementById("faqLibraryDialog")?.addEventListener("click",e=>{
   if(e.target===e.currentTarget)e.currentTarget.close();
 });
 document.getElementById("faqLibrarySearch")?.addEventListener("input",renderFaqLibrary);
+loadFaqsFromApi();
 </script>
 
 </body>
