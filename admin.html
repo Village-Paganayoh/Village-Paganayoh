@@ -20,7 +20,7 @@
 <style>
 :root{--bg:#f4f6f5;--card:#fff;--ink:#17201d;--muted:#718079;--line:#e4e9e6;--green:#1f9d68;--green2:#167a51;--gold:#c89d4a;--red:#c94b4b;--shadow:0 18px 55px rgba(20,40,31,.10)}*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink)}button,input,select,textarea{font:inherit}.hidden{display:none!important}.login{min-height:100vh;display:grid;place-items:center;padding:24px;background:linear-gradient(rgba(10,25,19,.55),rgba(10,25,19,.65)),url('assets/images/casa/pordosol.png') center/cover}.login-card{width:min(430px,100%);background:rgba(255,255,255,.96);padding:38px;border-radius:24px;box-shadow:var(--shadow);backdrop-filter:blur(8px)}.brand{font-size:.78rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);font-weight:800}.login h1{font-size:2rem;margin:10px 0 8px}.sub{color:var(--muted);line-height:1.5;margin:0 0 24px}.field{display:grid;gap:7px;margin:14px 0}.field label{font-size:.8rem;font-weight:750;color:#53615b}.field input,.field select,.field textarea{width:100%;border:1px solid var(--line);border-radius:12px;padding:13px 14px;background:#fff;outline:none}.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(31,157,104,.10)}.btn{border:0;border-radius:12px;padding:13px 17px;font-weight:800;cursor:pointer}.btn-primary{background:var(--green);color:#fff}.btn-primary:hover{background:var(--green2)}.btn-light{background:#edf2ef;color:var(--ink)}.btn-danger{background:#fff0f0;color:var(--red)}.wide{width:100%}.msg{font-size:.85rem;margin-top:12px;color:var(--red);min-height:20px}.app{min-height:100vh}.topbar{height:74px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 clamp(18px,4vw,56px);position:sticky;top:0;z-index:5}.top-title strong{display:block}.top-title span{font-size:.78rem;color:var(--muted)}.actions{display:flex;gap:9px}.main{max-width:1280px;margin:auto;padding:32px clamp(18px,4vw,56px) 60px}.hero-row{display:flex;justify-content:space-between;gap:20px;align-items:end;margin-bottom:24px}.hero-row h2{font-size:clamp(1.7rem,3vw,2.5rem);margin:0 0 5px}.hero-row p{margin:0;color:var(--muted)}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}.stat,.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:0 8px 28px rgba(20,40,31,.05)}.stat{padding:20px;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:130px}.stat small{color:var(--muted);display:block;margin-bottom:8px}.stat strong{font-size:1.8rem}.panel{padding:20px}.panel-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}.panel-head h3{margin:0}.table-wrap{overflow:auto}table{width:100%;border-collapse:collapse;min-width:850px}th,td{text-align:left;padding:14px 10px;border-bottom:1px solid var(--line);vertical-align:middle}th{font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}td{font-size:.9rem}.badge{display:inline-flex;padding:6px 9px;border-radius:999px;font-size:.73rem;font-weight:800}.confirmada{background:#e8f7ef;color:#18734e}.cancelada{background:#f7eaea;color:#a43c3c}.airbnb-badge{background:#fff0f1;color:#b8323d}.origin-airbnb{font-weight:800;color:#b8323d}.row-actions{display:flex;gap:6px}.mini{padding:8px 10px;border-radius:9px;border:0;cursor:pointer;font-weight:750}.edit{background:#eef3f0}.cancel{background:#fff0f0;color:#b63d3d}.empty{text-align:center;padding:40px;color:var(--muted)}.history-panel{margin-top:18px}.history-toggle{width:100%;border:0;background:transparent;padding:4px 0;display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer;text-align:left;color:var(--ink)}.history-toggle strong{font-size:1rem}.history-toggle span{color:var(--muted);font-size:.82rem}.history-toggle .chev{font-size:1.15rem;transition:transform .2s}.history-toggle[aria-expanded="true"] .chev{transform:rotate(180deg)}.history-content{margin-top:14px}.history-panel table{min-width:720px}.history-panel td{color:#66736d}dialog{border:0;border-radius:20px;padding:0;width:min(620px,calc(100% - 28px));box-shadow:0 30px 90px rgba(0,0,0,.22)}dialog::backdrop{background:rgba(15,25,21,.48)}.modal{padding:26px}.admin-cal{margin:18px 0;padding:16px;border:1px solid var(--line);border-radius:16px;background:#fafcfb}.admin-cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}.admin-cal-head button{width:38px;height:38px;border:1px solid var(--line);background:#fff;border-radius:50%;cursor:pointer}.admin-cal-title{font-weight:800}.admin-week,.admin-days{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}.admin-week div{text-align:center;font-size:.65rem;font-weight:800;color:var(--muted);padding:5px}.admin-day{min-height:48px;border:1px solid var(--line);border-radius:8px;background:#fff;cursor:pointer;font-size:.76rem;position:relative;padding:4px}.admin-day.empty{border:0;background:transparent}.admin-day.past{background:#f2f3f2;color:#aaa;cursor:not-allowed}.admin-day.direct{background:#e7f4ed;color:#176b49;cursor:not-allowed}.admin-day.airbnb{background:#fff0f1;color:#b8323d;cursor:not-allowed}.admin-day.pick{background:var(--green);color:#fff}.admin-day.range{background:#dcefe7;color:#14523d}.admin-day .hname{display:block;font-size:.42rem;line-height:1;margin-top:2px;color:var(--gold);font-weight:800}.admin-cal-hint{text-align:center;font-size:.78rem;font-weight:800;color:var(--green2);margin:8px 0}.admin-legend{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;font-size:.7rem;color:var(--muted);margin-top:10px}.admin-legend b{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:4px}.lg-free{background:#fff;border:1px solid #bbb}.lg-direct{background:#86c9aa}.lg-airbnb{background:#ef9da5}.lg-pick{background:var(--green)}.modal-head{display:flex;justify-content:space-between;align-items:center}.modal-head h3{margin:0}.x{border:0;background:transparent;font-size:1.5rem;cursor:pointer}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}.modal-actions{display:flex;justify-content:flex-end;gap:9px;margin-top:20px}.toast{position:fixed;right:20px;bottom:20px;background:#17201d;color:#fff;padding:14px 18px;border-radius:12px;box-shadow:var(--shadow);z-index:20}.loading{opacity:.55;pointer-events:none}.admin-shell{display:grid;grid-template-columns:230px minmax(0,1fr);gap:22px;max-width:1480px;margin:auto;padding:24px clamp(18px,3vw,40px) 60px}.admin-sidebar{position:sticky;top:94px;align-self:start;background:#fff;border:1px solid var(--line);border-radius:18px;padding:14px;box-shadow:0 8px 28px rgba(20,40,31,.05)}.admin-nav-group{border-bottom:1px solid var(--line);padding:8px 0}.admin-nav-group:last-child{border-bottom:0}.admin-nav-title{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:800;padding:7px 10px}.admin-nav-link{display:flex;align-items:center;gap:9px;width:100%;border:0;background:transparent;color:var(--ink);text-decoration:none;text-align:left;padding:10px 11px;border-radius:10px;cursor:pointer;font-weight:750}.admin-nav-link:hover,.admin-nav-link.active{background:#edf5f1;color:var(--green2)}.admin-content{min-width:0}.admin-content .main{max-width:none;margin:0;padding:8px 0 0}.section-anchor{scroll-margin-top:96px}@media(max-width:900px){.admin-shell{grid-template-columns:1fr;padding-top:14px}.admin-sidebar{position:static;display:flex;gap:8px;overflow:auto;padding:10px}.admin-nav-group{display:flex;align-items:center;gap:4px;border:0;padding:0;flex:0 0 auto}.admin-nav-title{display:none}.admin-nav-link{white-space:nowrap;background:#f5f7f6}.admin-content .main{padding-top:0}}
 @media(max-width:720px){.stats{grid-template-columns:1fr}.hero-row{align-items:stretch;flex-direction:column}.hero-row .btn{width:100%}.topbar{height:auto;padding-top:14px;padding-bottom:14px}.grid2{grid-template-columns:1fr}.actions .site-label{display:none}.login-card{padding:28px 22px}}
-</style>
+.region-photo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:12px 0}.region-photo-slot{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#fafcfb}.region-photo-preview{aspect-ratio:4/3;background:#eef2ef;display:grid;place-items:center;color:var(--muted);font-size:.8rem;overflow:hidden}.region-photo-preview img{width:100%;height:100%;object-fit:cover;display:block}.region-photo-actions{display:flex;gap:6px;padding:8px}.region-photo-actions .btn{padding:9px 10px;font-size:.78rem;flex:1}.region-photo-url{display:none;padding:0 8px 8px}.region-photo-url.show{display:block}.region-photo-url input{width:100%;border:1px solid var(--line);border-radius:10px;padding:10px 11px;background:#fff}.region-photo-label{font-size:.78rem;font-weight:800;padding:9px 10px 0;color:#53615b}@media(max-width:720px){.region-photo-grid{grid-template-columns:1fr}}</style>
 </head>
 <body>
 <section id="login" class="login">
@@ -126,9 +126,35 @@
       <div class="field"><label>Ordem</label><input id="regionItemOrder" type="number" min="0" step="1" value="0"></div>
     </div>
     <div class="field"><label>Link do Google Maps</label><input id="regionItemMapsUrl" type="url" placeholder="https://maps.google.com/..."></div>
-    <div class="field"><label>Foto 1</label><input id="regionItemImageUrl" type="url" placeholder="https://..."></div>
-    <div class="field"><label>Foto 2</label><input id="regionItemImageUrl2" type="url" placeholder="https://..."></div>
-    <div class="field"><label>Foto 3</label><input id="regionItemImageUrl3" type="url" placeholder="https://..."></div>
+    <div class="region-photo-grid">
+      <div class="region-photo-slot">
+        <div class="region-photo-label">Foto 1</div>
+        <div class="region-photo-preview" id="regionPhotoPreview1">Sem foto</div>
+        <div class="region-photo-actions">
+          <button type="button" class="btn btn-light" data-photo-url-toggle="1">Alterar</button>
+          <button type="button" class="btn btn-light" data-photo-open="1">Abrir</button>
+        </div>
+        <div class="region-photo-url" id="regionPhotoUrlBox1"><input id="regionItemImageUrl" type="url" placeholder="Cole a URL da imagem"></div>
+      </div>
+      <div class="region-photo-slot">
+        <div class="region-photo-label">Foto 2</div>
+        <div class="region-photo-preview" id="regionPhotoPreview2">Sem foto</div>
+        <div class="region-photo-actions">
+          <button type="button" class="btn btn-light" data-photo-url-toggle="2">Adicionar</button>
+          <button type="button" class="btn btn-light" data-photo-open="2">Abrir</button>
+        </div>
+        <div class="region-photo-url" id="regionPhotoUrlBox2"><input id="regionItemImageUrl2" type="url" placeholder="Cole a URL da imagem"></div>
+      </div>
+      <div class="region-photo-slot">
+        <div class="region-photo-label">Foto 3</div>
+        <div class="region-photo-preview" id="regionPhotoPreview3">Sem foto</div>
+        <div class="region-photo-actions">
+          <button type="button" class="btn btn-light" data-photo-url-toggle="3">Adicionar</button>
+          <button type="button" class="btn btn-light" data-photo-open="3">Abrir</button>
+        </div>
+        <div class="region-photo-url" id="regionPhotoUrlBox3"><input id="regionItemImageUrl3" type="url" placeholder="Cole a URL da imagem"></div>
+      </div>
+    </div>
     <div class="field"><label style="display:flex;align-items:center;gap:8px"><input id="regionItemActive" type="checkbox" checked style="width:auto"> Exibir este item no site</label></div>
     <div id="regionItemFormMsg" class="msg"></div>
     <div class="modal-actions"><button type="button" class="btn btn-light" id="cancelRegionItemModal">Voltar</button><button type="submit" class="btn btn-primary" id="saveRegionItemBtn">Salvar item</button></div>
@@ -355,6 +381,39 @@ function renderRegionDetailItems(){
   grid.querySelectorAll('[data-delete-region-item]').forEach(b=>b.onclick=()=>deleteRegionItem(Number(b.dataset.deleteRegionItem)));
 }
 
+function refreshRegionPhotoPreviews(){
+  const vals=[
+    $('#regionItemImageUrl')?.value.trim()||'',
+    $('#regionItemImageUrl2')?.value.trim()||'',
+    $('#regionItemImageUrl3')?.value.trim()||''
+  ];
+  vals.forEach((url,i)=>{
+    const n=i+1,box=$('#regionPhotoPreview'+n),open=document.querySelector('[data-photo-open="'+n+'"]'),toggle=document.querySelector('[data-photo-url-toggle="'+n+'"]');
+    if(!box)return;
+    box.innerHTML=url?'<img src="'+esc(url)+'" alt="Foto '+n+'" loading="lazy" referrerpolicy="no-referrer">':'Sem foto';
+    if(open)open.disabled=!url;
+    if(toggle)toggle.textContent=url?'Alterar':'Adicionar';
+  });
+}
+document.querySelectorAll('[data-photo-url-toggle]').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const n=btn.dataset.photoUrlToggle;
+    $('#regionPhotoUrlBox'+n)?.classList.toggle('show');
+    $('#regionItemImageUrl'+(n==='1'?'':n))?.focus();
+  });
+});
+document.querySelectorAll('[data-photo-open]').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const n=btn.dataset.photoOpen;
+    const input=$('#regionItemImageUrl'+(n==='1'?'':n));
+    const url=input?.value.trim();
+    if(url)window.open(url,'_blank','noopener');
+  });
+});
+['#regionItemImageUrl','#regionItemImageUrl2','#regionItemImageUrl3'].forEach(sel=>{
+  $(sel)?.addEventListener('input',refreshRegionPhotoPreviews);
+});
+
 function resetRegionItemForm(){
   editingRegionDetailId=null;
   $('#regionItemForm').reset();
@@ -363,6 +422,8 @@ function resetRegionItemForm(){
   $('#regionItemDialogTitle').textContent='Adicionar item';
   $('#saveRegionItemBtn').textContent='Salvar item';
   $('#regionItemFormMsg').textContent='';
+  [1,2,3].forEach(n=>$('#regionPhotoUrlBox'+n)?.classList.remove('show'));
+  refreshRegionPhotoPreviews();
 }
 
 function openRegionItemEdit(id){
@@ -380,6 +441,8 @@ function openRegionItemEdit(id){
   $('#regionItemImageUrl').value=item.imagem_url||'';
   $('#regionItemImageUrl2').value=item.imagem_url_2||'';
   $('#regionItemImageUrl3').value=item.imagem_url_3||'';
+  [1,2,3].forEach(n=>$('#regionPhotoUrlBox'+n)?.classList.remove('show'));
+  refreshRegionPhotoPreviews();
   $('#regionItemActive').checked=Number(item.ativo)===1;
   $('#regionItemDialogTitle').textContent='Editar item';
   $('#saveRegionItemBtn').textContent='Salvar alterações';
