@@ -1042,7 +1042,7 @@ img{max-width:100%;display:block}
 
 <section class="section" id="informacoes">
   <div class="section-header"><h2 class="section-title">Antes de reservar</h2><p class="section-subtitle">Informações importantes para sua estadia.</p></div>
-  <div class="important-grid">
+  <div class="important-grid" id="importantInfoGrid">
     <div class="important-card"><span>🧹</span><div><b>Check-in e check-out</b><p>A casa é entregue limpa e organizada. Pedimos a gentileza de entregá-la nas mesmas condições no check-out.</p></div></div>
     <div class="important-card"><span>💰</span><div><b>Valores e estadia mínima</b><p>Os valores variam conforme o período e a quantidade de diárias. Feriados e datas festivas podem exigir número mínimo de noites.</p></div></div>
     <div class="important-card energy"><span>⚡</span><div><b>Energia elétrica</b><p>A diária não inclui energia. O consumo é calculado pela diferença do medidor entre entrada e saída, multiplicada por <strong>R$ 1,06/kWh</strong>, conforme fotos do medidor. Pagamento no check-out em dinheiro, PIX ou transferência.</p></div></div>
@@ -1696,6 +1696,34 @@ document.addEventListener("DOMContentLoaded", carregarLocaisRegiao);
 
 
 <script>
+
+
+const IMPORTANT_INFO_API='https://village-paganayoh-api.dario-cdao.workers.dev';
+
+async function loadImportantInfoFromApi(){
+  try{
+    const r=await fetch(IMPORTANT_INFO_API+'/informacoes-importantes',{cache:'no-store'});
+    const d=await r.json();
+    if(!r.ok||d.ok===false||!Array.isArray(d.informacoes))throw new Error('Falha ao carregar informações importantes');
+    renderImportantInfoFromApi(d.informacoes);
+  }catch(err){
+    console.warn('Mantendo informações locais como contingência.',err);
+  }
+}
+
+function renderImportantInfoFromApi(items){
+  const grid=document.getElementById('importantInfoGrid');
+  if(!grid)return;
+  const sorted=[...items].sort((a,b)=>(Number(a.ordem)||0)-(Number(b.ordem)||0)||Number(a.id)-Number(b.id));
+  grid.innerHTML=sorted.map(item=>`
+    <div class="important-card${Number(item.destaque)===1?' energy':''}">
+      <span>${item.icone||'ℹ️'}</span>
+      <div><b>${item.titulo||''}</b><p>${item.descricao||''}</p></div>
+    </div>
+  `).join('');
+}
+
+loadImportantInfoFromApi();
 
 const FAQ_API='https://village-paganayoh-api.dario-cdao.workers.dev';
 let FAQ_REMOTE=null;
