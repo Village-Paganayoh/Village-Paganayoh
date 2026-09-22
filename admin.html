@@ -483,6 +483,14 @@ function resetRegionItemForm(){
 function openRegionItemEdit(id){
   const item=regionDetailItems.find(x=>Number(x.id)===Number(id));
   if(!item)return;
+
+  // Limpa qualquer arquivo escolhido anteriormente para evitar
+  // que uma foto de outro item seja enviada por engano.
+  [1,2,3].forEach(n=>{
+    const f=$('#regionItemImageFile'+n);
+    if(f)f.value='';
+  });
+
   editingRegionDetailId=id;
   $('#regionItemName').value=item.nome||'';
   $('#regionItemType').value=item.tipo||'local';
@@ -505,8 +513,8 @@ function openRegionItemEdit(id){
 
 $('#closeRegionItemsModal').onclick=()=>$('#regionItemsDialog').close();
 $('#addRegionItemBtn').onclick=()=>{resetRegionItemForm();$('#regionItemDialog').showModal()};
-$('#closeRegionItemModal').onclick=()=>$('#regionItemDialog').close();
-$('#cancelRegionItemModal').onclick=()=>$('#regionItemDialog').close();
+$('#closeRegionItemModal').onclick=()=>{[1,2,3].forEach(n=>{const f=$('#regionItemImageFile'+n);if(f)f.value=''});$('#regionItemDialog').close()};
+$('#cancelRegionItemModal').onclick=()=>{[1,2,3].forEach(n=>{const f=$('#regionItemImageFile'+n);if(f)f.value=''});$('#regionItemDialog').close()};
 
 $('#regionItemForm').addEventListener('submit',async e=>{
   e.preventDefault();
