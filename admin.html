@@ -126,38 +126,19 @@
       <div class="field"><label>Ordem</label><input id="regionItemOrder" type="number" min="0" step="1" value="0"></div>
     </div>
     <div class="field"><label>Link do Google Maps</label><input id="regionItemMapsUrl" type="url" placeholder="https://maps.google.com/..."></div>
-    <div class="region-photo-grid" id="regionPhotoGrid">
-      <div class="region-photo-slot" id="regionPhotoSlot1">
-        <div class="region-photo-label">Foto principal</div>
-        <div class="region-photo-preview" id="regionPhotoPreview1">Sem foto</div>
-        <div class="region-photo-actions">
-          <label class="btn btn-light" style="cursor:pointer;text-align:center">Escolher foto<input id="regionItemImageFile1" type="file" accept="image/jpeg,image/png,image/webp" hidden></label>
-        </div>
-        <input id="regionItemImageUrl" type="hidden">
-      </div>
-
-      <div class="region-photo-slot hidden" id="regionPhotoSlot2">
-        <div class="region-photo-label">Foto 2</div>
-        <div class="region-photo-preview" id="regionPhotoPreview2">Sem foto</div>
-        <div class="region-photo-actions">
-          <label class="btn btn-light" style="cursor:pointer;text-align:center">Escolher foto<input id="regionItemImageFile2" type="file" accept="image/jpeg,image/png,image/webp" hidden></label>
-          <button type="button" class="btn btn-danger" data-remove-region-photo="2">Remover</button>
-        </div>
-        <input id="regionItemImageUrl2" type="hidden">
-      </div>
-
-      <div class="region-photo-slot hidden" id="regionPhotoSlot3">
-        <div class="region-photo-label">Foto 3</div>
-        <div class="region-photo-preview" id="regionPhotoPreview3">Sem foto</div>
-        <div class="region-photo-actions">
-          <label class="btn btn-light" style="cursor:pointer;text-align:center">Escolher foto<input id="regionItemImageFile3" type="file" accept="image/jpeg,image/png,image/webp" hidden></label>
-          <button type="button" class="btn btn-danger" data-remove-region-photo="3">Remover</button>
-        </div>
-        <input id="regionItemImageUrl3" type="hidden">
-      </div>
+    <div class="field" style="margin-top:16px">
+      <label>Fotos do local</label>
+      <div id="regionPhotoPreviewGrid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:8px 0 10px"></div>
+      <label class="btn btn-light" style="display:inline-flex;align-items:center;justify-content:center;cursor:pointer">
+        📷 Selecionar fotos
+        <input id="regionItemImages" type="file" accept="image/jpeg,image/png,image/webp" multiple hidden>
+      </label>
+      <div style="font-size:.76rem;color:var(--muted);margin-top:8px">Escolha até 3 fotos. Para trocar, selecione novamente as fotos desejadas.</div>
+      <input id="regionItemImageUrl" type="hidden">
+      <input id="regionItemImageUrl2" type="hidden">
+      <input id="regionItemImageUrl3" type="hidden">
     </div>
-    <button type="button" id="addAnotherRegionPhoto" class="btn btn-light" style="margin:0 0 10px">+ Adicionar outra foto</button>
-    <div style="font-size:.76rem;color:var(--muted);margin:-2px 0 12px">JPG, PNG ou WebP • até 10 MB por foto</div>
+    
     </div>
     <div class="field"><label style="display:flex;align-items:center;gap:8px"><input id="regionItemActive" type="checkbox" checked style="width:auto"> Exibir este item no site</label></div>
     <div id="regionItemFormMsg" class="msg"></div>
@@ -385,57 +366,25 @@ function renderRegionDetailItems(){
   grid.querySelectorAll('[data-delete-region-item]').forEach(b=>b.onclick=()=>deleteRegionItem(Number(b.dataset.deleteRegionItem)));
 }
 
-function refreshRegionPhotoPreviews(){
-  const vals=[
+function currentRegionPhotoUrls(){
+  return [
     $('#regionItemImageUrl')?.value.trim()||'',
     $('#regionItemImageUrl2')?.value.trim()||'',
     $('#regionItemImageUrl3')?.value.trim()||''
-  ];
-  vals.forEach((url,i)=>{
-    const n=i+1,box=$('#regionPhotoPreview'+n);
-    if(!box)return;
-    box.innerHTML=url?'<img src="'+esc(url)+'" alt="Foto '+n+'" loading="lazy" referrerpolicy="no-referrer">':'Sem foto';
-  });
-  updateRegionPhotoSlots();
-}
-function updateRegionPhotoSlots(){
-  const url2=$('#regionItemImageUrl2')?.value.trim()||'';
-  const url3=$('#regionItemImageUrl3')?.value.trim()||'';
-  const file2=$('#regionItemImageFile2')?.files?.[0];
-  const file3=$('#regionItemImageFile3')?.files?.[0];
-  const slot2=$('#regionPhotoSlot2'),slot3=$('#regionPhotoSlot3'),addBtn=$('#addAnotherRegionPhoto');
-  const show2=!!(url2||file2);
-  const show3=!!(url3||file3);
-  slot2?.classList.toggle('hidden',!show2);
-  slot3?.classList.toggle('hidden',!show3);
-  if(addBtn)addBtn.style.display=show3?'none':'inline-flex';
+  ].filter(Boolean);
 }
 
-$('#addAnotherRegionPhoto')?.addEventListener('click',()=>{
-  const slot2=$('#regionPhotoSlot2'),slot3=$('#regionPhotoSlot3');
-  if(slot2?.classList.contains('hidden')){
-    slot2.classList.remove('hidden');
-    $('#regionItemImageFile2')?.click();
-  }else if(slot3?.classList.contains('hidden')){
-    slot3.classList.remove('hidden');
-    $('#regionItemImageFile3')?.click();
-  }
-});
+function renderRegionPhotoPreviews(files=null){
+  const grid=$('#regionPhotoPreviewGrid');
+  if(!grid)return;
+  const items=files
+    ? [...files].slice(0,3).map(file=>({src:URL.createObjectURL(file),name:file.name}))
+    : currentRegionPhotoUrls().map((src,i)=>({src,name:'Foto '+(i+1)}));
 
-document.querySelectorAll('[data-remove-region-photo]').forEach(btn=>{
-  btn.addEventListener('click',()=>{
-    const n=btn.dataset.removeRegionPhoto;
-    const urlInput=$('#regionItemImageUrl'+n);
-    const fileInput=$('#regionItemImageFile'+n);
-    if(urlInput)urlInput.value='';
-    if(fileInput)fileInput.value='';
-    const preview=$('#regionPhotoPreview'+n);
-    if(preview)preview.textContent='Sem foto';
-    $('#regionPhotoSlot'+n)?.classList.add('hidden');
-    updateRegionPhotoSlots();
-  });
-});
-
+  grid.innerHTML=items.length
+    ? items.map((x,i)=>'<div style="border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#eef2ef"><img src="'+esc(x.src)+'" alt="Foto '+(i+1)+'" style="width:100%;aspect-ratio:4/3;object-fit:cover;display:block"><div style="padding:7px 9px;font-size:.72rem;color:var(--muted)">Foto '+(i+1)+'</div></div>').join('')
+    : '<div style="grid-column:1/-1;border:1px dashed var(--line);border-radius:12px;padding:24px;text-align:center;color:var(--muted)">Nenhuma foto selecionada</div>';
+}
 
 async function uploadRegionPhoto(file){
   if(!file)return '';
@@ -453,31 +402,28 @@ async function uploadRegionPhoto(file){
   return d.url||d.imagem_url||'';
 }
 
-[1,2,3].forEach(n=>{
-  const input=$('#regionItemImageFile'+n);
-  input?.addEventListener('change',()=>{
-    const file=input.files?.[0];
-    const box=$('#regionPhotoPreview'+n);
-    if(!file||!box)return;
-    const temp=URL.createObjectURL(file);
-    box.innerHTML='<img src="'+temp+'" alt="Prévia da foto '+n+'">';
-    updateRegionPhotoSlots();
-  });
+$('#regionItemImages')?.addEventListener('change',()=>{
+  const input=$('#regionItemImages');
+  const files=[...(input.files||[])];
+  if(files.length>3){
+    toast('Escolha no máximo 3 fotos.');
+    input.value='';
+    renderRegionPhotoPreviews();
+    return;
+  }
+  renderRegionPhotoPreviews(files);
 });
 
 function resetRegionItemForm(){
   editingRegionDetailId=null;
   $('#regionItemForm').reset();
-  [1,2,3].forEach(n=>{const f=$('#regionItemImageFile'+n);if(f)f.value=''});
-  $('#regionPhotoSlot2')?.classList.add('hidden');
-  $('#regionPhotoSlot3')?.classList.add('hidden');
-  $('#addAnotherRegionPhoto').style.display='inline-flex';
+  const photoInput=$('#regionItemImages');if(photoInput)photoInput.value='';
   $('#regionItemActive').checked=true;
   $('#regionItemOrder').value=regionDetailItems.length+1;
   $('#regionItemDialogTitle').textContent='Adicionar item';
   $('#saveRegionItemBtn').textContent='Salvar item';
   $('#regionItemFormMsg').textContent='';
-  refreshRegionPhotoPreviews();
+  renderRegionPhotoPreviews();
 }
 
 function openRegionItemEdit(id){
@@ -486,10 +432,7 @@ function openRegionItemEdit(id){
 
   // Limpa qualquer arquivo escolhido anteriormente para evitar
   // que uma foto de outro item seja enviada por engano.
-  [1,2,3].forEach(n=>{
-    const f=$('#regionItemImageFile'+n);
-    if(f)f.value='';
-  });
+  const photoInput=$('#regionItemImages');if(photoInput)photoInput.value='';
 
   editingRegionDetailId=id;
   $('#regionItemName').value=item.nome||'';
@@ -503,7 +446,7 @@ function openRegionItemEdit(id){
   $('#regionItemImageUrl').value=item.imagem_url||'';
   $('#regionItemImageUrl2').value=item.imagem_url_2||'';
   $('#regionItemImageUrl3').value=item.imagem_url_3||'';
-  refreshRegionPhotoPreviews();
+  renderRegionPhotoPreviews();
   $('#regionItemActive').checked=Number(item.ativo)===1;
   $('#regionItemDialogTitle').textContent='Editar item';
   $('#saveRegionItemBtn').textContent='Salvar alterações';
@@ -513,8 +456,8 @@ function openRegionItemEdit(id){
 
 $('#closeRegionItemsModal').onclick=()=>$('#regionItemsDialog').close();
 $('#addRegionItemBtn').onclick=()=>{resetRegionItemForm();$('#regionItemDialog').showModal()};
-$('#closeRegionItemModal').onclick=()=>{[1,2,3].forEach(n=>{const f=$('#regionItemImageFile'+n);if(f)f.value=''});$('#regionItemDialog').close()};
-$('#cancelRegionItemModal').onclick=()=>{[1,2,3].forEach(n=>{const f=$('#regionItemImageFile'+n);if(f)f.value=''});$('#regionItemDialog').close()};
+$('#closeRegionItemModal').onclick=()=>{const f=$('#regionItemImages');if(f)f.value='';$('#regionItemDialog').close()};
+$('#cancelRegionItemModal').onclick=()=>{const f=$('#regionItemImages');if(f)f.value='';$('#regionItemDialog').close()};
 
 $('#regionItemForm').addEventListener('submit',async e=>{
   e.preventDefault();
@@ -526,14 +469,15 @@ $('#regionItemForm').addEventListener('submit',async e=>{
   let foto3=$('#regionItemImageUrl3').value.trim();
 
   try{
-    const files=[
-      $('#regionItemImageFile1')?.files?.[0],
-      $('#regionItemImageFile2')?.files?.[0],
-      $('#regionItemImageFile3')?.files?.[0]
-    ];
-    if(files[0])foto1=await uploadRegionPhoto(files[0]);
-    if(files[1])foto2=await uploadRegionPhoto(files[1]);
-    if(files[2])foto3=await uploadRegionPhoto(files[2]);
+    const files=[...($('#regionItemImages')?.files||[])];
+    if(files.length){
+      if(files.length>3)throw new Error('Escolha no máximo 3 fotos.');
+      const urls=[];
+      for(const file of files)urls.push(await uploadRegionPhoto(file));
+      foto1=urls[0]||'';
+      foto2=urls[1]||'';
+      foto3=urls[2]||'';
+    }
   }catch(err){msg.textContent=err.message;return}
 
   const payload={
