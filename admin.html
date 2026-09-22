@@ -218,7 +218,29 @@
     <div class="modal-head"><h3 id="infoDialogTitle">Adicionar informação</h3><button type="button" class="x" id="closeInfoModal">×</button></div>
     <div class="grid2">
       <div class="field"><label>Título</label><input id="infoTitle" type="text" maxlength="160" required placeholder="Ex.: Energia elétrica"></div>
-      <div class="field"><label>Ícone</label><input id="infoIcon" type="text" maxlength="12" placeholder="Ex.: ⚡"></div>
+      <div class="field">
+  <label>Ícone</label>
+  <input id="infoIcon" type="text" maxlength="12" placeholder="Escolha abaixo ou digite um emoji">
+  <div id="infoIconPicker" style="display:flex;flex-wrap:wrap;gap:7px;margin-top:9px">
+    <button type="button" class="mini edit" data-info-icon="🧹" title="Limpeza">🧹</button>
+    <button type="button" class="mini edit" data-info-icon="💰" title="Valores">💰</button>
+    <button type="button" class="mini edit" data-info-icon="⚡" title="Energia">⚡</button>
+    <button type="button" class="mini edit" data-info-icon="🐶" title="Animais">🐶</button>
+    <button type="button" class="mini edit" data-info-icon="🛏️" title="Cama e banho">🛏️</button>
+    <button type="button" class="mini edit" data-info-icon="🚗" title="Veículo / estacionamento">🚗</button>
+    <button type="button" class="mini edit" data-info-icon="📶" title="Wi-Fi">📶</button>
+    <button type="button" class="mini edit" data-info-icon="🏊" title="Piscina">🏊</button>
+    <button type="button" class="mini edit" data-info-icon="🔥" title="Churrasqueira">🔥</button>
+    <button type="button" class="mini edit" data-info-icon="🔐" title="Segurança">🔐</button>
+    <button type="button" class="mini edit" data-info-icon="🕒" title="Horários">🕒</button>
+    <button type="button" class="mini edit" data-info-icon="🚭" title="Proibido fumar">🚭</button>
+    <button type="button" class="mini edit" data-info-icon="👶" title="Crianças">👶</button>
+    <button type="button" class="mini edit" data-info-icon="🌴" title="Lazer">🌴</button>
+    <button type="button" class="mini edit" data-info-icon="📍" title="Localização">📍</button>
+    <button type="button" class="mini edit" data-info-icon="📞" title="Contato">📞</button>
+  </div>
+  <div style="font-size:.74rem;color:var(--muted);margin-top:7px">Clique em um ícone. Se preferir, você também pode colar outro emoji.</div>
+</div>
     </div>
     <div class="field"><label>Descrição</label><textarea id="infoDescription" rows="5" maxlength="1200" required placeholder="Digite a informação que será exibida ao hóspede."></textarea></div>
     <div class="grid2">
@@ -895,6 +917,28 @@ async function deleteInfo(id){
   }catch(err){toast(err.message)}
 }
 
+const INFO_ICON_ALIASES={
+  'veiculo':'🚗','veículo':'🚗','carro':'🚗','estacionamento':'🚗','garagem':'🚗',
+  'energia':'⚡','eletricidade':'⚡','luz':'⚡',
+  'animal':'🐶','animais':'🐶','cachorro':'🐶','pet':'🐶',
+  'cama':'🛏️','banho':'🛏️','roupa de cama':'🛏️',
+  'limpeza':'🧹','check-out':'🧹','checkout':'🧹',
+  'valor':'💰','valores':'💰','preço':'💰','preco':'💰',
+  'wifi':'📶','wi-fi':'📶','internet':'📶',
+  'piscina':'🏊','churrasqueira':'🔥','segurança':'🔐','seguranca':'🔐',
+  'horário':'🕒','horario':'🕒','horários':'🕒','horarios':'🕒',
+  'localização':'📍','localizacao':'📍','contato':'📞','telefone':'📞'
+};
+function normalizeInfoIcon(value){
+  const raw=String(value||'').trim();
+  return INFO_ICON_ALIASES[raw.toLowerCase()]||raw;
+}
+document.querySelectorAll('[data-info-icon]').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    $('#infoIcon').value=btn.dataset.infoIcon||'';
+  });
+});
+
 $('#addInfoBtn')?.addEventListener('click',()=>{resetInfoForm();$('#infoDialog').showModal()});
 $('#refreshInfos')?.addEventListener('click',loadImportantInfo);
 $('#closeInfoModal')?.addEventListener('click',()=>$('#infoDialog').close());
@@ -907,7 +951,7 @@ $('#infoForm')?.addEventListener('submit',async e=>{
   const payload={
     titulo:$('#infoTitle').value.trim(),
     descricao:$('#infoDescription').value.trim(),
-    icone:$('#infoIcon').value.trim(),
+    icone:normalizeInfoIcon($('#infoIcon').value),
     destaque:$('#infoFeatured').checked?1:0,
     ativo:$('#infoActive').checked?1:0,
     ordem:Number($('#infoOrder').value||0)
