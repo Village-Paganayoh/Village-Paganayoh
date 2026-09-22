@@ -804,6 +804,9 @@ img{max-width:100%;display:block}
   .faq-library-question{padding:16px}
   .faq-library-answer{padding:0 16px 16px}
 }
+
+.gallery-item video{width:100%;height:100%;object-fit:cover;display:block;background:#111}
+.gallery-video-play{position:absolute;inset:0;display:grid;place-items:center;font-size:2.4rem;color:#fff;background:rgba(0,0,0,.15);pointer-events:none;text-shadow:0 2px 10px rgba(0,0,0,.45)}
 </style>
     <!-- Compartilhamento do site - WhatsApp / Facebook -->
 <meta property="og:type" content="website">
@@ -1178,6 +1181,7 @@ img{max-width:100%;display:block}
     <button class="lb-close" id="lbClose" aria-label="Fechar">×</button>
     <button class="lb-prev" id="lbPrev" aria-label="Anterior">‹</button>
     <img id="lbImage" src="" alt="">
+    <video id="lbVideo" controls playsinline preload="metadata" style="display:none;max-width:92vw;max-height:82vh;border-radius:14px;background:#000"></video>
     <button class="lb-next" id="lbNext" aria-label="Próxima">›</button>
 </div>
 
@@ -1241,7 +1245,7 @@ const staticPhotos = [
    GALERIA
 ========================================================= */
 const gallery = document.getElementById("gallery");
-let photos = [...staticPhotos];
+let photos = [...staticPhotos].map(p=>({...p,type:"image"}));
 let visiblePhotos = [];
 let activeGalleryFilter = "todos";
 
@@ -1252,14 +1256,15 @@ async function loadDynamicPhotos(){
         const data = await response.json();
         if(!data.ok || !Array.isArray(data.midias)) return;
         const dynamicPhotos = data.midias
-            .filter(m => m.ativo !== false && (m.tipo === "foto" || m.tipo === "original") && m.url)
+            .filter(m => m.ativo !== false && ["foto","imagem","original","video"].includes(String(m.tipo||"").toLowerCase()) && m.url)
             .sort((a,b)=>(Number(a.ordem)||0)-(Number(b.ordem)||0)||Number(a.id)-Number(b.id))
             .map(m => ({
                 src:m.url,
                 cat:String(m.categoria || "casa").toLowerCase(),
-                label:m.titulo || m.legenda || "Foto"
+                label:m.titulo || m.legenda || (String(m.tipo).toLowerCase()==="video" ? "Vídeo" : "Foto"),
+                type:String(m.tipo||"foto").toLowerCase()==="video" ? "video" : "image"
             }));
-        photos = dynamicPhotos.length ? dynamicPhotos : [...staticPhotos];
+        photos = dynamicPhotos.length ? dynamicPhotos : [...staticPhotos].map(p=>({...p,type:"image"}));
         renderGallery(activeGalleryFilter);
     }catch(error){
         console.warn("Galeria dinâmica indisponível; mantendo fotos locais.", error);
@@ -1274,10 +1279,12 @@ function renderGallery(filter="todos"){
     visiblePhotos.forEach((photo,index)=>{
         const item=document.createElement("div");
         item.className="gallery-item";
-        item.innerHTML=`
-            <img src="${photo.src}" alt="${photo.label}" loading="lazy">
-            <span class="gallery-label">${photo.label}</span>
-        `;
+        item.innerHTML=photo.type==="video"
+          ? `<video src="${photo.src}" preload="metadata" muted playsinline></video>
+             <span class="gallery-video-play">▶</span>
+             <span class="gallery-label">${photo.label}</span>`
+          : `<img src="${photo.src}" alt="${photo.label}" loading="lazy">
+             <span class="gallery-label">${photo.label}</span>`;
         item.addEventListener("click",()=>openLightbox(index));
         gallery.appendChild(item);
     });
@@ -1298,19 +1305,39 @@ document.querySelectorAll(".tab").forEach(tab=>{
 ========================================================= */
 const lightbox=document.getElementById("lightbox");
 const lbImage=document.getElementById("lbImage");
+const lbVideo=document.getElementById("lbVideo");
 let currentPhoto=0;
 
+function showCurrentMedia(){
+    const media=visiblePhotos[currentPhoto];
+    if(media.type==="video"){
+        lbImage.style.display="none";
+        lbImage.removeAttribute("src");
+        lbVideo.style.display="block";
+        lbVideo.src=media.src;
+        lbVideo.load();
+    }else{
+        lbVideo.pause();
+        lbVideo.removeAttribute("src");
+        lbVideo.style.display="none";
+        lbImage.style.display="block";
+        lbImage.src=media.src;
+        lbImage.alt=media.label;
+    }
+}
 function openLightbox(index){
     currentPhoto=index;
-    lbImage.src=visiblePhotos[currentPhoto].src;
-    lbImage.alt=visiblePhotos[currentPhoto].label;
+    showCurrentMedia();
     lightbox.classList.add("show");
 }
-function closeLightbox(){lightbox.classList.remove("show")}
+function closeLightbox(){
+    lbVideo.pause();
+    lbVideo.removeAttribute("src");
+    lightbox.classList.remove("show");
+}
 function changePhoto(direction){
     currentPhoto=(currentPhoto+direction+visiblePhotos.length)%visiblePhotos.length;
-    lbImage.src=visiblePhotos[currentPhoto].src;
-    lbImage.alt=visiblePhotos[currentPhoto].label;
+    showCurrentMedia();
 }
 document.getElementById("lbClose").onclick=closeLightbox;
 document.getElementById("lbPrev").onclick=()=>changePhoto(-1);
