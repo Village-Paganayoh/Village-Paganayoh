@@ -50,6 +50,20 @@
       <div id="mediaOrderHint" style="color:var(--muted);font-size:.78rem;margin:-4px 0 12px">Organize a ordem das fotos no computador. No celular, use apenas Editar e Excluir.</div><div id="mediaGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px"></div>
       <div id="mediaEmpty" class="empty hidden">Nenhuma mídia cadastrada.</div>
     </section>
+    <section class="panel" id="regionAdminPanel" style="margin-top:18px">
+      <div class="panel-head">
+        <div>
+          <h3>Explore a Região</h3>
+          <div style="color:var(--muted);font-size:.82rem;margin-top:4px">Cadastre e atualize os locais exibidos no site.</div>
+        </div>
+        <div class="actions">
+          <button id="addRegionBtn" class="btn btn-primary" type="button">+ Adicionar local</button>
+          <button id="refreshRegions" class="btn btn-light" type="button">Atualizar</button>
+        </div>
+      </div>
+      <div id="regionAdminGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px"></div>
+      <div id="regionAdminEmpty" class="empty hidden">Nenhum local cadastrado.</div>
+    </section>
     <section class="panel history-panel" id="historyPanel">
       <button class="history-toggle" id="historyToggle" type="button" aria-expanded="false">
         <span><strong>Histórico de reservas canceladas</strong><br><span id="historySummary">Nenhuma reserva cancelada</span></span>
@@ -63,6 +77,25 @@
 </section>
 
 <dialog id="mediaDialog"><form id="mediaForm" class="modal"><div class="modal-head"><h3>Adicionar foto</h3><button type="button" class="x" id="closeMediaModal">×</button></div><div class="field"><label>Imagem</label><input id="mediaFile" type="file" accept="image/jpeg,image/png,image/webp" required><div style="font-size:.75rem;color:var(--muted)">JPG, PNG ou WebP • até 10 MB</div></div><div class="field"><label>Categoria</label><select id="mediaCategory"><option value="casa">Casa</option><option value="quartos">Quartos</option><option value="lazer">Lazer</option><option value="condominio">Condomínio</option><option value="guarajuba">Guarajuba</option></select></div><div class="field"><label>Título</label><input id="mediaTitle" type="text" maxlength="120" placeholder="Ex.: Piscina da casa"></div><div class="field"><label>Legenda</label><textarea id="mediaCaption" rows="3" maxlength="300" placeholder="Descrição opcional da foto"></textarea></div><div id="mediaFormMsg" class="msg"></div><div class="modal-actions"><button type="button" class="btn btn-light" id="cancelMediaModal">Voltar</button><button type="submit" class="btn btn-primary" id="saveMediaBtn">Enviar foto</button></div></form></dialog>
+<dialog id="regionDialog">
+  <form id="regionForm" class="modal">
+    <div class="modal-head"><h3 id="regionDialogTitle">Adicionar local</h3><button type="button" class="x" id="closeRegionModal">×</button></div>
+    <div class="grid2">
+      <div class="field"><label>Nome</label><input id="regionName" type="text" maxlength="120" required placeholder="Ex.: Guarajuba"></div>
+      <div class="field"><label>Categoria</label><input id="regionCategory" type="text" maxlength="80" required placeholder="Ex.: Praia"></div>
+    </div>
+    <div class="field"><label>Descrição</label><textarea id="regionDescription" rows="3" maxlength="320" placeholder="Descrição curta do local"></textarea></div>
+    <div class="grid2">
+      <div class="field"><label>Distância</label><input id="regionDistance" type="text" maxlength="80" placeholder="Ex.: 8 km • 12 min"></div>
+      <div class="field"><label>Ordem</label><input id="regionOrder" type="number" min="0" step="1" value="0"></div>
+    </div>
+    <div class="field"><label>Link do Google Maps</label><input id="regionMapsUrl" type="url" placeholder="https://maps.google.com/..."></div>
+    <div class="field"><label>URL da foto</label><input id="regionImageUrl" type="url" placeholder="https://..."></div>
+    <div class="field"><label style="display:flex;align-items:center;gap:8px"><input id="regionActive" type="checkbox" checked style="width:auto"> Exibir este local no site</label></div>
+    <div id="regionFormMsg" class="msg"></div>
+    <div class="modal-actions"><button type="button" class="btn btn-light" id="cancelRegionModal">Voltar</button><button type="submit" class="btn btn-primary" id="saveRegionBtn">Salvar local</button></div>
+  </form>
+</dialog>
 <dialog id="reservationDialog"><form id="reservationForm" class="modal"><div class="modal-head"><h3 id="modalTitle">Nova reserva</h3><button type="button" class="x" id="closeModal">×</button></div><input id="reservationId" type="hidden"><div class="admin-cal"><div class="admin-cal-hint" id="adminCalHint">Informe ou clique na data inicial</div><div class="admin-cal-head"><button type="button" id="adminPrev">‹</button><div class="admin-cal-title" id="adminCalTitle"></div><button type="button" id="adminNext">›</button></div><div class="admin-week"><div>DOM</div><div>SEG</div><div>TER</div><div>QUA</div><div>QUI</div><div>SEX</div><div>SÁB</div></div><div class="admin-days" id="adminDays"></div><div class="admin-legend"><span><b class="lg-free"></b>Livre</span><span><b class="lg-direct"></b>Direta</span><span><b class="lg-airbnb"></b>Airbnb</span><span><b class="lg-pick"></b>Selecionado</span></div></div><div class="grid2"><div class="field"><label>Check-in</label><input id="checkin" type="date" required></div><div class="field"><label>Check-out</label><input id="checkout" type="date" required></div></div><div class="field"><label>Hóspede</label><input id="hospede" type="text" placeholder="Nome do hóspede"></div><div class="grid2"><div class="field"><label>Telefone</label><input id="telefone" type="tel" placeholder="(71) 99999-9999"></div><div class="field"><label>Origem</label><select id="origem"><option value="direta">Direta</option><option value="airbnb">Airbnb</option><option value="outro">Outro</option></select></div></div><div class="field"><label>Status</label><select id="status"><option value="confirmada">Confirmada</option><option value="cancelada">Cancelada</option></select></div><div class="field"><label>Observações</label><textarea id="observacoes" rows="4" placeholder="Informações importantes sobre a reserva"></textarea></div><div id="formMsg" class="msg"></div><div class="modal-actions"><button type="button" class="btn btn-light" id="cancelModal">Voltar</button><button type="submit" class="btn btn-primary">Salvar reserva</button></div></form></dialog>
 <div id="toast" class="toast hidden"></div>
 <script>
@@ -72,6 +105,8 @@ let reservations=[];
 let airbnbPeriods=[];
 let mediaItems=[];
 let editingMediaId=null;
+let regionItems=[];
+let editingRegionId=null;
 let adminCalMonth=new Date();adminCalMonth.setDate(1);
 const $=s=>document.querySelector(s);
 function headers(){return {'Content-Type':'application/json',...(adminToken?{'Authorization':'Bearer '+adminToken}:{})}}
@@ -126,12 +161,12 @@ async function loginWithPasskey(){
     const body={credentialId:abToB64url(cred.rawId),clientDataJSON:abToB64url(resp.clientDataJSON),authenticatorData:abToB64url(resp.authenticatorData),signature:abToB64url(resp.signature)};
     const vr=await fetch(API+'/admin/passkey/login/verify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
     const vd=await vr.json();if(!vr.ok)throw new Error(vd.erro||'Não foi possível validar a biometria.');
-    adminToken=vd.token;$('#login').classList.add('hidden');$('#app').classList.remove('hidden');$('#password').value='';await Promise.all([loadReservations(),loadMedia()]);
+    adminToken=vd.token;$('#login').classList.add('hidden');$('#app').classList.remove('hidden');$('#password').value='';await Promise.all([loadReservations(),loadMedia(),loadRegions()]);
   }catch(err){if(err?.name==='NotAllowedError')msg.textContent='Autenticação biométrica cancelada.';else msg.textContent=err.message||'Não foi possível entrar com biometria.'}
   finally{btn.disabled=false}
 }
 
-$('#loginForm').addEventListener('submit',async e=>{e.preventDefault();const msg=$('#loginMsg');msg.textContent='';const password=$('#password').value;;try{const r=await fetch(API+'/admin/login',{method:'POST',headers:{'Content-Type':'application/json','X-Admin-Password':password}});const d=await r.json();if(!r.ok)throw new Error(d.erro||'Senha incorreta.');adminToken=d.token;$('#login').classList.add('hidden');$('#app').classList.remove('hidden');$('#password').value='';await Promise.all([loadReservations(),loadMedia()])}catch(err){adminPassword='';msg.textContent=err.message}});
+$('#loginForm').addEventListener('submit',async e=>{e.preventDefault();const msg=$('#loginMsg');msg.textContent='';const password=$('#password').value;;try{const r=await fetch(API+'/admin/login',{method:'POST',headers:{'Content-Type':'application/json','X-Admin-Password':password}});const d=await r.json();if(!r.ok)throw new Error(d.erro||'Senha incorreta.');adminToken=d.token;$('#login').classList.add('hidden');$('#app').classList.remove('hidden');$('#password').value='';await Promise.all([loadReservations(),loadMedia(),loadRegions()])}catch(err){adminPassword='';msg.textContent=err.message}});
 $('#logout').onclick=logout;
 $('#registerPasskeyBtn').onclick=registerPasskey;
 $('#passkeyLoginBtn').onclick=loginWithPasskey;
@@ -152,6 +187,141 @@ function openMediaEdit(id){const m=mediaItems.find(x=>Number(x.id)===Number(id))
 $('#closeMediaModal').onclick=()=>$('#mediaDialog').close();
 $('#cancelMediaModal').onclick=()=>$('#mediaDialog').close();
 $('#mediaForm').addEventListener('submit',async e=>{e.preventDefault();const file=$('#mediaFile').files[0],msg=$('#mediaFormMsg'),btn=$('#saveMediaBtn');msg.textContent='';if(editingMediaId){btn.disabled=true;btn.textContent='Salvando...';try{await api('/midias/'+editingMediaId,{method:'PUT',body:JSON.stringify({categoria:$('#mediaCategory').value,titulo:$('#mediaTitle').value.trim(),legenda:$('#mediaCaption').value.trim()})});$('#mediaDialog').close();toast('Foto atualizada com sucesso.');editingMediaId=null;await loadMedia()}catch(err){msg.textContent=err.message}finally{btn.disabled=false;btn.textContent='Salvar alterações'}return}if(!file){msg.textContent='Escolha uma imagem.';return}if(file.size>10*1024*1024){msg.textContent='A imagem deve ter no máximo 10 MB.';return}const form=new FormData();form.append('arquivo',file);form.append('categoria',$('#mediaCategory').value);form.append('titulo',$('#mediaTitle').value.trim());form.append('legenda',$('#mediaCaption').value.trim());btn.disabled=true;btn.textContent='Enviando...';try{const r=await fetch(API+'/midias/upload',{method:'POST',headers:{'Authorization':'Bearer '+adminToken},body:form});let d={};try{d=await r.json()}catch{}if(r.status===401){logout();throw new Error('Sessão não autorizada. Entre novamente.')}if(!r.ok||d.ok===false)throw new Error(d.erro||'Não foi possível enviar a foto.');$('#mediaDialog').close();toast('Foto adicionada com sucesso.');await loadMedia()}catch(err){msg.textContent=err.message}finally{btn.disabled=false;btn.textContent='Enviar foto'}});
+
+async function loadRegions(){
+  const panel=$('#regionAdminPanel');
+  panel.classList.add('loading');
+  try{
+    const d=await api('/admin/locais-regiao');
+    regionItems=[...(d.locais||[])].sort((a,b)=>(Number(a.ordem)||0)-(Number(b.ordem)||0)||Number(a.id)-Number(b.id));
+    renderRegions();
+  }catch(err){toast(err.message)}
+  finally{panel.classList.remove('loading')}
+}
+
+function renderRegions(){
+  const grid=$('#regionAdminGrid');
+  grid.innerHTML='';
+  $('#regionAdminEmpty').classList.toggle('hidden',regionItems.length>0);
+  for(const r of regionItems){
+    const card=document.createElement('article');
+    card.style.cssText='border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#fff';
+    const img=r.imagem_url
+      ? `<img src="${esc(r.imagem_url)}" alt="${esc(r.nome||'Local')}" style="width:100%;aspect-ratio:4/3;object-fit:cover;display:block" loading="lazy" referrerpolicy="no-referrer">`
+      : '<div style="aspect-ratio:4/3;display:grid;place-items:center;background:#eef2ef;color:var(--muted)">Sem foto</div>';
+    card.innerHTML=img+`
+      <div style="padding:12px">
+        <div style="display:flex;justify-content:space-between;gap:8px;align-items:center">
+          <span class="badge ${Number(r.ativo)===1?'confirmada':'cancelada'}">${Number(r.ativo)===1?'Ativo':'Oculto'}</span>
+          <span style="font-size:.75rem;color:var(--muted)">Ordem ${Number(r.ordem)||0}</span>
+        </div>
+        <strong style="display:block;margin-top:9px">${esc(r.nome||'Sem nome')}</strong>
+        <div style="font-size:.8rem;color:var(--muted);margin-top:3px">${esc(r.categoria||'')}</div>
+        ${r.distancia?'<div style="font-size:.78rem;margin-top:6px">📍 '+esc(r.distancia)+'</div>':''}
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:12px">
+          <button type="button" class="mini edit" data-edit-region="${r.id}">Editar</button>
+          <button type="button" class="mini cancel" data-delete-region="${r.id}">Excluir</button>
+        </div>
+        <div style="display:flex;gap:6px;margin-top:7px">
+          <button type="button" class="mini edit" style="flex:1" data-region-up="${r.id}">←</button>
+          <button type="button" class="mini edit" style="flex:1" data-region-down="${r.id}">→</button>
+        </div>
+      </div>`;
+    grid.appendChild(card);
+  }
+  grid.querySelectorAll('[data-edit-region]').forEach(b=>b.onclick=()=>openRegionEdit(Number(b.dataset.editRegion)));
+  grid.querySelectorAll('[data-delete-region]').forEach(b=>b.onclick=()=>deleteRegion(Number(b.dataset.deleteRegion)));
+  grid.querySelectorAll('[data-region-up]').forEach(b=>b.onclick=()=>moveRegion(Number(b.dataset.regionUp),-1));
+  grid.querySelectorAll('[data-region-down]').forEach(b=>b.onclick=()=>moveRegion(Number(b.dataset.regionDown),1));
+}
+
+function resetRegionForm(){
+  editingRegionId=null;
+  $('#regionForm').reset();
+  $('#regionActive').checked=true;
+  $('#regionOrder').value=regionItems.length+1;
+  $('#regionDialogTitle').textContent='Adicionar local';
+  $('#saveRegionBtn').textContent='Salvar local';
+  $('#regionFormMsg').textContent='';
+}
+
+function openRegionEdit(id){
+  const r=regionItems.find(x=>Number(x.id)===Number(id));
+  if(!r)return;
+  editingRegionId=id;
+  $('#regionName').value=r.nome||'';
+  $('#regionCategory').value=r.categoria||'';
+  $('#regionDescription').value=r.descricao||'';
+  $('#regionDistance').value=r.distancia||'';
+  $('#regionOrder').value=Number(r.ordem)||0;
+  $('#regionMapsUrl').value=r.maps_url||'';
+  $('#regionImageUrl').value=r.imagem_url||'';
+  $('#regionActive').checked=Number(r.ativo)===1;
+  $('#regionDialogTitle').textContent='Editar local';
+  $('#saveRegionBtn').textContent='Salvar alterações';
+  $('#regionFormMsg').textContent='';
+  $('#regionDialog').showModal();
+}
+
+$('#addRegionBtn').onclick=()=>{resetRegionForm();$('#regionDialog').showModal()};
+$('#refreshRegions').onclick=loadRegions;
+$('#closeRegionModal').onclick=()=>$('#regionDialog').close();
+$('#cancelRegionModal').onclick=()=>$('#regionDialog').close();
+
+$('#regionForm').addEventListener('submit',async e=>{
+  e.preventDefault();
+  const msg=$('#regionFormMsg'),btn=$('#saveRegionBtn');
+  msg.textContent='';
+  const payload={
+    nome:$('#regionName').value.trim(),
+    categoria:$('#regionCategory').value.trim(),
+    descricao:$('#regionDescription').value.trim(),
+    distancia:$('#regionDistance').value.trim(),
+    maps_url:$('#regionMapsUrl').value.trim(),
+    imagem_url:$('#regionImageUrl').value.trim(),
+    ativo:$('#regionActive').checked?1:0,
+    ordem:Number($('#regionOrder').value||0)
+  };
+  btn.disabled=true;
+  try{
+    await api(editingRegionId?'/admin/locais-regiao/'+editingRegionId:'/admin/locais-regiao',{
+      method:editingRegionId?'PUT':'POST',
+      body:JSON.stringify(payload)
+    });
+    $('#regionDialog').close();
+    toast(editingRegionId?'Local atualizado.':'Local cadastrado.');
+    editingRegionId=null;
+    await loadRegions();
+  }catch(err){msg.textContent=err.message}
+  finally{btn.disabled=false;btn.textContent=editingRegionId?'Salvar alterações':'Salvar local'}
+});
+
+async function deleteRegion(id){
+  const r=regionItems.find(x=>Number(x.id)===Number(id));
+  if(!confirm('Excluir '+(r?.nome||'este local')+'?\n\nEle deixará de aparecer no site.'))return;
+  try{
+    await api('/admin/locais-regiao/'+id,{method:'DELETE'});
+    toast('Local excluído.');
+    await loadRegions();
+  }catch(err){toast(err.message)}
+}
+
+async function moveRegion(id,direction){
+  const index=regionItems.findIndex(x=>Number(x.id)===Number(id));
+  const target=index+direction;
+  if(index<0||target<0||target>=regionItems.length)return;
+  [regionItems[index],regionItems[target]]=[regionItems[target],regionItems[index]];
+  regionItems.forEach((x,i)=>x.ordem=i+1);
+  renderRegions();
+  try{
+    await api('/admin/locais-regiao/reordenar',{method:'PUT',body:JSON.stringify({itens:regionItems.map(x=>({id:Number(x.id),ordem:Number(x.ordem)}))})});
+    toast('Ordem atualizada.');
+  }catch(err){
+    toast(err.message);
+    await loadRegions();
+  }
+}
+
 $('#historyToggle').onclick=()=>{const open=$('#historyToggle').getAttribute('aria-expanded')==='true';$('#historyToggle').setAttribute('aria-expanded',String(!open));$('#historyContent').classList.toggle('hidden',open)};
 async function loadReservations(){const panel=$('.panel');panel.classList.add('loading');try{const [direct,airbnb]=await Promise.all([api('/reservas'),fetch('disponibilidade.json?ts='+Date.now(),{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error('Calendário Airbnb indisponível.');return r.json()})]);reservations=direct.reservas||[];airbnbPeriods=Array.isArray(airbnb.periods)?airbnb.periods:[];render()}catch(err){toast(err.message)}finally{panel.classList.remove('loading')}}
 function render(){const body=$('#rows');body.innerHTML='';const activeDirect=[...reservations].filter(r=>r.status!=='cancelada').sort((a,b)=>a.checkin.localeCompare(b.checkin));const cancelled=[...reservations].filter(r=>r.status==='cancelada').sort((a,b)=>b.checkin.localeCompare(a.checkin));const airbnb=airbnbPeriods.map((p,i)=>({id:'airbnb-'+i,checkin:p.start,checkout:p.end,hospede:'Airbnb',telefone:'—',origem:'Airbnb',status:'Airbnb',_airbnb:true}));const sorted=[...activeDirect,...airbnb].sort((a,b)=>a.checkin.localeCompare(b.checkin));$('#empty').classList.toggle('hidden',sorted.length>0);for(const r of sorted){const tr=document.createElement('tr');const origin=r._airbnb?'<span class="badge airbnb-badge">Airbnb</span>':esc(r.origem||'direta');const actions=r._airbnb?'<span style="color:var(--muted);font-size:.8rem">Gerenciar no Airbnb</span>':`<div class="row-actions"><button class="mini edit" data-edit="${r.id}">Editar</button><button class="mini cancel" data-cancel="${r.id}">Cancelar</button></div>`;tr.innerHTML=`<td><strong>${brDate(r.checkin)}</strong><br><span style="color:var(--muted)">até ${brDate(r.checkout)}</span></td><td>${r._airbnb?'<span class="origin-airbnb">Airbnb</span>':esc(r.hospede||'—')}</td><td>${esc(r.telefone||'—')}</td><td>${origin}</td><td><span class="badge ${r._airbnb?'airbnb-badge':'confirmada'}">${esc(r.status||'confirmada')}</span></td><td>${actions}</td>`;body.appendChild(tr)}body.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>openEdit(Number(b.dataset.edit)));body.querySelectorAll('[data-cancel]').forEach(b=>b.onclick=()=>cancelReservation(Number(b.dataset.cancel)));const historyBody=$('#historyRows');historyBody.innerHTML='';$('#historySummary').textContent=cancelled.length===0?'Nenhuma reserva cancelada':cancelled.length===1?'1 reserva cancelada':cancelled.length+' reservas canceladas';$('#historyEmpty').classList.toggle('hidden',cancelled.length>0);for(const r of cancelled){const tr=document.createElement('tr');tr.innerHTML=`<td><strong>${brDate(r.checkin)}</strong><br><span style="color:var(--muted)">até ${brDate(r.checkout)}</span></td><td>${esc(r.hospede||'—')}</td><td>${esc(r.telefone||'—')}</td><td>${esc(r.origem||'direta')}</td><td><span class="badge cancelada">cancelada</span></td><td><button class="mini edit" data-history-edit="${r.id}">Editar</button></td>`;historyBody.appendChild(tr)}historyBody.querySelectorAll('[data-history-edit]').forEach(b=>b.onclick=()=>openEdit(Number(b.dataset.historyEdit)));$('#activeCount').textContent=activeDirect.length;$('#airbnbCount').textContent=airbnb.length;$('#totalCount').textContent=activeDirect.length+airbnb.length;const today=new Date().toISOString().slice(0,10);const next=[...activeDirect,...airbnb].filter(r=>r.checkin>=today).sort((a,b)=>a.checkin.localeCompare(b.checkin))[0];$('#nextCheckin').textContent=next?brDate(next.checkin):'Nenhuma'}
