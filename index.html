@@ -741,6 +741,35 @@ img{max-width:100%;display:block}
 .day.selected .holiday-name{color:#fff}
 @media(max-width:600px){.day .holiday-name{font-size:.44rem;line-height:1}}
 .calendar-sync{margin-top:12px;text-align:center;color:#7b827f;font-size:.72rem}
+
+.region-card{cursor:pointer}
+.region-card:focus{outline:3px solid rgba(31,157,104,.22);outline-offset:3px}
+.region-detail-modal{border:0;border-radius:22px;padding:0;width:min(980px,calc(100% - 28px));max-height:88vh;overflow:auto;box-shadow:0 30px 90px rgba(0,0,0,.25)}
+.region-detail-modal::backdrop{background:rgba(15,25,21,.58)}
+.region-detail-wrap{padding:26px}
+.region-detail-head{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;margin-bottom:18px}
+.region-detail-head h3{margin:0;font-size:clamp(1.5rem,3vw,2rem)}
+.region-detail-head p{margin:6px 0 0;color:#718079}
+.region-detail-close{border:0;background:#f1f4f2;width:42px;height:42px;border-radius:50%;font-size:1.45rem;cursor:pointer}
+.region-detail-list{display:grid;gap:18px}
+.region-detail-item{border:1px solid #e4e9e6;border-radius:18px;overflow:hidden;background:#fff}
+.region-detail-gallery{display:grid;grid-template-columns:2fr 1fr 1fr;gap:4px;background:#eef2ef}
+.region-detail-gallery img{width:100%;height:220px;object-fit:cover;display:block}
+.region-detail-gallery img:first-child{height:220px}
+.region-detail-body{padding:18px}
+.region-detail-top{display:flex;justify-content:space-between;gap:14px;align-items:flex-start}
+.region-detail-type{display:inline-flex;padding:6px 9px;border-radius:999px;background:#edf5f1;color:#167a51;font-size:.74rem;font-weight:800}
+.region-detail-body h4{margin:9px 0 7px;font-size:1.15rem}
+.region-detail-body p{margin:0;color:#5f6c66;line-height:1.55}
+.region-detail-meta{display:flex;flex-wrap:wrap;gap:8px 14px;margin-top:13px;font-size:.86rem;color:#41504a}
+.region-detail-map{display:inline-flex;margin-top:14px;padding:10px 13px;border-radius:10px;background:#1f9d68;color:#fff;text-decoration:none;font-weight:800}
+.region-detail-empty{padding:30px;text-align:center;color:#718079}
+@media(max-width:700px){
+  .region-detail-wrap{padding:18px}
+  .region-detail-gallery{grid-template-columns:1fr 1fr}
+  .region-detail-gallery img{height:150px}
+  .region-detail-gallery img:first-child{grid-column:1/-1;height:210px}
+}
 </style>
     <!-- Compartilhamento do site - WhatsApp / Facebook -->
 <meta property="og:type" content="website">
@@ -1480,7 +1509,79 @@ renderCalendar();
 })();
 </script>
 
+
+<dialog id="regionDetailDialog" class="region-detail-modal">
+  <div class="region-detail-wrap">
+    <div class="region-detail-head">
+      <div>
+        <h3 id="regionDetailTitle">Explore a Região</h3>
+        <p id="regionDetailSubtitle">Descubra lugares próximos ao Village.</p>
+      </div>
+      <button class="region-detail-close" id="regionDetailClose" type="button" aria-label="Fechar">×</button>
+    </div>
+    <div id="regionDetailList" class="region-detail-list"></div>
+  </div>
+</dialog>
+
 <script>
+const REGION_API = "https://village-paganayoh-api.dario-cdao.workers.dev";
+
+function regionEsc(v){
+  return String(v ?? "").replace(/[&<>'"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[c]));
+}
+
+async function abrirDetalhesRegiao(local){
+  const dialog=document.getElementById("regionDetailDialog");
+  const title=document.getElementById("regionDetailTitle");
+  const subtitle=document.getElementById("regionDetailSubtitle");
+  const list=document.getElementById("regionDetailList");
+  title.textContent=local.nome||"Explore a Região";
+  subtitle.textContent=local.descricao||"Lugares e experiências próximas ao Village.";
+  list.innerHTML='<div class="region-detail-empty">Carregando...</div>';
+  dialog.showModal();
+
+  try{
+    const r=await fetch(REGION_API+"/locais-regiao/"+local.id+"/itens",{cache:"no-store"});
+    if(!r.ok) throw new Error("Falha ao carregar os itens.");
+    const d=await r.json();
+    const itens=Array.isArray(d.itens)?d.itens:[];
+
+    if(!itens.length){
+      list.innerHTML='<div class="region-detail-empty">Ainda não há itens cadastrados nesta categoria.</div>';
+      return;
+    }
+
+    list.innerHTML=itens.map(item=>{
+      const fotos=[item.imagem_url,item.imagem_url_2,item.imagem_url_3].filter(Boolean);
+      const galeria=fotos.length
+        ? '<div class="region-detail-gallery">'+fotos.map((src,i)=>'<img src="'+regionEsc(src)+'" alt="'+regionEsc(item.nome||"Local")+(i? " - foto "+(i+1):"")+'" loading="lazy" referrerpolicy="no-referrer">').join('')+'</div>'
+        : '';
+      const metas=[
+        item.distancia?'📍 '+regionEsc(item.distancia):'',
+        item.tempo_carro?'🚗 '+regionEsc(item.tempo_carro):'',
+        item.faixa_preco?'💰 '+regionEsc(item.faixa_preco):''
+      ].filter(Boolean).map(x=>'<span>'+x+'</span>').join('');
+      const mapa=item.maps_url
+        ? '<a class="region-detail-map" href="'+regionEsc(item.maps_url)+'" target="_blank" rel="noopener noreferrer">Abrir no Google Maps</a>'
+        : '';
+
+      return '<article class="region-detail-item">'+
+        galeria+
+        '<div class="region-detail-body">'+
+          '<div class="region-detail-top"><span class="region-detail-type">'+regionEsc(item.tipo||"Local")+'</span></div>'+
+          '<h4>'+regionEsc(item.nome||"")+'</h4>'+
+          '<p>'+regionEsc(item.descricao||"")+'</p>'+
+          (metas?'<div class="region-detail-meta">'+metas+'</div>':'')+
+          mapa+
+        '</div>'+
+      '</article>';
+    }).join("");
+  }catch(err){
+    console.error("Erro ao carregar detalhes da região:",err);
+    list.innerHTML='<div class="region-detail-empty">Não foi possível carregar os detalhes agora.</div>';
+  }
+}
+
 async function carregarLocaisRegiao() {
   const grid = document.getElementById("regionGrid");
   if (!grid) return;
@@ -1493,10 +1594,7 @@ async function carregarLocaisRegiao() {
   };
 
   try {
-    const resposta = await fetch("https://village-paganayoh-api.dario-cdao.workers.dev/locais-regiao", {
-      cache: "no-store"
-    });
-
+    const resposta = await fetch(REGION_API+"/locais-regiao", {cache:"no-store"});
     if (!resposta.ok) throw new Error("Falha ao carregar locais");
 
     const dados = await resposta.json();
@@ -1504,29 +1602,35 @@ async function carregarLocaisRegiao() {
 
     grid.innerHTML = locais.map((local) => {
       const icone = icones[local.categoria] || "📍";
-      const distancia = local.distancia ? `<span class="region-distance">${local.distancia}</span>` : "";
-      const maps = local.maps_url
-        ? `<a class="region-map-link" href="${local.maps_url}" target="_blank" rel="noopener noreferrer">Ver no mapa</a>`
-        : "";
-
       return `
-        <article class="region-card">
-          <img src="${local.imagem_url || ""}" alt="${local.nome || "Local da região"}" loading="lazy" referrerpolicy="no-referrer">
+        <article class="region-card" tabindex="0" role="button" data-region-id="${local.id}">
+          <img src="${regionEsc(local.imagem_url || "")}" alt="${regionEsc(local.nome || "Local da região")}" loading="lazy" referrerpolicy="no-referrer">
           <div class="region-card-content">
-            <span class="region-tag">${icone} ${local.categoria || "Local"}</span>
-            <h3>${local.nome || ""}</h3>
-            <p>${local.descricao || ""}</p>
-            ${distancia}
-            ${maps}
+            <span class="region-tag">${icone} ${regionEsc(local.categoria || "Local")}</span>
+            <h3>${regionEsc(local.nome || "")}</h3>
+            <p>${regionEsc(local.descricao || "")}</p>
           </div>
         </article>
       `;
     }).join("");
+
+    grid.querySelectorAll(".region-card").forEach(card=>{
+      const local=locais.find(x=>String(x.id)===String(card.dataset.regionId));
+      if(!local)return;
+      card.addEventListener("click",()=>abrirDetalhesRegiao(local));
+      card.addEventListener("keydown",e=>{
+        if(e.key==="Enter"||e.key===" "){e.preventDefault();abrirDetalhesRegiao(local)}
+      });
+    });
   } catch (erro) {
     console.error("Erro ao carregar Explore a Região:", erro);
   }
 }
 
+document.getElementById("regionDetailClose")?.addEventListener("click",()=>document.getElementById("regionDetailDialog")?.close());
+document.getElementById("regionDetailDialog")?.addEventListener("click",e=>{
+  if(e.target===e.currentTarget)e.currentTarget.close();
+});
 document.addEventListener("DOMContentLoaded", carregarLocaisRegiao);
 </script>
 
