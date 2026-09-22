@@ -1051,43 +1051,7 @@ img{max-width:100%;display:block}
         <p class="section-subtitle">Praias, gastronomia, natureza e passeios para aproveitar o melhor do Litoral Norte da Bahia.</p>
     </div>
 
-    <div class="region-grid">
-        <article class="region-card">
-           <img src="https://commons.wikimedia.org/wiki/Special:Redirect/file/Guarajuba_Beach.jpg" alt="Praia de Guarajuba, Bahia" loading="lazy" referrerpolicy="no-referrer">
-            <div class="region-card-content">
-                <span class="region-tag">🏖️ Praia</span>
-                <h3>Guarajuba</h3>
-                <p>Mar, piscinas naturais e uma orla agradável para curtir o dia perto da casa.</p>
-            </div>
-        </article>
-
-        <article class="region-card">
-            <img src="https://commons.wikimedia.org/wiki/Special:Redirect/file/Piscinas_naturais_de_%C3%A1guas_mornas.JPG" alt="Praia de Itacimirim, Camaçari, Bahia" loading="lazy" referrerpolicy="no-referrer">
-            <div class="region-card-content">
-                <span class="region-tag">🌊 Passeio</span>
-                <h3>Itacimirim</h3>
-                <p>Praias tranquilas e cenários naturais para um passeio diferente durante a estadia.</p>
-            </div>
-        </article>
-
-        <article class="region-card">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/d/d1/Praia_do_Forte-001.jpg" alt="Praia do Forte, Bahia" loading="lazy" referrerpolicy="no-referrer">
-            <div class="region-card-content">
-                <span class="region-tag">🌴 Vila & lazer</span>
-                <h3>Praia do Forte</h3>
-                <p>Um dos destinos mais conhecidos da região, com vila, gastronomia, lojas e atrações.</p>
-            </div>
-        </article>
-
-        <article class="region-card">
-            <img src="https://commons.wikimedia.org/wiki/Special:Redirect/file/Caranguejo_ao_Estilo_Baiano.jpg" alt="Gastronomia e lazer em Guarajuba" loading="lazy">
-            <div class="region-card-content">
-                <span class="region-tag">🍽️ Gastronomia</span>
-                <h3>Sabores por perto</h3>
-                <p>Restaurantes, bares, pizzarias e opções para aproveitar a noite sem ir muito longe.</p>
-            </div>
-        </article>
-    </div>
+    <div class="region-grid" id="regionGrid" aria-live="polite"></div>
 
     
 
@@ -1515,5 +1479,56 @@ renderCalendar();
  document.addEventListener('DOMContentLoaded',()=>{setTimeout(syncAll,250)});
 })();
 </script>
+
+<script>
+async function carregarLocaisRegiao() {
+  const grid = document.getElementById("regionGrid");
+  if (!grid) return;
+
+  const icones = {
+    "Praia": "🏖️",
+    "Passeio": "🌊",
+    "Vila & lazer": "🌴",
+    "Gastronomia": "🍽️"
+  };
+
+  try {
+    const resposta = await fetch("https://village-paganayoh-api.dario-cdao.workers.dev/locais-regiao", {
+      cache: "no-store"
+    });
+
+    if (!resposta.ok) throw new Error("Falha ao carregar locais");
+
+    const dados = await resposta.json();
+    const locais = Array.isArray(dados.locais) ? dados.locais : [];
+
+    grid.innerHTML = locais.map((local) => {
+      const icone = icones[local.categoria] || "📍";
+      const distancia = local.distancia ? `<span class="region-distance">${local.distancia}</span>` : "";
+      const maps = local.maps_url
+        ? `<a class="region-map-link" href="${local.maps_url}" target="_blank" rel="noopener noreferrer">Ver no mapa</a>`
+        : "";
+
+      return `
+        <article class="region-card">
+          <img src="${local.imagem_url || ""}" alt="${local.nome || "Local da região"}" loading="lazy" referrerpolicy="no-referrer">
+          <div class="region-card-content">
+            <span class="region-tag">${icone} ${local.categoria || "Local"}</span>
+            <h3>${local.nome || ""}</h3>
+            <p>${local.descricao || ""}</p>
+            ${distancia}
+            ${maps}
+          </div>
+        </article>
+      `;
+    }).join("");
+  } catch (erro) {
+    console.error("Erro ao carregar Explore a Região:", erro);
+  }
+}
+
+document.addEventListener("DOMContentLoaded", carregarLocaisRegiao);
+</script>
+
 </body>
 </html>
