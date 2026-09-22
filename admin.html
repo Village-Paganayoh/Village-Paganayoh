@@ -78,16 +78,16 @@
 
 <dialog id="mediaDialog"><form id="mediaForm" class="modal"><div class="modal-head"><h3>Adicionar foto</h3><button type="button" class="x" id="closeMediaModal">×</button></div><div class="field"><label>Imagem</label><input id="mediaFile" type="file" accept="image/jpeg,image/png,image/webp" required><div style="font-size:.75rem;color:var(--muted)">JPG, PNG ou WebP • até 10 MB</div></div><div class="field"><label>Categoria</label><select id="mediaCategory"><option value="casa">Casa</option><option value="quartos">Quartos</option><option value="lazer">Lazer</option><option value="condominio">Condomínio</option><option value="guarajuba">Guarajuba</option></select></div><div class="field"><label>Título</label><input id="mediaTitle" type="text" maxlength="120" placeholder="Ex.: Piscina da casa"></div><div class="field"><label>Legenda</label><textarea id="mediaCaption" rows="3" maxlength="300" placeholder="Descrição opcional da foto"></textarea></div><div id="mediaFormMsg" class="msg"></div><div class="modal-actions"><button type="button" class="btn btn-light" id="cancelMediaModal">Voltar</button><button type="submit" class="btn btn-primary" id="saveMediaBtn">Enviar foto</button></div></form></dialog>
 <dialog id="regionItemsDialog" style="width:min(980px,calc(100% - 28px))">
-  <div class="modal">
-    <div class="modal-head">
+  <div class="modal" style="padding:24px">
+    <div class="modal-head" style="align-items:flex-start">
       <div><h3 id="regionItemsTitle">Conteúdo do local</h3><div id="regionItemsSubtitle" style="color:var(--muted);font-size:.82rem;margin-top:4px"></div></div>
-      <button type="button" class="x" id="closeRegionItemsModal">×</button>
+      <div style="display:flex;align-items:center;gap:8px">
+        <button id="addRegionItemBtn" class="btn btn-primary" type="button">+ Adicionar item</button>
+        <button type="button" class="x" id="closeRegionItemsModal">×</button>
+      </div>
     </div>
-    <div style="display:flex;justify-content:flex-end;margin:16px 0">
-      <button id="addRegionItemBtn" class="btn btn-primary" type="button">+ Adicionar item</button>
-    </div>
-    <div id="regionItemsGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px"></div>
-    <div id="regionItemsEmpty" class="empty hidden">Nenhum item cadastrado.</div>
+    <div id="regionItemsGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin-top:16px"></div>
+    <div id="regionItemsEmpty" class="empty hidden" style="padding:22px 10px 8px">Nenhum item cadastrado.</div>
   </div>
 </dialog>
 
