@@ -126,7 +126,9 @@
       <div class="field"><label>Ordem</label><input id="regionItemOrder" type="number" min="0" step="1" value="0"></div>
     </div>
     <div class="field"><label>Link do Google Maps</label><input id="regionItemMapsUrl" type="url" placeholder="https://maps.google.com/..."></div>
-    <div class="field"><label>URL da foto</label><input id="regionItemImageUrl" type="url" placeholder="https://..."></div>
+    <div class="field"><label>Foto 1</label><input id="regionItemImageUrl" type="url" placeholder="https://..."></div>
+    <div class="field"><label>Foto 2</label><input id="regionItemImageUrl2" type="url" placeholder="https://..."></div>
+    <div class="field"><label>Foto 3</label><input id="regionItemImageUrl3" type="url" placeholder="https://..."></div>
     <div class="field"><label style="display:flex;align-items:center;gap:8px"><input id="regionItemActive" type="checkbox" checked style="width:auto"> Exibir este item no site</label></div>
     <div id="regionItemFormMsg" class="msg"></div>
     <div class="modal-actions"><button type="button" class="btn btn-light" id="cancelRegionItemModal">Voltar</button><button type="submit" class="btn btn-primary" id="saveRegionItemBtn">Salvar item</button></div>
@@ -376,6 +378,8 @@ function openRegionItemEdit(id){
   $('#regionItemOrder').value=Number(item.ordem)||0;
   $('#regionItemMapsUrl').value=item.maps_url||'';
   $('#regionItemImageUrl').value=item.imagem_url||'';
+  $('#regionItemImageUrl2').value=item.imagem_url_2||'';
+  $('#regionItemImageUrl3').value=item.imagem_url_3||'';
   $('#regionItemActive').checked=Number(item.ativo)===1;
   $('#regionItemDialogTitle').textContent='Editar item';
   $('#saveRegionItemBtn').textContent='Salvar alterações';
@@ -402,6 +406,8 @@ $('#regionItemForm').addEventListener('submit',async e=>{
     faixa_preco:$('#regionItemPrice').value.trim(),
     maps_url:$('#regionItemMapsUrl').value.trim(),
     imagem_url:$('#regionItemImageUrl').value.trim(),
+    imagem_url_2:$('#regionItemImageUrl2').value.trim(),
+    imagem_url_3:$('#regionItemImageUrl3').value.trim(),
     ativo:$('#regionItemActive').checked?1:0,
     ordem:Number($('#regionItemOrder').value||0)
   };
