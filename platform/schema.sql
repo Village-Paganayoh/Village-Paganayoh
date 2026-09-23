@@ -187,3 +187,32 @@ CREATE INDEX IF NOT EXISTS idx_imoveis_tipo_locacao ON imoveis(tipo_locacao, ati
 CREATE INDEX IF NOT EXISTS idx_locatarios_imovel ON locatarios(imovel_id, ativo);
 CREATE INDEX IF NOT EXISTS idx_contratos_imovel ON contratos_locacao(imovel_id, status);
 CREATE INDEX IF NOT EXISTS idx_cobrancas_contrato ON cobrancas_locacao(contrato_id, vencimento, status);
+
+
+-- =====================================================
+-- AUTENTICAÇÃO E SESSÕES
+-- =====================================================
+
+CREATE TABLE IF NOT EXISTS sessoes_usuario (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  usuario_id INTEGER NOT NULL,
+  token_hash TEXT NOT NULL UNIQUE,
+  expira_em TEXT NOT NULL,
+  criado_em TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  ultimo_uso_em TEXT,
+  revogada_em TEXT,
+  FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS recuperacoes_senha (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  usuario_id INTEGER NOT NULL,
+  token_hash TEXT NOT NULL UNIQUE,
+  expira_em TEXT NOT NULL,
+  usado_em TEXT,
+  criado_em TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS idx_sessoes_usuario ON sessoes_usuario(usuario_id, expira_em);
+CREATE INDEX IF NOT EXISTS idx_recuperacoes_usuario ON recuperacoes_senha(usuario_id, expira_em);
