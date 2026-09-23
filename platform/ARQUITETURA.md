@@ -6,10 +6,21 @@ Esta branch é o início da evolução do projeto Village Paganayoh para uma pla
 
 - O site atual permanece preservado na branch `main`.
 - Cada usuário poderá cadastrar um ou vários imóveis.
+- Cada imóvel poderá operar como locação por temporada, locação anual ou ambos.
 - Cada imóvel terá sua própria página pública.
 - Fotos, vídeos, reservas, regras, FAQ, informações e calendário ficarão vinculados ao imóvel correto.
 - O Village Paganayoh será o imóvel-piloto da migração.
 - A estrutura deve servir tanto para web/PWA quanto para aplicativo mobile.
+
+## Modalidades de locação
+
+### Temporada
+Calendário, reservas, disponibilidade, diária, mídia, página pública e sincronização externa.
+
+### Anual
+Locatários, contratos, valor mensal, vencimentos, caução, reajuste e cobranças.
+
+A escolha da modalidade será feita por imóvel e a interface mostrará apenas os recursos pertinentes.
 
 ## Núcleo do produto
 
