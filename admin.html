@@ -56,6 +56,7 @@
         <a class="admin-nav-link" href="#exploreRegiao">📍 Explore a Região</a>
         <a class="admin-nav-link" href="#faqAdmin">❓ Perguntas e respostas</a>
         <a class="admin-nav-link" href="#infoAdmin">ℹ️ Informações importantes</a>
+        <a class="admin-nav-link" href="#rulesAdmin">📋 Regras da casa</a>
       </div>
     </aside>
     <div class="admin-content">
@@ -110,6 +111,20 @@
       </div>
       <div id="infoAdminList" style="display:grid;gap:10px"></div>
       <div id="infoAdminEmpty" class="empty hidden">Nenhuma informação cadastrada.</div>
+    </section>
+    <span id="rulesAdmin" class="section-anchor"></span><section class="panel section-anchor" id="rulesAdminPanel" data-nav="rulesAdmin" style="margin-top:18px">
+      <div class="panel-head">
+        <div>
+          <h3>Regras da casa / condomínio</h3>
+          <div style="color:var(--muted);font-size:.82rem;margin-top:4px">Gerencie as regras exibidas no site.</div>
+        </div>
+        <div class="actions">
+          <button id="addRuleBtn" class="btn btn-primary" type="button">+ Adicionar regra</button>
+          <button id="refreshRules" class="btn btn-light" type="button">Atualizar</button>
+        </div>
+      </div>
+      <div id="rulesAdminList" style="display:grid;gap:10px"></div>
+      <div id="rulesAdminEmpty" class="empty hidden">Nenhuma regra cadastrada.</div>
     </section>
     <span id="historicoReservas" class="section-anchor"></span><section class="panel history-panel section-anchor" id="historyPanel">
       <button class="history-toggle" id="historyToggle" type="button" aria-expanded="false">
@@ -289,6 +304,31 @@
     <div class="modal-actions"><button type="button" class="btn btn-light" id="cancelInfoModal">Voltar</button><button type="submit" class="btn btn-primary" id="saveInfoBtn">Salvar informação</button></div>
   </form>
 </dialog>
+<dialog id="ruleDialog" style="width:min(760px,calc(100% - 28px))">
+  <form id="ruleForm" class="modal">
+    <div class="modal-head"><h3 id="ruleDialogTitle">Adicionar regra</h3><button type="button" class="x" id="closeRuleModal">×</button></div>
+    <div class="grid2">
+      <div class="field"><label>Título</label><input id="ruleTitle" type="text" maxlength="160" required placeholder="Ex.: Silêncio"></div>
+      <div class="field">
+        <label>Ícone</label>
+        <input id="ruleIcon" type="text" maxlength="12" placeholder="Escolha abaixo ou digite um emoji">
+        <div id="ruleIconPicker" style="display:flex;flex-wrap:wrap;gap:7px;margin-top:9px">
+          <button type="button" class="mini edit" data-rule-icon="🔇">🔇</button><button type="button" class="mini edit" data-rule-icon="🎉">🎉</button><button type="button" class="mini edit" data-rule-icon="👥">👥</button><button type="button" class="mini edit" data-rule-icon="🐶">🐶</button><button type="button" class="mini edit" data-rule-icon="🚭">🚭</button><button type="button" class="mini edit" data-rule-icon="🏊">🏊</button><button type="button" class="mini edit" data-rule-icon="🔥">🔥</button><button type="button" class="mini edit" data-rule-icon="🚗">🚗</button><button type="button" class="mini edit" data-rule-icon="🏡">🏡</button><button type="button" class="mini edit" data-rule-icon="🔑">🔑</button><button type="button" class="mini edit" data-rule-icon="⚠️">⚠️</button><button type="button" class="mini edit" data-rule-icon="🕒">🕒</button><button type="button" class="mini edit" data-rule-icon="🛡️">🛡️</button><button type="button" class="mini edit" data-rule-icon="🅿️">🅿️</button><button type="button" class="mini edit" data-rule-icon="📍">📍</button><button type="button" class="mini edit" data-rule-icon="👶">👶</button><button type="button" class="mini edit" data-rule-icon="♿">♿</button><button type="button" class="mini edit" data-rule-icon="📞">📞</button><button type="button" class="mini edit" data-rule-icon="💬">💬</button><button type="button" class="mini edit" data-rule-icon="ℹ️">ℹ️</button>
+        </div>
+      </div>
+    </div>
+    <div class="field"><label>Descrição</label><textarea id="ruleDescription" rows="5" maxlength="1200" required placeholder="Digite a regra que será exibida ao hóspede."></textarea></div>
+    <div class="grid2">
+      <div class="field"><label>Ordem</label><input id="ruleOrder" type="number" min="0" step="1" value="0"></div>
+      <div class="field" style="display:flex;flex-direction:column;gap:12px;justify-content:center;padding-top:22px">
+        <label style="display:flex;align-items:center;gap:8px"><input id="ruleFeatured" type="checkbox" style="width:auto"> Destacar esta regra</label>
+        <label style="display:flex;align-items:center;gap:8px"><input id="ruleActive" type="checkbox" checked style="width:auto"> Exibir no site</label>
+      </div>
+    </div>
+    <div id="ruleFormMsg" class="msg"></div>
+    <div class="modal-actions"><button type="button" class="btn btn-light" id="cancelRuleModal">Voltar</button><button type="submit" class="btn btn-primary" id="saveRuleBtn">Salvar regra</button></div>
+  </form>
+</dialog>
 <dialog id="reservationDialog"><form id="reservationForm" class="modal"><div class="modal-head"><h3 id="modalTitle">Nova reserva</h3><button type="button" class="x" id="closeModal">×</button></div><input id="reservationId" type="hidden"><div class="admin-cal"><div class="admin-cal-hint" id="adminCalHint">Informe ou clique na data inicial</div><div class="admin-cal-head"><button type="button" id="adminPrev">‹</button><div class="admin-cal-title" id="adminCalTitle"></div><button type="button" id="adminNext">›</button></div><div class="admin-week"><div>DOM</div><div>SEG</div><div>TER</div><div>QUA</div><div>QUI</div><div>SEX</div><div>SÁB</div></div><div class="admin-days" id="adminDays"></div><div class="admin-legend"><span><b class="lg-free"></b>Livre</span><span><b class="lg-direct"></b>Direta</span><span><b class="lg-airbnb"></b>Airbnb</span><span><b class="lg-pick"></b>Selecionado</span></div></div><div class="grid2"><div class="field"><label>Check-in</label><input id="checkin" type="date" required></div><div class="field"><label>Check-out</label><input id="checkout" type="date" required></div></div><div class="field"><label>Hóspede</label><input id="hospede" type="text" placeholder="Nome do hóspede"></div><div class="grid2"><div class="field"><label>Telefone</label><input id="telefone" type="tel" placeholder="(71) 99999-9999"></div><div class="field"><label>Origem</label><select id="origem"><option value="direta">Direta</option><option value="airbnb">Airbnb</option><option value="outro">Outro</option></select></div></div><div class="field"><label>Status</label><select id="status"><option value="confirmada">Confirmada</option><option value="cancelada">Cancelada</option></select></div><div class="field"><label>Observações</label><textarea id="observacoes" rows="4" placeholder="Informações importantes sobre a reserva"></textarea></div><div id="formMsg" class="msg"></div><div class="modal-actions"><button type="button" class="btn btn-light" id="cancelModal">Voltar</button><button type="submit" class="btn btn-primary">Salvar reserva</button></div></form></dialog>
 <div id="toast" class="toast hidden"></div>
 <script>
@@ -307,6 +347,8 @@ let faqItems=[];
 let editingFaqId=null;
 let importantInfoItems=[];
 let editingInfoId=null;
+let ruleItems=[];
+let editingRuleId=null;
 let adminCalMonth=new Date();adminCalMonth.setDate(1);
 const $=s=>document.querySelector(s);
 function headers(){return {'Content-Type':'application/json',...(adminToken?{'Authorization':'Bearer '+adminToken}:{})}}
@@ -361,12 +403,12 @@ async function loginWithPasskey(){
     const body={credentialId:abToB64url(cred.rawId),clientDataJSON:abToB64url(resp.clientDataJSON),authenticatorData:abToB64url(resp.authenticatorData),signature:abToB64url(resp.signature)};
     const vr=await fetch(API+'/admin/passkey/login/verify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
     const vd=await vr.json();if(!vr.ok)throw new Error(vd.erro||'Não foi possível validar a biometria.');
-    adminToken=vd.token;$('#login').classList.add('hidden');$('#app').classList.remove('hidden');$('#password').value='';await Promise.all([loadReservations(),loadMedia(),loadRegions(),loadFaqs(),loadImportantInfo()]);
+    adminToken=vd.token;$('#login').classList.add('hidden');$('#app').classList.remove('hidden');$('#password').value='';await Promise.all([loadReservations(),loadMedia(),loadRegions(),loadFaqs(),loadImportantInfo(),loadRules()]);
   }catch(err){if(err?.name==='NotAllowedError')msg.textContent='Autenticação biométrica cancelada.';else msg.textContent=err.message||'Não foi possível entrar com biometria.'}
   finally{btn.disabled=false}
 }
 
-$('#loginForm').addEventListener('submit',async e=>{e.preventDefault();const msg=$('#loginMsg');msg.textContent='';const password=$('#password').value;;try{const r=await fetch(API+'/admin/login',{method:'POST',headers:{'Content-Type':'application/json','X-Admin-Password':password}});const d=await r.json();if(!r.ok)throw new Error(d.erro||'Senha incorreta.');adminToken=d.token;$('#login').classList.add('hidden');$('#app').classList.remove('hidden');$('#password').value='';await Promise.all([loadReservations(),loadMedia(),loadRegions(),loadFaqs(),loadImportantInfo()])}catch(err){adminPassword='';msg.textContent=err.message}});
+$('#loginForm').addEventListener('submit',async e=>{e.preventDefault();const msg=$('#loginMsg');msg.textContent='';const password=$('#password').value;;try{const r=await fetch(API+'/admin/login',{method:'POST',headers:{'Content-Type':'application/json','X-Admin-Password':password}});const d=await r.json();if(!r.ok)throw new Error(d.erro||'Senha incorreta.');adminToken=d.token;$('#login').classList.add('hidden');$('#app').classList.remove('hidden');$('#password').value='';await Promise.all([loadReservations(),loadMedia(),loadRegions(),loadFaqs(),loadImportantInfo(),loadRules()])}catch(err){adminPassword='';msg.textContent=err.message}});
 $('#logout').onclick=logout;
 $('#registerPasskeyBtn').onclick=registerPasskey;
 $('#passkeyLoginBtn').onclick=loginWithPasskey;
@@ -1028,6 +1070,124 @@ $('#infoForm')?.addEventListener('submit',async e=>{
     await loadImportantInfo();
   }catch(err){msg.textContent=err.message}
   finally{btn.disabled=false;btn.textContent=editingInfoId?'Salvar alterações':'Salvar informação'}
+});
+
+
+async function loadRules(){
+  const panel=$('#rulesAdminPanel');
+  if(!panel)return;
+  panel.classList.add('loading');
+  try{
+    const d=await api('/admin/regras-casa');
+    ruleItems=[...(d.regras||[])].sort((x,y)=>(Number(x.ordem)||0)-(Number(y.ordem)||0)||Number(x.id)-Number(y.id));
+    renderRules();
+  }catch(err){toast(err.message)}
+  finally{panel.classList.remove('loading')}
+}
+
+function renderRules(){
+  const list=$('#rulesAdminList');
+  if(!list)return;
+  list.innerHTML='';
+  $('#rulesAdminEmpty').classList.toggle('hidden',ruleItems.length>0);
+  for(const item of ruleItems){
+    const card=document.createElement('article');
+    card.style.cssText='border:1px solid var(--line);border-radius:14px;background:#fff;padding:15px';
+    card.innerHTML=`
+      <div style="display:flex;justify-content:space-between;gap:14px;align-items:flex-start">
+        <div style="display:flex;gap:12px;min-width:0">
+          <div style="font-size:1.55rem;line-height:1.1">${esc(item.icone||'📋')}</div>
+          <div>
+            <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:8px">
+              <span class="badge ${Number(item.ativo)===1?'confirmada':'cancelada'}">${Number(item.ativo)===1?'Ativa':'Oculta'}</span>
+              ${Number(item.destaque)===1?'<span class="badge confirmada" style="background:#f4efe4;color:#9a742f">Destaque</span>':''}
+              <span style="font-size:.75rem;color:var(--muted);align-self:center">Ordem ${Number(item.ordem)||0}</span>
+            </div>
+            <strong style="display:block;font-size:.96rem">${esc(item.titulo||'Sem título')}</strong>
+            <div style="color:var(--muted);font-size:.82rem;line-height:1.45;margin-top:6px">${esc(item.descricao||'')}</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:6px;flex:none">
+          <button type="button" class="mini edit" data-edit-rule="${item.id}">Editar</button>
+          <button type="button" class="mini cancel" data-delete-rule="${item.id}">Excluir</button>
+        </div>
+      </div>`;
+    list.appendChild(card);
+  }
+  list.querySelectorAll('[data-edit-rule]').forEach(b=>b.onclick=()=>openRuleEdit(Number(b.dataset.editRule)));
+  list.querySelectorAll('[data-delete-rule]').forEach(b=>b.onclick=()=>deleteRule(Number(b.dataset.deleteRule)));
+}
+
+function resetRuleForm(){
+  editingRuleId=null;
+  $('#ruleForm').reset();
+  $('#ruleActive').checked=true;
+  $('#ruleFeatured').checked=false;
+  $('#ruleOrder').value=ruleItems.length+1;
+  $('#ruleDialogTitle').textContent='Adicionar regra';
+  $('#saveRuleBtn').textContent='Salvar regra';
+  $('#ruleFormMsg').textContent='';
+}
+
+function openRuleEdit(id){
+  const item=ruleItems.find(x=>Number(x.id)===Number(id));
+  if(!item)return;
+  editingRuleId=id;
+  $('#ruleTitle').value=item.titulo||'';
+  $('#ruleIcon').value=item.icone||'';
+  $('#ruleDescription').value=item.descricao||'';
+  $('#ruleOrder').value=Number(item.ordem)||0;
+  $('#ruleFeatured').checked=Number(item.destaque)===1;
+  $('#ruleActive').checked=Number(item.ativo)===1;
+  $('#ruleDialogTitle').textContent='Editar regra';
+  $('#saveRuleBtn').textContent='Salvar alterações';
+  $('#ruleFormMsg').textContent='';
+  $('#ruleDialog').showModal();
+}
+
+async function deleteRule(id){
+  const item=ruleItems.find(x=>Number(x.id)===Number(id));
+  if(!item)return;
+  if(!confirm('Excluir “'+item.titulo+'”?'))return;
+  try{
+    await api('/admin/regras-casa/'+id,{method:'DELETE'});
+    toast('Regra excluída.');
+    await loadRules();
+  }catch(err){toast(err.message)}
+}
+
+document.querySelectorAll('[data-rule-icon]').forEach(btn=>{
+  btn.addEventListener('click',()=>{$('#ruleIcon').value=btn.dataset.ruleIcon||''});
+});
+$('#addRuleBtn')?.addEventListener('click',()=>{resetRuleForm();$('#ruleDialog').showModal()});
+$('#refreshRules')?.addEventListener('click',loadRules);
+$('#closeRuleModal')?.addEventListener('click',()=>$('#ruleDialog').close());
+$('#cancelRuleModal')?.addEventListener('click',()=>$('#ruleDialog').close());
+
+$('#ruleForm')?.addEventListener('submit',async e=>{
+  e.preventDefault();
+  const msg=$('#ruleFormMsg'),btn=$('#saveRuleBtn');
+  msg.textContent='';
+  const payload={
+    titulo:$('#ruleTitle').value.trim(),
+    descricao:$('#ruleDescription').value.trim(),
+    icone:$('#ruleIcon').value.trim(),
+    destaque:$('#ruleFeatured').checked?1:0,
+    ativo:$('#ruleActive').checked?1:0,
+    ordem:Number($('#ruleOrder').value||0)
+  };
+  btn.disabled=true;
+  try{
+    await api(editingRuleId?'/admin/regras-casa/'+editingRuleId:'/admin/regras-casa',{
+      method:editingRuleId?'PUT':'POST',
+      body:JSON.stringify(payload)
+    });
+    $('#ruleDialog').close();
+    toast(editingRuleId?'Regra atualizada.':'Regra adicionada.');
+    editingRuleId=null;
+    await loadRules();
+  }catch(err){msg.textContent=err.message}
+  finally{btn.disabled=false;btn.textContent=editingRuleId?'Salvar alterações':'Salvar regra'}
 });
 
 async function loadReservations(){const panel=$('.panel');panel.classList.add('loading');try{const [direct,airbnb]=await Promise.all([api('/reservas'),fetch('disponibilidade.json?ts='+Date.now(),{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error('Calendário Airbnb indisponível.');return r.json()})]);reservations=direct.reservas||[];airbnbPeriods=Array.isArray(airbnb.periods)?airbnb.periods:[];render()}catch(err){toast(err.message)}finally{panel.classList.remove('loading')}}
