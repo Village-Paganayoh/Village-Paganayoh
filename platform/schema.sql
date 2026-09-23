@@ -33,6 +33,7 @@ CREATE TABLE IF NOT EXISTS imoveis (
   banheiros INTEGER,
   telefone_contato TEXT,
   whatsapp_contato TEXT,
+  tipo_locacao TEXT NOT NULL DEFAULT 'temporada' CHECK (tipo_locacao IN ('temporada','anual','ambos')),
   publicado INTEGER NOT NULL DEFAULT 0,
   ativo INTEGER NOT NULL DEFAULT 1,
   criado_em TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -130,3 +131,59 @@ CREATE INDEX IF NOT EXISTS idx_imovel_reservas_datas ON imovel_reservas(imovel_i
 CREATE INDEX IF NOT EXISTS idx_imovel_regras ON imovel_regras(imovel_id, ativo, ordem);
 CREATE INDEX IF NOT EXISTS idx_imovel_informacoes ON imovel_informacoes(imovel_id, ativo, ordem);
 CREATE INDEX IF NOT EXISTS idx_imovel_faqs ON imovel_faqs(imovel_id, ativo, ordem);
+
+
+-- =====================================================
+-- LOCAÇÃO ANUAL
+-- Estrutura separada da reserva por temporada
+-- =====================================================
+
+CREATE TABLE IF NOT EXISTS locatarios (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  imovel_id INTEGER NOT NULL,
+  nome TEXT NOT NULL,
+  email TEXT,
+  telefone TEXT,
+  documento TEXT,
+  ativo INTEGER NOT NULL DEFAULT 1,
+  criado_em TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  atualizado_em TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (imovel_id) REFERENCES imoveis(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS contratos_locacao (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  imovel_id INTEGER NOT NULL,
+  locatario_id INTEGER NOT NULL,
+  data_inicio TEXT NOT NULL,
+  data_fim TEXT,
+  valor_mensal REAL NOT NULL,
+  dia_vencimento INTEGER NOT NULL DEFAULT 10,
+  deposito_caucao REAL,
+  indice_reajuste TEXT,
+  observacoes TEXT,
+  status TEXT NOT NULL DEFAULT 'ativo',
+  criado_em TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  atualizado_em TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (imovel_id) REFERENCES imoveis(id) ON DELETE CASCADE,
+  FOREIGN KEY (locatario_id) REFERENCES locatarios(id) ON DELETE RESTRICT
+);
+
+CREATE TABLE IF NOT EXISTS cobrancas_locacao (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  contrato_id INTEGER NOT NULL,
+  competencia TEXT NOT NULL,
+  vencimento TEXT NOT NULL,
+  valor REAL NOT NULL,
+  status TEXT NOT NULL DEFAULT 'pendente',
+  pago_em TEXT,
+  observacoes TEXT,
+  criado_em TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  atualizado_em TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (contrato_id) REFERENCES contratos_locacao(id) ON DELETE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS idx_imoveis_tipo_locacao ON imoveis(tipo_locacao, ativo);
+CREATE INDEX IF NOT EXISTS idx_locatarios_imovel ON locatarios(imovel_id, ativo);
+CREATE INDEX IF NOT EXISTS idx_contratos_imovel ON contratos_locacao(imovel_id, status);
+CREATE INDEX IF NOT EXISTS idx_cobrancas_contrato ON cobrancas_locacao(contrato_id, vencimento, status);
