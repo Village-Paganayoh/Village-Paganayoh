@@ -807,6 +807,11 @@ img{max-width:100%;display:block}
 
 .gallery-item video{width:100%;height:100%;object-fit:cover;display:block;background:#111}
 .gallery-video-play{position:absolute;inset:0;display:grid;place-items:center;font-size:2.4rem;color:#fff;background:rgba(0,0,0,.15);pointer-events:none;text-shadow:0 2px 10px rgba(0,0,0,.45)}
+
+.rule{display:flex;gap:13px;align-items:flex-start}
+.rule .rule-icon{font-size:1.45rem;line-height:1.2;flex:none}
+.rule.featured{grid-column:1/-1;background:#fffaf0;border-left-color:#b18c4e}
+@media(max-width:600px){.rule.featured{grid-column:auto}}
 </style>
     <!-- Compartilhamento do site - WhatsApp / Facebook -->
 <meta property="og:type" content="website">
@@ -1054,6 +1059,15 @@ img{max-width:100%;display:block}
   </div>
 </section>
 
+
+<section class="section alt" id="regras-casa">
+  <div class="section-header">
+    <div style="color:#245e4e;font-size:.76rem;font-weight:800;letter-spacing:3px;text-transform:uppercase;">Durante a estadia</div>
+    <h2 class="section-title">Regras da casa e do condomínio</h2>
+    <p class="section-subtitle">Orientações para uma estadia tranquila e uma boa convivência.</p>
+  </div>
+  <div class="rules" id="houseRulesGrid" aria-live="polite"></div>
+</section>
 
     <section class="section" id="faq">
         <div class="section-header">
@@ -1725,6 +1739,34 @@ document.addEventListener("DOMContentLoaded", carregarLocaisRegiao);
 
 <script>
 
+
+
+const RULES_API='https://village-paganayoh-api.dario-cdao.workers.dev';
+
+async function loadRulesFromApi(){
+  const grid=document.getElementById('houseRulesGrid');
+  if(!grid)return;
+  try{
+    const r=await fetch(RULES_API+'/regras-casa',{cache:'no-store'});
+    const d=await r.json();
+    if(!r.ok||d.ok===false||!Array.isArray(d.regras))throw new Error('Falha ao carregar regras');
+    const items=[...d.regras].sort((a,b)=>(Number(a.ordem)||0)-(Number(b.ordem)||0)||Number(a.id)-Number(b.id));
+    grid.innerHTML=items.map(item=>`
+      <div class="rule${Number(item.destaque)===1?' featured':''}">
+        <div class="rule-icon">${item.icone||'📋'}</div>
+        <div>
+          <strong>${item.titulo||''}</strong>
+          <span>${item.descricao||''}</span>
+        </div>
+      </div>
+    `).join('');
+  }catch(err){
+    console.warn('Regras indisponíveis no momento.',err);
+    grid.innerHTML='<div class="rule"><div class="rule-icon">ℹ️</div><div><strong>Regras da casa</strong><span>Consulte as orientações com o proprietário antes da estadia.</span></div></div>';
+  }
+}
+
+loadRulesFromApi();
 
 const IMPORTANT_INFO_API='https://village-paganayoh-api.dario-cdao.workers.dev';
 
