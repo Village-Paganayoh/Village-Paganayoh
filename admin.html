@@ -57,6 +57,7 @@
         <a class="admin-nav-link" href="#faqAdmin">❓ Perguntas e respostas</a>
         <a class="admin-nav-link" href="#infoAdmin">ℹ️ Informações importantes</a>
         <a class="admin-nav-link" href="#rulesAdmin">📋 Regras da casa</a>
+        <a class="admin-nav-link" href="#pricingAdmin">💰 Preços e Tarifas</a>
       </div>
     </aside>
     <div class="admin-content">
@@ -125,6 +126,46 @@
       </div>
       <div id="rulesAdminList" style="display:grid;gap:10px"></div>
       <div id="rulesAdminEmpty" class="empty hidden">Nenhuma regra cadastrada.</div>
+    </section>
+    <span id="pricingAdmin" class="section-anchor"></span><section class="panel section-anchor" id="pricingAdminPanel" data-nav="pricingAdmin" style="margin-top:18px">
+      <div class="panel-head">
+        <div>
+          <h3>Preços e Tarifas</h3>
+          <div style="color:var(--muted);font-size:.82rem;margin-top:4px">Defina a diária padrão, o valor de sexta a domingo e tarifas para datas especiais.</div>
+        </div>
+        <button id="refreshPricing" class="btn btn-light" type="button">Atualizar</button>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;margin-bottom:16px">
+        <div style="border:1px solid var(--line);border-radius:14px;padding:15px;background:#fff">
+          <div style="font-size:.78rem;color:var(--muted);margin-bottom:7px">Diária padrão</div>
+          <div class="field" style="margin:0"><label>Valor por noite (R$)</label><input id="priceDefault" type="number" min="0" step="0.01" placeholder="Ex.: 750,00"></div>
+        </div>
+        <div style="border:1px solid var(--line);border-radius:14px;padding:15px;background:#fff">
+          <div style="font-size:.78rem;color:var(--muted);margin-bottom:7px">Fim de semana</div>
+          <div class="field" style="margin:0"><label>Sexta, sábado e domingo (R$)</label><input id="priceWeekend" type="number" min="0" step="0.01" placeholder="Ex.: 900,00"></div>
+        </div>
+        <div style="border:1px solid var(--line);border-radius:14px;padding:15px;background:#fff">
+          <div style="font-size:.78rem;color:var(--muted);margin-bottom:7px">Venda direta</div>
+          <div class="field" style="margin:0"><label>Desconto opcional (%)</label><input id="priceDirectDiscount" type="number" min="0" max="100" step="0.1" placeholder="Ex.: 10"></div>
+        </div>
+      </div>
+
+      <div style="display:flex;justify-content:flex-end;margin-bottom:24px">
+        <button id="savePricingConfig" class="btn btn-primary" type="button">Salvar configuração</button>
+      </div>
+
+      <div style="border-top:1px solid var(--line);padding-top:20px">
+        <div class="panel-head" style="margin-bottom:12px">
+          <div>
+            <h3 style="font-size:1rem">Períodos especiais</h3>
+            <div style="color:var(--muted);font-size:.78rem;margin-top:4px">Réveillon, Carnaval, feriados, festas locais e outras datas com tarifa própria.</div>
+          </div>
+          <button id="addSpecialPeriodBtn" class="btn btn-primary" type="button">+ Adicionar período</button>
+        </div>
+        <div id="specialPeriodsList" style="display:grid;gap:10px"></div>
+        <div id="specialPeriodsEmpty" class="empty hidden">Nenhum período especial cadastrado.</div>
+      </div>
     </section>
     <span id="historicoReservas" class="section-anchor"></span><section class="panel history-panel section-anchor" id="historyPanel">
       <button class="history-toggle" id="historyToggle" type="button" aria-expanded="false">
@@ -304,6 +345,27 @@
     <div class="modal-actions"><button type="button" class="btn btn-light" id="cancelInfoModal">Voltar</button><button type="submit" class="btn btn-primary" id="saveInfoBtn">Salvar informação</button></div>
   </form>
 </dialog>
+<dialog id="specialPeriodDialog" style="width:min(760px,calc(100% - 28px))">
+  <form id="specialPeriodForm" class="modal">
+    <div class="modal-head"><h3 id="specialPeriodDialogTitle">Adicionar período especial</h3><button type="button" class="x" id="closeSpecialPeriodModal">×</button></div>
+    <div class="field"><label>Nome do período</label><input id="specialPeriodName" type="text" maxlength="120" required placeholder="Ex.: Réveillon 2026/2027"></div>
+    <div class="grid2">
+      <div class="field"><label>Data inicial</label><input id="specialPeriodStart" type="date" required></div>
+      <div class="field"><label>Data final</label><input id="specialPeriodEnd" type="date" required></div>
+    </div>
+    <div class="grid2">
+      <div class="field"><label>Valor da diária (R$)</label><input id="specialPeriodPrice" type="number" min="0" step="0.01" required placeholder="Ex.: 1800,00"></div>
+      <div class="field"><label>Mínimo de noites</label><input id="specialPeriodMinNights" type="number" min="1" step="1" value="1" required></div>
+    </div>
+    <div class="grid2">
+      <div class="field"><label>Prioridade</label><input id="specialPeriodPriority" type="number" step="1" value="10"><div style="font-size:.74rem;color:var(--muted);margin-top:5px">Só precisa alterar se dois períodos se sobrepuserem. O maior número prevalece.</div></div>
+      <div class="field" style="display:flex;align-items:center;padding-top:24px"><label style="display:flex;align-items:center;gap:8px"><input id="specialPeriodActive" type="checkbox" checked style="width:auto"> Período ativo</label></div>
+    </div>
+    <div class="field"><label>Observação interna</label><textarea id="specialPeriodNote" rows="3" maxlength="500" placeholder="Ex.: Pacote mínimo definido para o Réveillon"></textarea></div>
+    <div id="specialPeriodFormMsg" class="msg"></div>
+    <div class="modal-actions"><button type="button" class="btn btn-light" id="cancelSpecialPeriodModal">Voltar</button><button type="submit" class="btn btn-primary" id="saveSpecialPeriodBtn">Salvar período</button></div>
+  </form>
+</dialog>
 <dialog id="ruleDialog" style="width:min(760px,calc(100% - 28px))">
   <form id="ruleForm" class="modal">
     <div class="modal-head"><h3 id="ruleDialogTitle">Adicionar regra</h3><button type="button" class="x" id="closeRuleModal">×</button></div>
@@ -349,6 +411,9 @@ let importantInfoItems=[];
 let editingInfoId=null;
 let ruleItems=[];
 let editingRuleId=null;
+let pricingConfig=null;
+let specialPeriods=[];
+let editingSpecialPeriodId=null;
 let adminCalMonth=new Date();adminCalMonth.setDate(1);
 const $=s=>document.querySelector(s);
 function headers(){return {'Content-Type':'application/json',...(adminToken?{'Authorization':'Bearer '+adminToken}:{})}}
@@ -403,12 +468,12 @@ async function loginWithPasskey(){
     const body={credentialId:abToB64url(cred.rawId),clientDataJSON:abToB64url(resp.clientDataJSON),authenticatorData:abToB64url(resp.authenticatorData),signature:abToB64url(resp.signature)};
     const vr=await fetch(API+'/admin/passkey/login/verify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
     const vd=await vr.json();if(!vr.ok)throw new Error(vd.erro||'Não foi possível validar a biometria.');
-    adminToken=vd.token;$('#login').classList.add('hidden');$('#app').classList.remove('hidden');$('#password').value='';await Promise.all([loadReservations(),loadMedia(),loadRegions(),loadFaqs(),loadImportantInfo(),loadRules()]);
+    adminToken=vd.token;$('#login').classList.add('hidden');$('#app').classList.remove('hidden');$('#password').value='';await Promise.all([loadReservations(),loadMedia(),loadRegions(),loadFaqs(),loadImportantInfo(),loadRules(),loadPricing()]);
   }catch(err){if(err?.name==='NotAllowedError')msg.textContent='Autenticação biométrica cancelada.';else msg.textContent=err.message||'Não foi possível entrar com biometria.'}
   finally{btn.disabled=false}
 }
 
-$('#loginForm').addEventListener('submit',async e=>{e.preventDefault();const msg=$('#loginMsg');msg.textContent='';const password=$('#password').value;;try{const r=await fetch(API+'/admin/login',{method:'POST',headers:{'Content-Type':'application/json','X-Admin-Password':password}});const d=await r.json();if(!r.ok)throw new Error(d.erro||'Senha incorreta.');adminToken=d.token;$('#login').classList.add('hidden');$('#app').classList.remove('hidden');$('#password').value='';await Promise.all([loadReservations(),loadMedia(),loadRegions(),loadFaqs(),loadImportantInfo(),loadRules()])}catch(err){adminPassword='';msg.textContent=err.message}});
+$('#loginForm').addEventListener('submit',async e=>{e.preventDefault();const msg=$('#loginMsg');msg.textContent='';const password=$('#password').value;;try{const r=await fetch(API+'/admin/login',{method:'POST',headers:{'Content-Type':'application/json','X-Admin-Password':password}});const d=await r.json();if(!r.ok)throw new Error(d.erro||'Senha incorreta.');adminToken=d.token;$('#login').classList.add('hidden');$('#app').classList.remove('hidden');$('#password').value='';await Promise.all([loadReservations(),loadMedia(),loadRegions(),loadFaqs(),loadImportantInfo(),loadRules(),loadPricing()])}catch(err){adminPassword='';msg.textContent=err.message}});
 $('#logout').onclick=logout;
 $('#registerPasskeyBtn').onclick=registerPasskey;
 $('#passkeyLoginBtn').onclick=loginWithPasskey;
@@ -1072,6 +1137,170 @@ $('#infoForm')?.addEventListener('submit',async e=>{
   finally{btn.disabled=false;btn.textContent=editingInfoId?'Salvar alterações':'Salvar informação'}
 });
 
+
+
+function moneyBR(value){
+  const n=Number(value);
+  if(!Number.isFinite(n))return '—';
+  return n.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+}
+
+async function loadPricing(){
+  const panel=$('#pricingAdminPanel');
+  if(!panel)return;
+  panel.classList.add('loading');
+  try{
+    const [cfgData,periodData]=await Promise.all([
+      api('/admin/precos/configuracao'),
+      api('/admin/precos/periodos-especiais')
+    ]);
+    pricingConfig=cfgData.configuracao||null;
+    specialPeriods=[...(periodData.periodos||[])].sort((a,b)=>
+      String(a.data_inicio||'').localeCompare(String(b.data_inicio||'')) ||
+      (Number(b.prioridade)||0)-(Number(a.prioridade)||0) ||
+      Number(a.id)-Number(b.id)
+    );
+    $('#priceDefault').value=pricingConfig?.preco_padrao ?? '';
+    $('#priceWeekend').value=pricingConfig?.preco_fim_semana ?? '';
+    $('#priceDirectDiscount').value=pricingConfig?.desconto_direto_percentual ?? 0;
+    renderSpecialPeriods();
+  }catch(err){toast(err.message)}
+  finally{panel.classList.remove('loading')}
+}
+
+function renderSpecialPeriods(){
+  const list=$('#specialPeriodsList');
+  if(!list)return;
+  list.innerHTML='';
+  $('#specialPeriodsEmpty').classList.toggle('hidden',specialPeriods.length>0);
+  for(const item of specialPeriods){
+    const card=document.createElement('article');
+    card.style.cssText='border:1px solid var(--line);border-radius:14px;background:#fff;padding:15px';
+    card.innerHTML=`
+      <div style="display:flex;justify-content:space-between;gap:14px;align-items:flex-start">
+        <div style="min-width:0">
+          <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:8px">
+            <span class="badge ${Number(item.ativo)===1?'confirmada':'cancelada'}">${Number(item.ativo)===1?'Ativo':'Inativo'}</span>
+            <span style="font-size:.75rem;color:var(--muted);align-self:center">Prioridade ${Number(item.prioridade)||0}</span>
+          </div>
+          <strong style="display:block;font-size:.98rem">${esc(item.nome||'Período especial')}</strong>
+          <div style="color:var(--muted);font-size:.82rem;line-height:1.55;margin-top:6px">
+            ${brDate(item.data_inicio)} a ${brDate(item.data_fim)} • <strong style="color:var(--text)">${moneyBR(item.preco_diaria)}/noite</strong> • mínimo de ${Number(item.minimo_noites)||1} noite${Number(item.minimo_noites)===1?'':'s'}
+          </div>
+          ${item.observacao?'<div style="color:var(--muted);font-size:.78rem;margin-top:6px">'+esc(item.observacao)+'</div>':''}
+        </div>
+        <div style="display:flex;gap:6px;flex:none">
+          <button type="button" class="mini edit" data-edit-special-period="${item.id}">Editar</button>
+          <button type="button" class="mini cancel" data-delete-special-period="${item.id}">Excluir</button>
+        </div>
+      </div>`;
+    list.appendChild(card);
+  }
+  list.querySelectorAll('[data-edit-special-period]').forEach(b=>b.onclick=()=>openSpecialPeriodEdit(Number(b.dataset.editSpecialPeriod)));
+  list.querySelectorAll('[data-delete-special-period]').forEach(b=>b.onclick=()=>deleteSpecialPeriod(Number(b.dataset.deleteSpecialPeriod)));
+}
+
+function resetSpecialPeriodForm(){
+  editingSpecialPeriodId=null;
+  $('#specialPeriodForm').reset();
+  $('#specialPeriodMinNights').value=1;
+  $('#specialPeriodPriority').value=10;
+  $('#specialPeriodActive').checked=true;
+  $('#specialPeriodDialogTitle').textContent='Adicionar período especial';
+  $('#saveSpecialPeriodBtn').textContent='Salvar período';
+  $('#specialPeriodFormMsg').textContent='';
+}
+
+function openSpecialPeriodEdit(id){
+  const item=specialPeriods.find(x=>Number(x.id)===Number(id));
+  if(!item)return;
+  editingSpecialPeriodId=id;
+  $('#specialPeriodName').value=item.nome||'';
+  $('#specialPeriodStart').value=item.data_inicio||'';
+  $('#specialPeriodEnd').value=item.data_fim||'';
+  $('#specialPeriodPrice').value=item.preco_diaria ?? '';
+  $('#specialPeriodMinNights').value=Number(item.minimo_noites)||1;
+  $('#specialPeriodPriority').value=Number(item.prioridade)||10;
+  $('#specialPeriodActive').checked=Number(item.ativo)===1;
+  $('#specialPeriodNote').value=item.observacao||'';
+  $('#specialPeriodDialogTitle').textContent='Editar período especial';
+  $('#saveSpecialPeriodBtn').textContent='Salvar alterações';
+  $('#specialPeriodFormMsg').textContent='';
+  $('#specialPeriodDialog').showModal();
+}
+
+async function deleteSpecialPeriod(id){
+  const item=specialPeriods.find(x=>Number(x.id)===Number(id));
+  if(!item)return;
+  if(!confirm('Excluir “'+item.nome+'”?'))return;
+  try{
+    await api('/admin/precos/periodos-especiais/'+id,{method:'DELETE'});
+    toast('Período excluído.');
+    await loadPricing();
+  }catch(err){toast(err.message)}
+}
+
+$('#savePricingConfig')?.addEventListener('click',async()=>{
+  const btn=$('#savePricingConfig');
+  const defaultPrice=Number($('#priceDefault').value);
+  const weekendRaw=$('#priceWeekend').value.trim();
+  const weekendPrice=weekendRaw===''?null:Number(weekendRaw);
+  const discount=Number($('#priceDirectDiscount').value||0);
+  if(!Number.isFinite(defaultPrice)||defaultPrice<0){toast('Informe uma diária padrão válida.');return}
+  if(weekendPrice!==null&&(!Number.isFinite(weekendPrice)||weekendPrice<0)){toast('Informe um valor de fim de semana válido.');return}
+  btn.disabled=true;
+  try{
+    const d=await api('/admin/precos/configuracao',{
+      method:'PUT',
+      body:JSON.stringify({
+        preco_padrao:defaultPrice,
+        preco_fim_semana:weekendPrice,
+        desconto_direto_percentual:discount,
+        sexta_fim_semana:true,
+        sabado_fim_semana:true,
+        domingo_fim_semana:true
+      })
+    });
+    pricingConfig=d.configuracao||null;
+    toast('Configuração de preços salva.');
+  }catch(err){toast(err.message)}
+  finally{btn.disabled=false}
+});
+
+$('#refreshPricing')?.addEventListener('click',loadPricing);
+$('#addSpecialPeriodBtn')?.addEventListener('click',()=>{resetSpecialPeriodForm();$('#specialPeriodDialog').showModal()});
+$('#closeSpecialPeriodModal')?.addEventListener('click',()=>$('#specialPeriodDialog').close());
+$('#cancelSpecialPeriodModal')?.addEventListener('click',()=>$('#specialPeriodDialog').close());
+
+$('#specialPeriodForm')?.addEventListener('submit',async e=>{
+  e.preventDefault();
+  const msg=$('#specialPeriodFormMsg'),btn=$('#saveSpecialPeriodBtn');
+  msg.textContent='';
+  const payload={
+    nome:$('#specialPeriodName').value.trim(),
+    data_inicio:$('#specialPeriodStart').value,
+    data_fim:$('#specialPeriodEnd').value,
+    preco_diaria:Number($('#specialPeriodPrice').value),
+    minimo_noites:Number($('#specialPeriodMinNights').value||1),
+    observacao:$('#specialPeriodNote').value.trim(),
+    prioridade:Number($('#specialPeriodPriority').value||10),
+    ativo:$('#specialPeriodActive').checked
+  };
+  if(payload.data_fim<payload.data_inicio){msg.textContent='A data final não pode ser anterior à data inicial.';return}
+  btn.disabled=true;
+  const editing=editingSpecialPeriodId;
+  try{
+    await api(editing?'/admin/precos/periodos-especiais/'+editing:'/admin/precos/periodos-especiais',{
+      method:editing?'PUT':'POST',
+      body:JSON.stringify(payload)
+    });
+    $('#specialPeriodDialog').close();
+    editingSpecialPeriodId=null;
+    toast(editing?'Período atualizado.':'Período adicionado.');
+    await loadPricing();
+  }catch(err){msg.textContent=err.message}
+  finally{btn.disabled=false;btn.textContent=editingSpecialPeriodId?'Salvar alterações':'Salvar período'}
+});
 
 async function loadRules(){
   const panel=$('#rulesAdminPanel');
