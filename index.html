@@ -812,6 +812,23 @@ img{max-width:100%;display:block}
 .rule .rule-icon{font-size:1.45rem;line-height:1.2;flex:none}
 .rule.featured{grid-column:1/-1;background:#fffaf0;border-left-color:#b18c4e}
 @media(max-width:600px){.rule.featured{grid-column:auto}}
+
+.rules-access-wrap{display:flex;justify-content:center;margin:-48px auto 55px;padding:0 18px}
+.rules-access-btn{min-height:48px;background:#eef4f1;color:#14523d;border:1px solid #dce8e2}
+.rules-dialog{border:0;border-radius:22px;padding:0;width:min(900px,calc(100% - 28px));max-height:88vh;overflow:auto;box-shadow:0 30px 90px rgba(0,0,0,.24)}
+.rules-dialog::backdrop{background:rgba(15,25,21,.58)}
+.rules-dialog-wrap{padding:28px}
+.rules-dialog-head{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;margin-bottom:20px}
+.rules-dialog-kicker{color:#245e4e;font-size:.72rem;font-weight:800;letter-spacing:2.5px;text-transform:uppercase}
+.rules-dialog-head h3{font-size:clamp(1.6rem,3vw,2.15rem);margin:4px 0 7px}
+.rules-dialog-head p{margin:0;color:#6f7974;line-height:1.5}
+.rules-dialog-close{border:0;background:#f1f4f2;width:42px;height:42px;border-radius:50%;font-size:1.45rem;cursor:pointer;flex:none}
+.rules-dialog .rules{max-width:none}
+@media(max-width:600px){
+  .rules-access-wrap{margin:-34px auto 42px}
+  .rules-dialog-wrap{padding:20px 16px}
+  .rules-dialog-head{gap:12px}
+}
 </style>
     <!-- Compartilhamento do site - WhatsApp / Facebook -->
 <meta property="og:type" content="website">
@@ -1060,14 +1077,24 @@ img{max-width:100%;display:block}
 </section>
 
 
-<section class="section alt" id="regras-casa">
-  <div class="section-header">
-    <div style="color:#245e4e;font-size:.76rem;font-weight:800;letter-spacing:3px;text-transform:uppercase;">Durante a estadia</div>
-    <h2 class="section-title">Regras da casa e do condomínio</h2>
-    <p class="section-subtitle">Orientações para uma estadia tranquila e uma boa convivência.</p>
+<div class="rules-access-wrap">
+  <button type="button" class="btn btn-light rules-access-btn" id="openHouseRules">📋 Ver regras da casa e do condomínio</button>
+</div>
+
+
+<dialog id="houseRulesDialog" class="rules-dialog">
+  <div class="rules-dialog-wrap">
+    <div class="rules-dialog-head">
+      <div>
+        <div class="rules-dialog-kicker">Durante a estadia</div>
+        <h3>Regras da casa e do condomínio</h3>
+        <p>Orientações para uma estadia tranquila e uma boa convivência.</p>
+      </div>
+      <button type="button" class="rules-dialog-close" id="closeHouseRules" aria-label="Fechar">×</button>
+    </div>
+    <div class="rules" id="houseRulesGrid" aria-live="polite"></div>
   </div>
-  <div class="rules" id="houseRulesGrid" aria-live="polite"></div>
-</section>
+</dialog>
 
     <section class="section" id="faq">
         <div class="section-header">
@@ -1767,6 +1794,17 @@ async function loadRulesFromApi(){
 }
 
 loadRulesFromApi();
+document.getElementById('openHouseRules')?.addEventListener('click',()=>{
+  document.getElementById('houseRulesDialog')?.showModal();
+});
+document.getElementById('closeHouseRules')?.addEventListener('click',()=>{
+  document.getElementById('houseRulesDialog')?.close();
+});
+document.getElementById('houseRulesDialog')?.addEventListener('click',e=>{
+  if(e.target===e.currentTarget)e.currentTarget.close();
+});
+
+
 
 const IMPORTANT_INFO_API='https://village-paganayoh-api.dario-cdao.workers.dev';
 
