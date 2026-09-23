@@ -190,7 +190,16 @@
       <div class="field"><label>Ordem</label><input id="regionOrder" type="number" min="0" step="1" value="0"></div>
     </div>
     <div class="field"><label>Link do Google Maps</label><input id="regionMapsUrl" type="url" placeholder="https://maps.google.com/..."></div>
-    <div class="field"><label>URL da foto</label><input id="regionImageUrl" type="url" placeholder="https://..."></div>
+    <div class="field">
+  <label>Foto principal</label>
+  <div id="regionMainPhotoPreview" style="border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#eef2ef;min-height:180px;display:grid;place-items:center;color:var(--muted);margin-bottom:10px">Sem foto</div>
+  <label class="btn btn-light" style="display:inline-flex;align-items:center;justify-content:center;cursor:pointer">
+    📷 Escolher foto
+    <input id="regionImageFile" type="file" accept="image/jpeg,image/png,image/webp" hidden>
+  </label>
+  <div style="font-size:.76rem;color:var(--muted);margin-top:8px">JPG, PNG ou WebP • até 10 MB</div>
+  <input id="regionImageUrl" type="hidden">
+</div>
     <div class="field"><label style="display:flex;align-items:center;gap:8px"><input id="regionActive" type="checkbox" checked style="width:auto"> Exibir este local no site</label></div>
     <div id="regionFormMsg" class="msg"></div>
     <div class="modal-actions"><button type="button" class="btn btn-light" id="cancelRegionModal">Voltar</button><button type="submit" class="btn btn-primary" id="saveRegionBtn">Salvar local</button></div>
@@ -378,6 +387,26 @@ function openMediaEdit(id){const m=mediaItems.find(x=>Number(x.id)===Number(id))
 $('#closeMediaModal').onclick=()=>$('#mediaDialog').close();
 $('#cancelMediaModal').onclick=()=>$('#mediaDialog').close();
 $('#mediaForm').addEventListener('submit',async e=>{e.preventDefault();const file=$('#mediaFile').files[0],msg=$('#mediaFormMsg'),btn=$('#saveMediaBtn');msg.textContent='';if(editingMediaId){btn.disabled=true;btn.textContent='Salvando...';try{await api('/midias/'+editingMediaId,{method:'PUT',body:JSON.stringify({categoria:$('#mediaCategory').value,titulo:$('#mediaTitle').value.trim(),legenda:$('#mediaCaption').value.trim()})});$('#mediaDialog').close();toast('Mídia atualizada com sucesso.');editingMediaId=null;await loadMedia()}catch(err){msg.textContent=err.message}finally{btn.disabled=false;btn.textContent='Salvar alterações'}return}if(!file){msg.textContent='Escolha uma foto ou vídeo.';return}if(file.size>50*1024*1024){msg.textContent='O arquivo deve ter no máximo 50 MB.';return}const form=new FormData();form.append('arquivo',file);form.append('categoria',$('#mediaCategory').value);form.append('titulo',$('#mediaTitle').value.trim());form.append('legenda',$('#mediaCaption').value.trim());btn.disabled=true;btn.textContent='Enviando...';try{const r=await fetch(API+'/midias/upload',{method:'POST',headers:{'Authorization':'Bearer '+adminToken},body:form});let d={};try{d=await r.json()}catch{}if(r.status===401){logout();throw new Error('Sessão não autorizada. Entre novamente.')}if(!r.ok||d.ok===false)throw new Error(d.erro||'Não foi possível enviar a mídia.');$('#mediaDialog').close();toast('Mídia adicionada com sucesso.');await loadMedia()}catch(err){msg.textContent=err.message}finally{btn.disabled=false;btn.textContent='Enviar mídia'}});
+
+
+function renderRegionMainPhotoPreview(src=''){
+  const box=$('#regionMainPhotoPreview');
+  if(!box)return;
+  box.innerHTML=src
+    ? '<img src="'+esc(src)+'" alt="Foto principal" style="width:100%;height:220px;object-fit:cover;display:block" referrerpolicy="no-referrer">'
+    : 'Sem foto';
+}
+
+$('#regionImageFile')?.addEventListener('change',()=>{
+  const file=$('#regionImageFile').files?.[0];
+  if(!file){renderRegionMainPhotoPreview($('#regionImageUrl').value.trim());return}
+  if(file.size>10*1024*1024){
+    toast('A foto deve ter no máximo 10 MB.');
+    $('#regionImageFile').value='';
+    return;
+  }
+  renderRegionMainPhotoPreview(URL.createObjectURL(file));
+});
 
 async function loadRegions(){
   const panel=$('#regionAdminPanel');
@@ -666,7 +695,7 @@ function openRegionEdit(id){
   $('#regionDistance').value=r.distancia||'';
   $('#regionOrder').value=Number(r.ordem)||0;
   $('#regionMapsUrl').value=r.maps_url||'';
-  $('#regionImageUrl').value=r.imagem_url||'';
+  $('#regionImageUrl').value=r.imagem_url||'';const rf=$('#regionImageFile');if(rf)rf.value='';renderRegionMainPhotoPreview(r.imagem_url||'');
   $('#regionActive').checked=Number(r.ativo)===1;
   $('#regionDialogTitle').textContent='Editar local';
   $('#saveRegionBtn').textContent='Salvar alterações';
@@ -683,13 +712,18 @@ $('#regionForm').addEventListener('submit',async e=>{
   e.preventDefault();
   const msg=$('#regionFormMsg'),btn=$('#saveRegionBtn');
   msg.textContent='';
+  let regionFoto=$('#regionImageUrl').value.trim();
+  try{
+    const regionFile=$('#regionImageFile')?.files?.[0];
+    if(regionFile)regionFoto=await uploadRegionPhoto(regionFile);
+  }catch(err){msg.textContent=err.message;return}
   const payload={
     nome:$('#regionName').value.trim(),
     categoria:$('#regionCategory').value.trim(),
     descricao:$('#regionDescription').value.trim(),
     distancia:$('#regionDistance').value.trim(),
     maps_url:$('#regionMapsUrl').value.trim(),
-    imagem_url:$('#regionImageUrl').value.trim(),
+    imagem_url:regionFoto,
     ativo:$('#regionActive').checked?1:0,
     ordem:Number($('#regionOrder').value||0)
   };
