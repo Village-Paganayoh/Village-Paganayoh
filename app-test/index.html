@@ -2,13 +2,11 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="robots" content="noindex,nofollow">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">\n  <meta name="robots" content="noindex,nofollow">
   <title>Temporada Direta - App</title>
-  <link rel="stylesheet" href="styles.css?v=2">
+  <link rel="stylesheet" href="styles.css?v=3">
 </head>
-<body>
-  <div class="test-banner">AMBIENTE DE TESTE • dados reais do backend</div>
+<body>\n  <div class="test-banner">AMBIENTE DE TESTE • dados reais do backend</div>
   <header class="topbar">
     <div>
       <strong>Temporada Direta</strong>
@@ -66,6 +64,117 @@
         <button class="primary" id="emptyNewPropertyBtn">Cadastrar imóvel</button>
       </div>
     </section>
+
+    <section id="propertyDetailView" class="hidden">
+      <button id="backToProperties" class="back-link" type="button">← Meus imóveis</button>
+
+      <div class="property-detail-head">
+        <div>
+          <div class="detail-badges">
+            <span id="detailRentalType" class="tag">Temporada</span>
+            <span id="detailStatus" class="status-pill">Rascunho</span>
+          </div>
+          <h1 id="detailPropertyName">Imóvel</h1>
+          <p id="detailPropertyLocation"></p>
+        </div>
+        <div class="detail-actions">
+          <button class="ghost" id="previewPublicPageBtn" type="button" disabled>Ver página</button>
+          <button class="primary" id="publishPropertyBtn" type="button" disabled>Publicar</button>
+        </div>
+      </div>
+
+      <nav class="property-tabs" id="propertyTabs" aria-label="Gestão do imóvel">
+        <button class="property-tab active" data-property-tab="overview">Visão geral</button>
+        <button class="property-tab" data-property-tab="details">Dados do imóvel</button>
+        <button class="property-tab" data-property-tab="media">Fotos e vídeos</button>
+        <button class="property-tab temporada-only" data-property-tab="reservations">Reservas</button>
+        <button class="property-tab temporada-only" data-property-tab="calendar">Calendário</button>
+        <button class="property-tab anual-only hidden" data-property-tab="contracts">Contratos</button>
+        <button class="property-tab anual-only hidden" data-property-tab="tenants">Locatários</button>
+        <button class="property-tab" data-property-tab="rules">Regras</button>
+        <button class="property-tab" data-property-tab="info">Informações</button>
+        <button class="property-tab temporada-only" data-property-tab="public">Página pública</button>
+      </nav>
+
+      <div class="property-tab-panels">
+        <section class="property-panel" data-property-panel="overview">
+          <div class="overview-grid">
+            <article class="overview-card">
+              <span class="overview-icon">🏠</span>
+              <div><small>Status</small><strong id="overviewStatus">Rascunho</strong></div>
+            </article>
+            <article class="overview-card">
+              <span class="overview-icon">📸</span>
+              <div><small>Mídias</small><strong>0</strong></div>
+            </article>
+            <article class="overview-card temporada-only">
+              <span class="overview-icon">📅</span>
+              <div><small>Reservas futuras</small><strong>0</strong></div>
+            </article>
+            <article class="overview-card anual-only hidden">
+              <span class="overview-icon">🧾</span>
+              <div><small>Contratos ativos</small><strong>0</strong></div>
+            </article>
+          </div>
+          <div class="setup-card">
+            <div>
+              <span class="eyebrow">Próximos passos</span>
+              <h2>Prepare seu imóvel para começar.</h2>
+              <p id="setupText">Complete os dados, adicione fotos e configure as informações principais.</p>
+            </div>
+            <div class="setup-list">
+              <button type="button" data-go-tab="details"><span>1</span><b>Complete os dados do imóvel</b><em>→</em></button>
+              <button type="button" data-go-tab="media"><span>2</span><b>Adicione fotos e vídeos</b><em>→</em></button>
+              <button type="button" data-go-tab="rules"><span>3</span><b>Configure regras e informações</b><em>→</em></button>
+              <button type="button" class="temporada-only" data-go-tab="public"><span>4</span><b>Prepare a página pública</b><em>→</em></button>
+              <button type="button" class="anual-only hidden" data-go-tab="contracts"><span>4</span><b>Cadastre o primeiro contrato</b><em>→</em></button>
+            </div>
+          </div>
+        </section>
+
+        <section class="property-panel hidden" data-property-panel="details">
+          <div class="module-card">
+            <div class="module-head"><div><span class="eyebrow">Cadastro</span><h2>Dados do imóvel</h2></div><span class="coming-badge">Próxima etapa</span></div>
+            <p>Nome, descrição, endereço, capacidade, quartos, comodidades e contatos ficarão aqui.</p>
+          </div>
+        </section>
+
+        <section class="property-panel hidden" data-property-panel="media">
+          <div class="module-card">
+            <div class="module-head"><div><span class="eyebrow">Conteúdo</span><h2>Fotos e vídeos</h2></div><span class="coming-badge">Em breve</span></div>
+            <p>Vamos reaproveitar o sistema de upload e organização de mídia do Village Paganayoh.</p>
+          </div>
+        </section>
+
+        <section class="property-panel hidden temporada-only" data-property-panel="reservations">
+          <div class="module-card"><div class="module-head"><div><span class="eyebrow">Temporada</span><h2>Reservas</h2></div><span class="coming-badge">Em breve</span></div><p>Reservas diretas e bloqueios externos serão gerenciados por imóvel.</p></div>
+        </section>
+
+        <section class="property-panel hidden temporada-only" data-property-panel="calendar">
+          <div class="module-card"><div class="module-head"><div><span class="eyebrow">Temporada</span><h2>Calendário</h2></div><span class="coming-badge">Em breve</span></div><p>Disponibilidade, bloqueios e sincronização externa serão exibidos aqui.</p></div>
+        </section>
+
+        <section class="property-panel hidden anual-only" data-property-panel="contracts">
+          <div class="module-card"><div class="module-head"><div><span class="eyebrow">Locação anual</span><h2>Contratos</h2></div><span class="coming-badge">Em breve</span></div><p>Contratos, valores mensais, vencimentos, caução e reajustes.</p></div>
+        </section>
+
+        <section class="property-panel hidden anual-only" data-property-panel="tenants">
+          <div class="module-card"><div class="module-head"><div><span class="eyebrow">Locação anual</span><h2>Locatários</h2></div><span class="coming-badge">Em breve</span></div><p>Cadastre e acompanhe os locatários vinculados a este imóvel.</p></div>
+        </section>
+
+        <section class="property-panel hidden" data-property-panel="rules">
+          <div class="module-card"><div class="module-head"><div><span class="eyebrow">Conteúdo</span><h2>Regras</h2></div><span class="coming-badge">Em breve</span></div><p>As regras da casa e do condomínio serão personalizadas para cada imóvel.</p></div>
+        </section>
+
+        <section class="property-panel hidden" data-property-panel="info">
+          <div class="module-card"><div class="module-head"><div><span class="eyebrow">Conteúdo</span><h2>Informações importantes</h2></div><span class="coming-badge">Em breve</span></div><p>Check-in, energia, animais, roupa de cama e outras orientações ficarão aqui.</p></div>
+        </section>
+
+        <section class="property-panel hidden temporada-only" data-property-panel="public">
+          <div class="module-card"><div class="module-head"><div><span class="eyebrow">Divulgação</span><h2>Página pública</h2></div><span class="coming-badge">Em breve</span></div><p>Cada imóvel poderá gerar sua própria página profissional para compartilhar com hóspedes.</p></div>
+        </section>
+      </div>
+    </section>
   </main>
 
   <dialog id="propertyDialog">
@@ -93,6 +202,6 @@
     </form>
   </dialog>
 
-  <script src="app.js?v=2"></script>
+  <script src="app.js?v=3"></script>
 </body>
 </html>
