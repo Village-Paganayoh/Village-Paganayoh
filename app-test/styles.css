@@ -85,7 +85,12 @@ button:disabled{opacity:.62;cursor:wait}
 .msg.ok{color:var(--green)}
 
 .test-banner{
-  background:#fff4d6;color:#7b5200;text-align:center;
-  padding:8px 12px;font-size:.72rem;font-weight:800;letter-spacing:.5px;
+  background:#fff4d6;
+  color:#7b5200;
+  text-align:center;
+  padding:8px 12px;
+  font-size:.72rem;
+  font-weight:800;
+  letter-spacing:.5px;
   border-bottom:1px solid #ead9a7;
 }
