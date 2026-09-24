@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Temporada Direta - App</title>
+  <link rel="stylesheet" href="styles.css?v=2">
+</head>
+<body>
+  <div class="test-banner">AMBIENTE DE TESTE • dados reais do backend</div>
+  <header class="topbar">
+    <div>
+      <strong>Temporada Direta</strong>
+      <span>Gestão de imóveis</span>
+    </div>
+    <button id="logoutBtn" class="ghost hidden">Sair</button>
+  </header>
+
+  <main class="shell">
+    <section id="authView" class="auth-card">
+      <div class="brand-block">
+        <span class="eyebrow">Sua gestão em um só lugar</span>
+        <h1>Administre seus imóveis com simplicidade.</h1>
+        <p>Temporada, locação anual ou ambos.</p>
+      </div>
+
+      <div class="auth-tabs">
+        <button class="tab active" data-auth="login">Entrar</button>
+        <button class="tab" data-auth="register">Criar conta</button>
+      </div>
+
+      <form id="loginForm" class="form">
+        <label>E-mail<input id="loginEmail" type="email" required></label>
+        <label>Senha<input id="loginPassword" type="password" required></label>
+        <button class="primary" type="submit">Entrar</button>
+      </form>
+
+      <form id="registerForm" class="form hidden">
+        <label>Nome<input id="registerName" type="text" required></label>
+        <label>E-mail<input id="registerEmail" type="email" required></label>
+        <label>Telefone<input id="registerPhone" type="tel"></label>
+        <label>Senha<input id="registerPassword" type="password" minlength="8" required></label>
+        <button class="primary" type="submit">Criar conta</button>
+      </form>
+
+      <div id="authMsg" class="msg"></div>
+    </section>
+
+    <section id="propertiesView" class="hidden">
+      <div class="page-head">
+        <div>
+          <span class="eyebrow">Painel do proprietário</span>
+          <h1>Meus imóveis</h1>
+          <p>Cadastre, organize e publique seus imóveis.</p>
+          <div id="userSummary" class="user-summary"></div>
+        </div>
+        <button id="newPropertyBtn" class="primary">+ Novo imóvel</button>
+      </div>
+
+      <div id="propertyGrid" class="property-grid"></div>
+      <div id="propertyEmpty" class="empty">
+        <div class="empty-icon">🏠</div>
+        <h2>Seu primeiro imóvel começa aqui</h2>
+        <p>Cadastre um imóvel para temporada, locação anual ou ambos.</p>
+        <button class="primary" id="emptyNewPropertyBtn">Cadastrar imóvel</button>
+      </div>
+    </section>
+  </main>
+
+  <dialog id="propertyDialog">
+    <form id="propertyForm" class="modal">
+      <div class="modal-head">
+        <h2>Novo imóvel</h2>
+        <button type="button" id="closePropertyDialog">×</button>
+      </div>
+
+      <label>Nome do imóvel<input id="propertyName" type="text" required placeholder="Ex.: Casa em Guarajuba"></label>
+      <label>Cidade<input id="propertyCity" type="text" required></label>
+      <label>Estado<input id="propertyState" type="text" maxlength="2" placeholder="BA"></label>
+
+      <fieldset>
+        <legend>Tipo de locação</legend>
+        <label class="choice"><input type="radio" name="rentalType" value="temporada" checked> Temporada</label>
+        <label class="choice"><input type="radio" name="rentalType" value="anual"> Locação anual</label>
+        <label class="choice"><input type="radio" name="rentalType" value="ambos"> Ambos</label>
+      </fieldset>
+
+      <div class="modal-actions">
+        <button type="button" class="ghost" id="cancelProperty">Cancelar</button>
+        <button type="submit" class="primary">Salvar imóvel</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="app.js?v=2"></script>
+</body>
+</html>
