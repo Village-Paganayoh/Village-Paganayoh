@@ -133,10 +133,105 @@
         </section>
 
         <section class="property-panel hidden" data-property-panel="details">
-          <div class="module-card">
-            <div class="module-head"><div><span class="eyebrow">Cadastro</span><h2>Dados do imóvel</h2></div><span class="coming-badge">Próxima etapa</span></div>
-            <p>Nome, descrição, endereço, capacidade, quartos, comodidades e contatos ficarão aqui.</p>
-          </div>
+          <form id="propertyDetailsForm" class="module-card details-form">
+            <div class="module-head">
+              <div><span class="eyebrow">Cadastro</span><h2>Dados do imóvel</h2></div>
+              <span class="status-pill" id="detailsSaveStatus">Salvo</span>
+            </div>
+
+            <div class="form-section">
+              <h3>Informações principais</h3>
+              <div class="form-grid two">
+                <label>Nome do imóvel
+                  <input id="detailsName" type="text" required maxlength="120">
+                </label>
+                <label>Tipo de locação
+                  <select id="detailsRentalType">
+                    <option value="temporada">Temporada</option>
+                    <option value="anual">Locação anual</option>
+                    <option value="ambos">Temporada + anual</option>
+                  </select>
+                </label>
+              </div>
+              <label>Descrição
+                <textarea id="detailsDescription" rows="5" maxlength="3000" placeholder="Apresente o imóvel, seus diferenciais e o que o torna especial."></textarea>
+              </label>
+            </div>
+
+            <div class="form-section">
+              <h3>Localização</h3>
+              <div class="form-grid two">
+                <label>Endereço
+                  <input id="detailsAddress" type="text" maxlength="180" placeholder="Rua, avenida, condomínio...">
+                </label>
+                <label>Bairro
+                  <input id="detailsNeighborhood" type="text" maxlength="100">
+                </label>
+                <label>Cidade
+                  <input id="detailsCity" type="text" maxlength="100">
+                </label>
+                <label>Estado
+                  <input id="detailsState" type="text" maxlength="2" placeholder="BA">
+                </label>
+                <label>CEP
+                  <input id="detailsZip" type="text" maxlength="10" inputmode="numeric" placeholder="00000-000">
+                </label>
+                <label>País
+                  <input id="detailsCountry" type="text" maxlength="80" value="Brasil">
+                </label>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <h3>Estrutura</h3>
+              <div class="form-grid metrics">
+                <label>Capacidade
+                  <input id="detailsCapacity" type="number" min="0" max="100" inputmode="numeric">
+                </label>
+                <label>Quartos
+                  <input id="detailsBedrooms" type="number" min="0" max="50" inputmode="numeric">
+                </label>
+                <label>Suítes
+                  <input id="detailsSuites" type="number" min="0" max="50" inputmode="numeric">
+                </label>
+                <label>Banheiros
+                  <input id="detailsBathrooms" type="number" min="0" max="50" inputmode="numeric">
+                </label>
+                <label>Vagas
+                  <input id="detailsParking" type="number" min="0" max="50" inputmode="numeric">
+                </label>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <h3>Contato</h3>
+              <div class="form-grid two">
+                <label>Telefone
+                  <input id="detailsPhone" type="tel" maxlength="30">
+                </label>
+                <label>WhatsApp
+                  <input id="detailsWhatsapp" type="tel" maxlength="30">
+                </label>
+              </div>
+            </div>
+
+            <details class="advanced-location">
+              <summary>Localização precisa (opcional)</summary>
+              <div class="form-grid two">
+                <label>Latitude
+                  <input id="detailsLatitude" type="number" step="any">
+                </label>
+                <label>Longitude
+                  <input id="detailsLongitude" type="number" step="any">
+                </label>
+              </div>
+            </details>
+
+            <div id="detailsMsg" class="inline-msg" aria-live="polite"></div>
+            <div class="form-actions">
+              <button id="savePropertyDetailsBtn" class="primary" type="submit">Salvar alterações</button>
+            </div>
+          </form>
         </section>
 
         <section class="property-panel hidden" data-property-panel="media">
