@@ -118,6 +118,63 @@ function switchPropertyTab(name){
   document.querySelectorAll('[data-property-panel]').forEach(x=>x.classList.toggle('hidden',x.dataset.propertyPanel!==name));
 }
 
+function valueOrEmpty(v){return v===null||v===undefined?'':v;}
+
+function fillPropertyDetailsForm(item){
+  if(!item)return;
+  $('#detailsName').value=valueOrEmpty(item.nome);
+  $('#detailsRentalType').value=item.tipo_locacao||'temporada';
+  $('#detailsDescription').value=valueOrEmpty(item.descricao);
+  $('#detailsAddress').value=valueOrEmpty(item.endereco);
+  $('#detailsNeighborhood').value=valueOrEmpty(item.bairro);
+  $('#detailsCity').value=valueOrEmpty(item.cidade);
+  $('#detailsState').value=valueOrEmpty(item.estado);
+  $('#detailsZip').value=valueOrEmpty(item.cep);
+  $('#detailsCountry').value=valueOrEmpty(item.pais||'Brasil');
+  $('#detailsCapacity').value=valueOrEmpty(item.capacidade);
+  $('#detailsBedrooms').value=valueOrEmpty(item.quartos);
+  $('#detailsSuites').value=valueOrEmpty(item.suites);
+  $('#detailsBathrooms').value=valueOrEmpty(item.banheiros);
+  $('#detailsParking').value=valueOrEmpty(item.vagas);
+  $('#detailsPhone').value=valueOrEmpty(item.telefone_contato);
+  $('#detailsWhatsapp').value=valueOrEmpty(item.whatsapp_contato);
+  $('#detailsLatitude').value=valueOrEmpty(item.latitude);
+  $('#detailsLongitude').value=valueOrEmpty(item.longitude);
+  $('#detailsMsg').textContent='';
+  $('#detailsMsg').className='inline-msg';
+  $('#detailsSaveStatus').textContent='Salvo';
+}
+
+function numericOrNull(selector){
+  const raw=$(selector).value.trim();
+  if(raw==='')return null;
+  const n=Number(raw);
+  return Number.isFinite(n)?n:null;
+}
+
+function propertyDetailsPayload(){
+  return {
+    nome:$('#detailsName').value.trim(),
+    tipo_locacao:$('#detailsRentalType').value,
+    descricao:$('#detailsDescription').value.trim(),
+    endereco:$('#detailsAddress').value.trim(),
+    bairro:$('#detailsNeighborhood').value.trim(),
+    cidade:$('#detailsCity').value.trim(),
+    estado:$('#detailsState').value.trim().toUpperCase(),
+    cep:$('#detailsZip').value.trim(),
+    pais:$('#detailsCountry').value.trim()||'Brasil',
+    capacidade:numericOrNull('#detailsCapacity'),
+    quartos:numericOrNull('#detailsBedrooms'),
+    suites:numericOrNull('#detailsSuites'),
+    banheiros:numericOrNull('#detailsBathrooms'),
+    vagas:numericOrNull('#detailsParking'),
+    telefone_contato:$('#detailsPhone').value.trim(),
+    whatsapp_contato:$('#detailsWhatsapp').value.trim(),
+    latitude:numericOrNull('#detailsLatitude'),
+    longitude:numericOrNull('#detailsLongitude')
+  };
+}
+
 async function openPropertyDetail(id){
   try{
     const d=await api('/app/imoveis/'+id);
@@ -130,6 +187,7 @@ async function openPropertyDetail(id){
     $('#detailRentalType').textContent=rentalLabel(item.tipo_locacao);
     $('#detailStatus').textContent=Number(item.publicado)===1?'Publicado':'Rascunho';
     $('#overviewStatus').textContent=Number(item.publicado)===1?'Publicado':'Rascunho';
+    fillPropertyDetailsForm(item);
     applyPropertyMode(item.tipo_locacao);
     switchPropertyTab('overview');
     window.scrollTo({top:0,behavior:'smooth'});
@@ -150,6 +208,56 @@ document.querySelectorAll('[data-property-tab]').forEach(btn=>{
 });
 document.querySelectorAll('[data-go-tab]').forEach(btn=>{
   btn.addEventListener('click',()=>switchPropertyTab(btn.dataset.goTab));
+});
+
+$('#propertyDetailsForm')?.addEventListener('input',()=>{
+  $('#detailsSaveStatus').textContent='Alterações pendentes';
+});
+
+$('#propertyDetailsForm')?.addEventListener('submit',async e=>{
+  e.preventDefault();
+  if(!state.activeProperty?.id)return;
+
+  const btn=$('#savePropertyDetailsBtn');
+  const msg=$('#detailsMsg');
+  btn.disabled=true;
+  btn.textContent='Salvando...';
+  msg.textContent='';
+  msg.className='inline-msg';
+
+  try{
+    const payload=propertyDetailsPayload();
+    if(!payload.nome)throw new Error('Informe o nome do imóvel.');
+
+    const d=await api('/app/imoveis/'+state.activeProperty.id,{
+      method:'PUT',
+      body:JSON.stringify(payload)
+    });
+
+    state.activeProperty=d.imovel||{...state.activeProperty,...payload};
+    const item=state.activeProperty;
+
+    $('#detailPropertyName').textContent=item.nome||'Imóvel';
+    $('#detailPropertyLocation').textContent=[item.cidade,item.estado,item.pais].filter(Boolean).join(' • ');
+    $('#detailRentalType').textContent=rentalLabel(item.tipo_locacao);
+    applyPropertyMode(item.tipo_locacao);
+    fillPropertyDetailsForm(item);
+
+    const idx=state.properties.findIndex(x=>Number(x.id)===Number(item.id));
+    if(idx>=0)state.properties[idx]={...state.properties[idx],...item};
+    renderProperties();
+
+    msg.textContent='Alterações salvas com sucesso.';
+    msg.className='inline-msg ok';
+    $('#detailsSaveStatus').textContent='Salvo';
+  }catch(err){
+    msg.textContent=err.message;
+    msg.className='inline-msg error';
+    $('#detailsSaveStatus').textContent='Não salvo';
+  }finally{
+    btn.disabled=false;
+    btn.textContent='Salvar alterações';
+  }
 });
 
 function escapeHtml(value){
