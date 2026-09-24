@@ -1,7 +1,7 @@
 const API='https://village-paganayoh-api.dario-cdao.workers.dev';
 const TOKEN_KEY='temporada_direta_token';
 
-const state={user:null,properties:[],token:localStorage.getItem(TOKEN_KEY)||''};
+const state={user:null,properties:[],token:localStorage.getItem(TOKEN_KEY)||'',activeProperty:null};
 
 const $=s=>document.querySelector(s);
 const authView=$('#authView');
@@ -42,6 +42,7 @@ function clearSession(){
   saveSession('',null);
   state.properties=[];
   propertiesView.classList.add('hidden');
+  $('#propertyDetailView')?.classList.add('hidden');
   authView.classList.remove('hidden');
   $('#logoutBtn').classList.add('hidden');
   renderProperties();
@@ -90,9 +91,66 @@ function renderProperties(){
       </div>
     `;
 
+    card.tabIndex=0;
+    card.setAttribute('role','button');
+    card.setAttribute('aria-label','Abrir '+(item.nome||'imóvel'));
+    card.addEventListener('click',()=>openPropertyDetail(item.id));
+    card.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openPropertyDetail(item.id)}});
     propertyGrid.appendChild(card);
   }
 }
+
+function rentalLabel(type){
+  return type==='anual'?'Locação anual':type==='ambos'?'Temporada + anual':'Temporada';
+}
+
+function applyPropertyMode(type){
+  const temporada=type==='temporada'||type==='ambos';
+  const anual=type==='anual'||type==='ambos';
+  document.querySelectorAll('.temporada-only').forEach(el=>el.classList.toggle('hidden',!temporada));
+  document.querySelectorAll('.anual-only').forEach(el=>el.classList.toggle('hidden',!anual));
+}
+
+function switchPropertyTab(name){
+  const btn=document.querySelector('[data-property-tab="'+name+'"]');
+  if(!btn||btn.classList.contains('hidden'))return;
+  document.querySelectorAll('[data-property-tab]').forEach(x=>x.classList.toggle('active',x===btn));
+  document.querySelectorAll('[data-property-panel]').forEach(x=>x.classList.toggle('hidden',x.dataset.propertyPanel!==name));
+}
+
+async function openPropertyDetail(id){
+  try{
+    const d=await api('/app/imoveis/'+id);
+    const item=d.imovel;
+    state.activeProperty=item;
+    propertiesView.classList.add('hidden');
+    $('#propertyDetailView').classList.remove('hidden');
+    $('#detailPropertyName').textContent=item.nome||'Imóvel';
+    $('#detailPropertyLocation').textContent=[item.cidade,item.estado,item.pais].filter(Boolean).join(' • ');
+    $('#detailRentalType').textContent=rentalLabel(item.tipo_locacao);
+    $('#detailStatus').textContent=Number(item.publicado)===1?'Publicado':'Rascunho';
+    $('#overviewStatus').textContent=Number(item.publicado)===1?'Publicado':'Rascunho';
+    applyPropertyMode(item.tipo_locacao);
+    switchPropertyTab('overview');
+    window.scrollTo({top:0,behavior:'smooth'});
+  }catch(err){
+    alert(err.message);
+  }
+}
+
+$('#backToProperties')?.addEventListener('click',()=>{
+  state.activeProperty=null;
+  $('#propertyDetailView').classList.add('hidden');
+  propertiesView.classList.remove('hidden');
+  window.scrollTo({top:0,behavior:'smooth'});
+});
+
+document.querySelectorAll('[data-property-tab]').forEach(btn=>{
+  btn.addEventListener('click',()=>switchPropertyTab(btn.dataset.propertyTab));
+});
+document.querySelectorAll('[data-go-tab]').forEach(btn=>{
+  btn.addEventListener('click',()=>switchPropertyTab(btn.dataset.goTab));
+});
 
 function escapeHtml(value){
   return String(value??'').replace(/[&<>"']/g,ch=>({
