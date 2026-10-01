@@ -51,6 +51,10 @@
         <a class="admin-nav-link" href="#historicoReservas">🕘 Histórico</a>
       </div>
       <div class="admin-nav-group">
+        <div class="admin-nav-title">Documentos</div>
+        <a class="admin-nav-link" href="#contratosAdmin">📄 Contratos</a>
+      </div>
+      <div class="admin-nav-group">
         <div class="admin-nav-title">Conteúdo do site</div>
         <a class="admin-nav-link" href="#galeriaMidia">🖼️ Galeria e Mídia</a>
         <a class="admin-nav-link" href="#exploreRegiao">📍 Explore a Região</a>
@@ -65,6 +69,31 @@
     <div class="hero-row section-anchor" id="reservasTopo"><div><h2>Reservas</h2><p>Visão unificada das reservas diretas e períodos ocupados pelo Airbnb.</p></div><button id="newBtn" class="btn btn-primary">+ Nova reserva</button></div>
     <div class="stats"><div class="stat"><small>Reservas diretas</small><strong id="activeCount">—</strong></div><div class="stat"><small>Indisponibilidades Airbnb</small><strong id="airbnbCount">—</strong></div><div class="stat"><small>Próxima ocupação</small><strong id="nextCheckin" style="font-size:1.25rem">—</strong></div><div class="stat"><small>Total de períodos</small><strong id="totalCount">—</strong></div></div>
     <section class="panel section-anchor" id="listaReservas"><div class="panel-head"><h3>Lista de reservas</h3><button id="refresh" class="btn btn-light">Atualizar</button></div><div class="table-wrap"><table><thead><tr><th>Período</th><th>Hóspede</th><th>Telefone</th><th>Origem</th><th>Status</th><th>Ações</th></tr></thead><tbody id="rows"></tbody></table><div id="empty" class="empty hidden">Nenhuma reserva cadastrada.</div></div></section>
+    <span id="contratosAdmin" class="section-anchor"></span>
+    <section class="panel section-anchor" id="contractsPanel" data-nav="contratosAdmin" style="margin-top:18px">
+      <div class="panel-head">
+        <div>
+          <h3>Contratos</h3>
+          <div style="color:var(--muted);font-size:.82rem;margin-top:4px">Gere contratos de locação por temporada a partir das reservas diretas.</div>
+        </div>
+        <button id="newContractBtn" class="btn btn-primary" type="button">+ Gerar contrato</button>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px">
+        <div style="border:1px solid var(--line);border-radius:14px;padding:15px;background:#fff">
+          <small style="color:var(--muted)">Reservas aptas</small>
+          <strong id="contractEligibleCount" style="display:block;font-size:1.7rem;margin-top:5px">—</strong>
+        </div>
+        <div style="border:1px solid var(--line);border-radius:14px;padding:15px;background:#fff">
+          <small style="color:var(--muted)">Modelo</small>
+          <strong style="display:block;margin-top:8px">Locação por temporada</strong>
+        </div>
+        <div style="border:1px solid var(--line);border-radius:14px;padding:15px;background:#fff">
+          <small style="color:var(--muted)">Saída</small>
+          <strong style="display:block;margin-top:8px">Impressão / PDF</strong>
+        </div>
+      </div>
+      <div style="margin-top:14px;color:var(--muted);font-size:.8rem;line-height:1.5">O contrato usa os dados da reserva e permite complementar CPF, endereço, valor, forma de pagamento e quantidade de hóspedes antes da emissão.</div>
+    </section>
     <span id="galeriaMidia" class="section-anchor"></span><section class="panel section-anchor" id="mediaPanel" data-nav="galeriaMidia" style="margin-top:18px">
       <div class="panel-head"><div><h3>Galeria e Mídia</h3><div style="color:var(--muted);font-size:.82rem;margin-top:4px">Conteúdo dinâmico cadastrado para o site.</div></div><div class="actions"><button id="addMediaBtn" class="btn btn-primary" type="button">+ Adicionar mídia</button><button id="refreshMedia" class="btn btn-light" type="button">Atualizar</button></div></div>
       <div id="mediaOrderHint" style="color:var(--muted);font-size:.78rem;margin:-4px 0 12px">Organize a ordem das mídias no computador. No celular, use apenas Editar e Excluir.</div><div id="mediaGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px"></div>
@@ -389,6 +418,34 @@
     </div>
     <div id="ruleFormMsg" class="msg"></div>
     <div class="modal-actions"><button type="button" class="btn btn-light" id="cancelRuleModal">Voltar</button><button type="submit" class="btn btn-primary" id="saveRuleBtn">Salvar regra</button></div>
+  </form>
+</dialog>
+<dialog id="contractDialog" style="width:min(900px,calc(100% - 28px))">
+  <form id="contractForm" class="modal">
+    <div class="modal-head"><h3>Gerar contrato</h3><button type="button" class="x" id="closeContractModal">×</button></div>
+    <div class="field"><label>Reserva</label><select id="contractReservation" required></select></div>
+    <div class="grid2">
+      <div class="field"><label>Locatário</label><input id="contractGuestName" type="text" required></div>
+      <div class="field"><label>CPF do locatário</label><input id="contractGuestCpf" type="text" placeholder="000.000.000-00"></div>
+    </div>
+    <div class="field"><label>Endereço do locatário</label><input id="contractGuestAddress" type="text" placeholder="Rua, número, bairro, cidade/UF"></div>
+    <div class="grid2">
+      <div class="field"><label>Valor total da locação (R$)</label><input id="contractTotal" type="number" min="0" step="0.01" placeholder="0,00"></div>
+      <div class="field"><label>Quantidade de hóspedes</label><input id="contractGuests" type="number" min="1" step="1" value="1"></div>
+    </div>
+    <div class="grid2">
+      <div class="field"><label>Forma de pagamento</label><input id="contractPayment" type="text" placeholder="Ex.: PIX / transferência"></div>
+      <div class="field"><label>Caução (R$)</label><input id="contractDeposit" type="number" min="0" step="0.01" placeholder="0,00"></div>
+    </div>
+    <div class="field"><label>Observações adicionais</label><textarea id="contractNotes" rows="3" placeholder="Condições específicas desta locação"></textarea></div>
+    <div style="border-top:1px solid var(--line);margin:20px 0 10px;padding-top:16px;font-weight:800">Dados do locador</div>
+    <div class="grid2">
+      <div class="field"><label>Nome do locador</label><input id="contractOwnerName" type="text" placeholder="Nome completo"></div>
+      <div class="field"><label>CPF/CNPJ do locador</label><input id="contractOwnerDoc" type="text" placeholder="CPF ou CNPJ"></div>
+    </div>
+    <div class="field"><label>Endereço do locador</label><input id="contractOwnerAddress" type="text" placeholder="Endereço completo"></div>
+    <div id="contractMsg" class="msg"></div>
+    <div class="modal-actions"><button type="button" class="btn btn-light" id="cancelContractModal">Voltar</button><button type="submit" class="btn btn-primary">Visualizar / Imprimir PDF</button></div>
   </form>
 </dialog>
 <dialog id="reservationDialog"><form id="reservationForm" class="modal"><div class="modal-head"><h3 id="modalTitle">Nova reserva</h3><button type="button" class="x" id="closeModal">×</button></div><input id="reservationId" type="hidden"><div class="admin-cal"><div class="admin-cal-hint" id="adminCalHint">Informe ou clique na data inicial</div><div class="admin-cal-head"><button type="button" id="adminPrev">‹</button><div class="admin-cal-title" id="adminCalTitle"></div><button type="button" id="adminNext">›</button></div><div class="admin-week"><div>DOM</div><div>SEG</div><div>TER</div><div>QUA</div><div>QUI</div><div>SEX</div><div>SÁB</div></div><div class="admin-days" id="adminDays"></div><div class="admin-legend"><span><b class="lg-free"></b>Livre</span><span><b class="lg-direct"></b>Direta</span><span><b class="lg-airbnb"></b>Airbnb</span><span><b class="lg-pick"></b>Selecionado</span></div></div><div class="grid2"><div class="field"><label>Check-in</label><input id="checkin" type="date" required></div><div class="field"><label>Check-out</label><input id="checkout" type="date" required></div></div><div class="field"><label>Hóspede</label><input id="hospede" type="text" placeholder="Nome do hóspede"></div><div class="grid2"><div class="field"><label>Telefone</label><input id="telefone" type="tel" placeholder="(71) 99999-9999"></div><div class="field"><label>Origem</label><select id="origem"><option value="direta">Direta</option><option value="airbnb">Airbnb</option><option value="outro">Outro</option></select></div></div><div class="field"><label>Status</label><select id="status"><option value="confirmada">Confirmada</option><option value="cancelada">Cancelada</option></select></div><div class="field"><label>Observações</label><textarea id="observacoes" rows="4" placeholder="Informações importantes sobre a reserva"></textarea></div><div id="formMsg" class="msg"></div><div class="modal-actions"><button type="button" class="btn btn-light" id="cancelModal">Voltar</button><button type="submit" class="btn btn-primary">Salvar reserva</button></div></form></dialog>
@@ -1420,7 +1477,7 @@ $('#ruleForm')?.addEventListener('submit',async e=>{
 });
 
 async function loadReservations(){const panel=$('.panel');panel.classList.add('loading');try{const [direct,airbnb]=await Promise.all([api('/reservas'),fetch('disponibilidade.json?ts='+Date.now(),{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error('Calendário Airbnb indisponível.');return r.json()})]);reservations=direct.reservas||[];airbnbPeriods=Array.isArray(airbnb.periods)?airbnb.periods:[];render()}catch(err){toast(err.message)}finally{panel.classList.remove('loading')}}
-function render(){const body=$('#rows');body.innerHTML='';const activeDirect=[...reservations].filter(r=>r.status!=='cancelada').sort((a,b)=>a.checkin.localeCompare(b.checkin));const cancelled=[...reservations].filter(r=>r.status==='cancelada').sort((a,b)=>b.checkin.localeCompare(a.checkin));const airbnb=airbnbPeriods.map((p,i)=>({id:'airbnb-'+i,checkin:p.start,checkout:p.end,hospede:'Airbnb',telefone:'—',origem:'Airbnb',status:'Airbnb',_airbnb:true}));const sorted=[...activeDirect,...airbnb].sort((a,b)=>a.checkin.localeCompare(b.checkin));$('#empty').classList.toggle('hidden',sorted.length>0);for(const r of sorted){const tr=document.createElement('tr');const origin=r._airbnb?'<span class="badge airbnb-badge">Airbnb</span>':esc(r.origem||'direta');const actions=r._airbnb?'<span style="color:var(--muted);font-size:.8rem">Gerenciar no Airbnb</span>':`<div class="row-actions"><button class="mini edit" data-edit="${r.id}">Editar</button><button class="mini cancel" data-cancel="${r.id}">Cancelar</button></div>`;tr.innerHTML=`<td><strong>${brDate(r.checkin)}</strong><br><span style="color:var(--muted)">até ${brDate(r.checkout)}</span></td><td>${r._airbnb?'<span class="origin-airbnb">Airbnb</span>':esc(r.hospede||'—')}</td><td>${esc(r.telefone||'—')}</td><td>${origin}</td><td><span class="badge ${r._airbnb?'airbnb-badge':'confirmada'}">${esc(r.status||'confirmada')}</span></td><td>${actions}</td>`;body.appendChild(tr)}body.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>openEdit(Number(b.dataset.edit)));body.querySelectorAll('[data-cancel]').forEach(b=>b.onclick=()=>cancelReservation(Number(b.dataset.cancel)));const historyBody=$('#historyRows');historyBody.innerHTML='';$('#historySummary').textContent=cancelled.length===0?'Nenhuma reserva cancelada':cancelled.length===1?'1 reserva cancelada':cancelled.length+' reservas canceladas';$('#historyEmpty').classList.toggle('hidden',cancelled.length>0);for(const r of cancelled){const tr=document.createElement('tr');tr.innerHTML=`<td><strong>${brDate(r.checkin)}</strong><br><span style="color:var(--muted)">até ${brDate(r.checkout)}</span></td><td>${esc(r.hospede||'—')}</td><td>${esc(r.telefone||'—')}</td><td>${esc(r.origem||'direta')}</td><td><span class="badge cancelada">cancelada</span></td><td><button class="mini edit" data-history-edit="${r.id}">Editar</button></td>`;historyBody.appendChild(tr)}historyBody.querySelectorAll('[data-history-edit]').forEach(b=>b.onclick=()=>openEdit(Number(b.dataset.historyEdit)));$('#activeCount').textContent=activeDirect.length;$('#airbnbCount').textContent=airbnb.length;$('#totalCount').textContent=activeDirect.length+airbnb.length;const today=new Date().toISOString().slice(0,10);const next=[...activeDirect,...airbnb].filter(r=>r.checkin>=today).sort((a,b)=>a.checkin.localeCompare(b.checkin))[0];$('#nextCheckin').textContent=next?brDate(next.checkin):'Nenhuma'}
+function render(){const body=$('#rows');body.innerHTML='';const activeDirect=[...reservations].filter(r=>r.status!=='cancelada').sort((a,b)=>a.checkin.localeCompare(b.checkin));const cancelled=[...reservations].filter(r=>r.status==='cancelada').sort((a,b)=>b.checkin.localeCompare(a.checkin));const airbnb=airbnbPeriods.map((p,i)=>({id:'airbnb-'+i,checkin:p.start,checkout:p.end,hospede:'Airbnb',telefone:'—',origem:'Airbnb',status:'Airbnb',_airbnb:true}));const sorted=[...activeDirect,...airbnb].sort((a,b)=>a.checkin.localeCompare(b.checkin));$('#empty').classList.toggle('hidden',sorted.length>0);for(const r of sorted){const tr=document.createElement('tr');const origin=r._airbnb?'<span class="badge airbnb-badge">Airbnb</span>':esc(r.origem||'direta');const actions=r._airbnb?'<span style="color:var(--muted);font-size:.8rem">Gerenciar no Airbnb</span>':`<div class="row-actions"><button class="mini edit" data-edit="${r.id}">Editar</button><button class="mini edit" data-contract="${r.id}">Contrato</button><button class="mini cancel" data-cancel="${r.id}">Cancelar</button></div>`;tr.innerHTML=`<td><strong>${brDate(r.checkin)}</strong><br><span style="color:var(--muted)">até ${brDate(r.checkout)}</span></td><td>${r._airbnb?'<span class="origin-airbnb">Airbnb</span>':esc(r.hospede||'—')}</td><td>${esc(r.telefone||'—')}</td><td>${origin}</td><td><span class="badge ${r._airbnb?'airbnb-badge':'confirmada'}">${esc(r.status||'confirmada')}</span></td><td>${actions}</td>`;body.appendChild(tr)}body.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>openEdit(Number(b.dataset.edit)));body.querySelectorAll('[data-contract]').forEach(b=>b.onclick=()=>openContract(Number(b.dataset.contract)));body.querySelectorAll('[data-cancel]').forEach(b=>b.onclick=()=>cancelReservation(Number(b.dataset.cancel)));const historyBody=$('#historyRows');historyBody.innerHTML='';$('#historySummary').textContent=cancelled.length===0?'Nenhuma reserva cancelada':cancelled.length===1?'1 reserva cancelada':cancelled.length+' reservas canceladas';$('#historyEmpty').classList.toggle('hidden',cancelled.length>0);for(const r of cancelled){const tr=document.createElement('tr');tr.innerHTML=`<td><strong>${brDate(r.checkin)}</strong><br><span style="color:var(--muted)">até ${brDate(r.checkout)}</span></td><td>${esc(r.hospede||'—')}</td><td>${esc(r.telefone||'—')}</td><td>${esc(r.origem||'direta')}</td><td><span class="badge cancelada">cancelada</span></td><td><button class="mini edit" data-history-edit="${r.id}">Editar</button></td>`;historyBody.appendChild(tr)}historyBody.querySelectorAll('[data-history-edit]').forEach(b=>b.onclick=()=>openEdit(Number(b.dataset.historyEdit)));$('#activeCount').textContent=activeDirect.length;$('#airbnbCount').textContent=airbnb.length;$('#totalCount').textContent=activeDirect.length+airbnb.length;const today=new Date().toISOString().slice(0,10);const next=[...activeDirect,...airbnb].filter(r=>r.checkin>=today).sort((a,b)=>a.checkin.localeCompare(b.checkin))[0];$('#nextCheckin').textContent=next?brDate(next.checkin):'Nenhuma';const cc=$('#contractEligibleCount');if(cc)cc.textContent=activeDirect.length}
 function esc(v){return String(v).replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
 function ymd(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
 function parseYmd(v){if(!v)return null;const [y,m,d]=v.split('-').map(Number);return new Date(y,m-1,d)}
@@ -1435,6 +1492,79 @@ function resetForm(){reservationForm.reset();$('#reservationId').value='';$('#or
 function openNew(){resetForm();adminCalMonth=new Date();adminCalMonth.setDate(1);renderAdminCalendar();$('#reservationDialog').showModal()}
 function openEdit(id){const r=reservations.find(x=>x.id===id);if(!r)return;resetForm();$('#modalTitle').textContent='Editar reserva';$('#reservationId').value=r.id;$('#checkin').value=r.checkin;$('#checkout').value=r.checkout;$('#hospede').value=r.hospede||'';$('#telefone').value=r.telefone||'';$('#origem').value=r.origem||'direta';$('#status').value=r.status||'confirmada';$('#observacoes').value=r.observacoes||'';adminCalMonth=parseYmd(r.checkin)||new Date();adminCalMonth.setDate(1);renderAdminCalendar();$('#reservationDialog').showModal()}
 $('#adminPrev').onclick=()=>{adminCalMonth.setMonth(adminCalMonth.getMonth()-1);renderAdminCalendar()};$('#adminNext').onclick=()=>{adminCalMonth.setMonth(adminCalMonth.getMonth()+1);renderAdminCalendar()};$('#checkin').addEventListener('change',()=>{if($('#checkin').value&&$('#checkout').value&&$('#checkout').value<=$('#checkin').value)$('#checkout').value='';renderAdminCalendar()});$('#checkout').addEventListener('change',renderAdminCalendar);
+
+function moneyBR(v){const n=Number(v||0);return n.toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}
+function contractNights(a,b){const x=parseYmd(a),y=parseYmd(b);if(!x||!y)return 0;return Math.max(0,Math.round((y-x)/86400000))}
+function saveContractOwnerPrefs(){localStorage.setItem('vp_contract_owner',JSON.stringify({name:$('#contractOwnerName').value.trim(),doc:$('#contractOwnerDoc').value.trim(),address:$('#contractOwnerAddress').value.trim()}))}
+function loadContractOwnerPrefs(){try{const p=JSON.parse(localStorage.getItem('vp_contract_owner')||'{}');$('#contractOwnerName').value=p.name||'';$('#contractOwnerDoc').value=p.doc||'';$('#contractOwnerAddress').value=p.address||''}catch(e){}}
+function fillContractFromReservation(id){
+  const r=reservations.find(x=>String(x.id)===String(id));
+  if(!r)return;
+  $('#contractGuestName').value=r.hospede||'';
+  $('#contractGuestCpf').value='';
+  $('#contractGuestAddress').value='';
+  $('#contractTotal').value='';
+  $('#contractGuests').value='1';
+  $('#contractPayment').value='';
+  $('#contractDeposit').value='';
+  $('#contractNotes').value=r.observacoes||'';
+}
+function openContract(id){
+  const sel=$('#contractReservation');
+  const active=[...reservations].filter(r=>r.status!=='cancelada').sort((a,b)=>a.checkin.localeCompare(b.checkin));
+  sel.innerHTML=active.map(r=>'<option value="'+esc(r.id)+'">'+esc((r.hospede||'Sem nome')+' • '+brDate(r.checkin)+' a '+brDate(r.checkout))+'</option>').join('');
+  if(!active.length){toast('Não há reserva direta ativa para gerar contrato.');return}
+  sel.value=String(id||active[0].id);
+  loadContractOwnerPrefs();
+  fillContractFromReservation(sel.value);
+  $('#contractMsg').textContent='';
+  $('#contractDialog').showModal();
+}
+$('#contractReservation').addEventListener('change',e=>fillContractFromReservation(e.target.value));
+$('#newContractBtn').onclick=()=>openContract();
+$('#closeContractModal').onclick=()=>$('#contractDialog').close();
+$('#cancelContractModal').onclick=()=>$('#contractDialog').close();
+$('#contractForm').addEventListener('submit',e=>{
+  e.preventDefault();
+  const r=reservations.find(x=>String(x.id)===String($('#contractReservation').value));
+  if(!r){$('#contractMsg').textContent='Selecione uma reserva válida.';return}
+  saveContractOwnerPrefs();
+  const guest=$('#contractGuestName').value.trim()||r.hospede||'LOCATÁRIO';
+  const guestCpf=$('#contractGuestCpf').value.trim()||'não informado';
+  const guestAddress=$('#contractGuestAddress').value.trim()||'não informado';
+  const owner=$('#contractOwnerName').value.trim()||'LOCADOR';
+  const ownerDoc=$('#contractOwnerDoc').value.trim()||'não informado';
+  const ownerAddress=$('#contractOwnerAddress').value.trim()||'não informado';
+  const total=moneyBR($('#contractTotal').value);
+  const payment=$('#contractPayment').value.trim()||'a combinar';
+  const deposit=moneyBR($('#contractDeposit').value);
+  const guests=$('#contractGuests').value||'1';
+  const notes=$('#contractNotes').value.trim();
+  const nights=contractNights(r.checkin,r.checkout);
+  const issueDate=new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'});
+  const extra=notes?'<p><strong>Condições adicionais:</strong> '+esc(notes)+'</p>':'';
+  const doc='<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>Contrato - '+esc(guest)+'</title><style>body{font-family:Georgia,serif;color:#191919;max-width:820px;margin:38px auto;padding:0 26px;line-height:1.55;font-size:14px}h1{text-align:center;font-size:20px;margin-bottom:30px}h2{font-size:14px;margin-top:22px;text-transform:uppercase}.meta{border:1px solid #bbb;padding:14px;margin:18px 0;background:#fafafa}p{text-align:justify}.sign{display:grid;grid-template-columns:1fr 1fr;gap:50px;margin-top:70px}.line{border-top:1px solid #333;text-align:center;padding-top:7px}.muted{color:#555;font-size:12px}@media print{body{margin:0;max-width:none}.no-print{display:none}}</style></head><body>'+
+  '<h1>CONTRATO PARTICULAR DE LOCAÇÃO POR TEMPORADA</h1>'+
+  '<p><strong>LOCADOR:</strong> '+esc(owner)+', CPF/CNPJ '+esc(ownerDoc)+', endereço '+esc(ownerAddress)+'.</p>'+
+  '<p><strong>LOCATÁRIO:</strong> '+esc(guest)+', CPF '+esc(guestCpf)+', endereço '+esc(guestAddress)+'.</p>'+
+  '<div class="meta"><strong>Imóvel:</strong> Village Paganayoh – Casa 01, Guarajuba, Camaçari/BA.<br><strong>Período:</strong> '+brDate(r.checkin)+' a '+brDate(r.checkout)+' ('+nights+' noites).<br><strong>Hóspedes:</strong> '+esc(guests)+'.<br><strong>Valor total:</strong> '+esc(total)+'.<br><strong>Pagamento:</strong> '+esc(payment)+'.<br><strong>Caução:</strong> '+esc(deposit)+'.</div>'+
+  '<h2>1. Objeto e prazo</h2><p>O LOCADOR cede ao LOCATÁRIO, exclusivamente para hospedagem temporária e lazer, o uso do imóvel acima identificado durante o período indicado neste instrumento. O contrato encerra-se automaticamente no check-out, sem prorrogação tácita.</p>'+
+  '<h2>2. Uso do imóvel</h2><p>O imóvel deverá ser utilizado com zelo, respeitando-se a capacidade informada, as regras da casa e do condomínio, os horários de silêncio, as normas de segurança e as restrições aplicáveis às áreas comuns. É vedada a cessão, sublocação ou transferência da hospedagem a terceiros sem autorização expressa do LOCADOR.</p>'+
+  '<h2>3. Pagamento e caução</h2><p>O valor da locação e a forma de pagamento são os descritos acima. Havendo caução, esta poderá ser utilizada para ressarcir danos materiais, perdas de itens, multas condominiais ou outras despesas comprovadamente decorrentes da estadia, sem prejuízo de cobrança complementar quando o prejuízo exceder o valor caucionado.</p>'+
+  '<h2>4. Conservação e responsabilidade</h2><p>O LOCATÁRIO declara receber o imóvel em condições adequadas de uso e compromete-se a devolvê-lo no mesmo estado de conservação, ressalvado o desgaste normal. Danos causados pelo LOCATÁRIO, seus acompanhantes, visitantes ou prestadores por ele autorizados serão de sua responsabilidade.</p>'+
+  '<h2>5. Regras e ocorrências</h2><p>O descumprimento grave das regras do imóvel ou do condomínio, a realização de eventos não autorizados, a perturbação reiterada do sossego ou a prática de ato ilícito poderá ensejar encerramento antecipado da hospedagem, observadas as circunstâncias do caso e as obrigações legais aplicáveis.</p>'+
+  '<h2>6. Check-in e check-out</h2><p>Os horários, forma de entrega de chaves/acesso e demais orientações operacionais serão informados pelo LOCADOR. Eventual permanência além do horário de check-out dependerá de autorização prévia.</p>'+
+  '<h2>7. Disposições gerais</h2><p>As partes reconhecem que este instrumento registra as condições da locação por temporada indicada acima. Alterações específicas deverão constar por escrito. Fica eleito o foro legalmente competente para solução de controvérsias, observadas as regras de competência aplicáveis.</p>'+
+  extra+
+  '<p style="margin-top:32px">Guarajuba, Camaçari/BA, '+esc(issueDate)+'.</p>'+
+  '<div class="sign"><div class="line">'+esc(owner)+'<br><span class="muted">LOCADOR</span></div><div class="line">'+esc(guest)+'<br><span class="muted">LOCATÁRIO</span></div></div>'+
+  '<div class="no-print" style="margin-top:45px;text-align:center"><button onclick="window.print()" style="padding:12px 18px;border:0;border-radius:8px;background:#1f9d68;color:white;font-weight:700;cursor:pointer">Imprimir / Salvar como PDF</button></div>'+
+  '</body></html>';
+  const w=window.open('','_blank');
+  if(!w){$('#contractMsg').textContent='O navegador bloqueou a nova janela. Permita pop-ups para gerar o contrato.';return}
+  w.document.open();w.document.write(doc);w.document.close();
+});
+
 $('#newBtn').onclick=openNew;$('#closeModal').onclick=()=>$('#reservationDialog').close();$('#cancelModal').onclick=()=>$('#reservationDialog').close();$('#refresh').onclick=loadReservations;
 $('#reservationForm').addEventListener('submit',async e=>{e.preventDefault();const id=$('#reservationId').value;const payload={checkin:$('#checkin').value,checkout:$('#checkout').value,hospede:$('#hospede').value.trim(),telefone:$('#telefone').value.trim(),origem:$('#origem').value,status:$('#status').value,observacoes:$('#observacoes').value.trim()};const msg=$('#formMsg');msg.textContent='';try{await api(id?'/reservas/'+id:'/reservas',{method:id?'PUT':'POST',body:JSON.stringify(payload)});$('#reservationDialog').close();toast(id?'Reserva atualizada.':'Reserva cadastrada.');await loadReservations()}catch(err){msg.textContent=err.message}});
 async function cancelReservation(id){const r=reservations.find(x=>x.id===id);if(!confirm(`Cancelar a reserva de ${r?.hospede||'este hóspede'}?\n\nO histórico será mantido e as datas voltarão a ficar disponíveis.`))return;try{await api('/reservas/'+id,{method:'DELETE'});toast('Reserva cancelada.');await loadReservations()}catch(err){toast(err.message)}}
