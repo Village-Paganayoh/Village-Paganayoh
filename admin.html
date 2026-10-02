@@ -436,19 +436,24 @@
       <div class="field"><label>Quantidade de hóspedes</label><input id="contractGuests" type="number" min="1" max="8" step="1" value="1" required></div>
       <div class="field"><label>Enxoval</label><select id="contractLinens"><option value="nao">Não serão fornecidas roupas de cama e banho</option><option value="sim">Serão fornecidas roupas de cama e banho</option></select></div>
     </div>
+    <div class="grid2">
+      <div class="field"><label>Horário de entrada</label><input id="contractCheckinTime" type="time" value="12:00"></div>
+      <div class="field"><label>Horário de saída</label><input id="contractCheckoutTime" type="time" value="12:00"></div>
+    </div>
+    <div class="field"><label>Pets de pequeno porte</label><select id="contractPets"><option value="nao">Não aceita animais</option><option value="sim">Aceita 1 animal de pequeno porte</option></select></div>
 
     <div style="border-top:1px solid var(--line);margin:20px 0 10px;padding-top:16px;font-weight:800">Valores e pagamento</div>
     <div class="grid2">
-      <div class="field"><label>Valor total da locação (R$)</label><input id="contractTotal" type="number" min="0" step="0.01" required placeholder="0,00"></div>
-      <div class="field"><label>Caução (R$)</label><input id="contractDeposit" type="number" min="0" step="0.01" value="0"></div>
+      <div class="field"><label>Valor total da locação (R$)</label><input id="contractTotal" type="text" inputmode="decimal" value="0,00" required></div>
+      <div class="field"><label>Caução (R$)</label><input id="contractDeposit" type="text" inputmode="decimal" value="0,00"></div>
     </div>
     <div class="field"><label>Forma / cronograma de pagamento</label><textarea id="contractPayment" rows="5" required placeholder="Ex.: R$ 1.000,00 na assinatura do contrato&#10;R$ 1.000,00 em 10/12/2026&#10;R$ 1.000,00 em 15/12/2026"></textarea></div>
     <div class="grid2">
       <div class="field"><label>Taxa de limpeza</label><select id="contractCleaningMode"><option value="included">Incluída no valor da locação</option><option value="separate">Cobrada à parte</option></select></div>
-      <div class="field"><label>Valor da taxa de limpeza (R$)</label><input id="contractCleaningValue" type="number" min="0" step="0.01" value="0"></div>
+      <div class="field"><label>Valor da taxa de limpeza (R$)</label><input id="contractCleaningValue" type="text" inputmode="decimal" value="0,00"></div>
     </div>
     <div class="grid2">
-      <div class="field"><label>Multa por dia de permanência após o prazo (R$)</label><input id="contractOverstayFine" type="number" min="0" step="0.01" value="0"></div>
+      <div class="field"><label>Multa por dia de permanência após o prazo (R$)</label><input id="contractOverstayFine" type="text" inputmode="decimal" value="0,00"></div>
       <div class="field"><label>Consumo de energia</label><select id="contractElectricity"><option value="separate">Pago pelo locatário conforme leitura do contador</option><option value="included">Incluído no valor da locação</option></select></div>
     </div>
 
@@ -1509,7 +1514,9 @@ function openNew(){resetForm();adminCalMonth=new Date();adminCalMonth.setDate(1)
 function openEdit(id){const r=reservations.find(x=>x.id===id);if(!r)return;resetForm();$('#modalTitle').textContent='Editar reserva';$('#reservationId').value=r.id;$('#checkin').value=r.checkin;$('#checkout').value=r.checkout;$('#hospede').value=r.hospede||'';$('#telefone').value=r.telefone||'';$('#origem').value=r.origem||'direta';$('#status').value=r.status||'confirmada';$('#observacoes').value=r.observacoes||'';adminCalMonth=parseYmd(r.checkin)||new Date();adminCalMonth.setDate(1);renderAdminCalendar();$('#reservationDialog').showModal()}
 $('#adminPrev').onclick=()=>{adminCalMonth.setMonth(adminCalMonth.getMonth()-1);renderAdminCalendar()};$('#adminNext').onclick=()=>{adminCalMonth.setMonth(adminCalMonth.getMonth()+1);renderAdminCalendar()};$('#checkin').addEventListener('change',()=>{if($('#checkin').value&&$('#checkout').value&&$('#checkout').value<=$('#checkin').value)$('#checkout').value='';renderAdminCalendar()});$('#checkout').addEventListener('change',renderAdminCalendar);
 
-function moneyBR(v){const n=Number(v||0);return n.toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}
+function parseMoneyBR(v){const s=String(v??'').trim().replace(/\./g,'').replace(',','.').replace(/[^0-9.-]/g,'');const n=Number(s);return Number.isFinite(n)?n:0}
+function moneyBR(v){return parseMoneyBR(v).toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}
+function normalizeMoneyInput(el){el.value=parseMoneyBR(el.value).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}
 function contractNights(a,b){const x=parseYmd(a),y=parseYmd(b);if(!x||!y)return 0;return Math.max(0,Math.round((y-x)/86400000))}
 function saveContractOwnerPrefs(){
   localStorage.setItem('vp_contract_owner',JSON.stringify({
@@ -1532,14 +1539,17 @@ function fillContractFromReservation(id){
   $('#contractGuestName').value=r.hospede||'';
   $('#contractGuestCpf').value='';
   $('#contractGuestAddress').value='';
-  $('#contractTotal').value='';
-  $('#contractDeposit').value='0';
+  $('#contractTotal').value='0,00';
+  $('#contractDeposit').value='0,00';
   $('#contractGuests').value='1';
   $('#contractLinens').value='nao';
+  $('#contractCheckinTime').value='12:00';
+  $('#contractCheckoutTime').value='12:00';
+  $('#contractPets').value='nao';
   $('#contractPayment').value='';
   $('#contractCleaningMode').value='included';
-  $('#contractCleaningValue').value='0';
-  $('#contractOverstayFine').value='0';
+  $('#contractCleaningValue').value='0,00';
+  $('#contractOverstayFine').value='0,00';
   $('#contractElectricity').value='separate';
   $('#contractNotes').value=r.observacoes||''
 }
@@ -1558,6 +1568,11 @@ $('#contractReservation').addEventListener('change',e=>fillContractFromReservati
 $('#newContractBtn').onclick=()=>openContract();
 $('#closeContractModal').onclick=()=>$('#contractDialog').close();
 $('#cancelContractModal').onclick=()=>$('#contractDialog').close();
+['contractTotal','contractDeposit','contractCleaningValue','contractOverstayFine'].forEach(id=>{
+  const el=$('#'+id);
+  el.addEventListener('focus',()=>{if(el.value==='0,00')el.select()});
+  el.addEventListener('blur',()=>normalizeMoneyInput(el))
+});
 
 $('#contractForm').addEventListener('submit',e=>{
   e.preventDefault();
@@ -1582,6 +1597,9 @@ $('#contractForm').addEventListener('submit',e=>{
   const overstayFine=moneyBR($('#contractOverstayFine').value);
   const electricity=$('#contractElectricity').value;
   const linens=$('#contractLinens').value;
+  const checkinTime=$('#contractCheckinTime').value||'12:00';
+  const checkoutTime=$('#contractCheckoutTime').value||'12:00';
+  const pets=$('#contractPets').value;
   const notes=$('#contractNotes').value.trim();
   const nights=contractNights(r.checkin,r.checkout);
   const start=brDate(r.checkin), end=brDate(r.checkout);
@@ -1590,6 +1608,9 @@ $('#contractForm').addEventListener('submit',e=>{
   const linensText=linens==='sim'
     ?'Serão fornecidas roupas de cama e de banho.'
     :'Não serão fornecidas roupas de cama e de banho.';
+  const petsText=pets==='sim'
+    ?'Fica autorizada a manutenção de 01 (um) animal doméstico de pequeno porte no village, permanecendo vedada a circulação do pet nas dependências do Condomínio Paganayoh, sob pena de multa pelo descumprimento dessa regra.'
+    :'Não é permitida a permanência de animais domésticos no imóvel durante esta locação.';
   const cleaningText=cleaningMode==='included'
     ?'O valor da taxa de limpeza já está incluído no valor da locação.'
     :'Fica ajustado o valor de '+cleaningValue+', referente à taxa de limpeza, a ser pago pelo LOCATÁRIO no momento da entrega das chaves.';
@@ -1616,7 +1637,7 @@ $('#contractForm').addEventListener('submit',e=>{
   '<p class="subp"><strong>Parágrafo Sexto –</strong> Fica o LOCATÁRIO obrigado por todas as cláusulas constantes na Convenção e no Regulamento Interno do village, cuja cópia está à disposição de qualquer interessado na portaria e no próprio village, comprometendo-se o LOCATÁRIO a lê-las e acatá-las.</p>'+
   '<p class="subp"><strong>Parágrafo Sétimo –</strong> Deve ser respeitada a Lei de Silêncio, inclusive não utilizando som das 22h às 9h do dia seguinte. É proibida a realização de festas ou reuniões, bem como a acomodação de mais de 08 (oito) pessoas, sob pena de multa de 1/3 do valor total acordado na Cláusula Terceira por pessoa acrescida indevidamente.</p></div>'+
 
-  '<div class="clause"><h2>Cláusula Segunda – Prazo</h2><p>O presente contrato tem prazo de <strong>'+nights+' dias</strong> e inicia-se às 12h do dia <strong>'+start+'</strong>, com término até às 12h do dia <strong>'+end+'</strong>.</p>'+
+  '<div class="clause"><h2>Cláusula Segunda – Prazo</h2><p>O presente contrato tem prazo de <strong>'+nights+' dias</strong> e inicia-se às <strong>'+esc(checkinTime)+'</strong> do dia <strong>'+start+'</strong>, com término até às <strong>'+esc(checkoutTime)+'</strong> do dia <strong>'+end+'</strong>.</p>'+
   '<p class="subp"><strong>Parágrafo Primeiro –</strong> Cumpridas as obrigações do LOCATÁRIO, as chaves do imóvel lhe serão entregues, devendo ser devolvidas à LOCADORA ao final da locação.</p>'+
   '<p class="subp"><strong>Parágrafo Segundo –</strong> Na hipótese de vencimento antecipado deste contrato, que ocorrerá quando houver infração de quaisquer das suas condições, o imóvel deverá ser devolvido à LOCADORA de imediato, independentemente de qualquer notificação.</p></div>'+
 
@@ -1632,7 +1653,7 @@ $('#contractForm').addEventListener('submit',e=>{
   '<div class="clause"><h2>Cláusula Oitava</h2><p>Em caso de ação judicial de despejo ou cobrança de dívida referente à locação do imóvel, fica estabelecido que o LOCATÁRIO será responsável pelo pagamento das custas judiciais e extrajudiciais mais honorários advocatícios de 20% (vinte por cento) sobre o valor da causa.</p></div>'+
   '<div class="clause"><h2>Cláusula Nona – Dos atos de informação entre os contratantes</h2><p>As partes acordam que toda e qualquer comunicação referente à locação será na forma escrita e inequívoca e com assinatura de recebimento. Por forma inequívoca entende-se “em mãos” ou envio por Cartório de Títulos e Documentos ou Correio com A.R.</p><p class="subp"><strong>Parágrafo Único –</strong> O LOCATÁRIO poderá receber citação, intimação, notificação e qualquer ato de comunicação tanto no imóvel ora locado, se ainda não o tiver devolvido, como no endereço de residência e domicílio identificado no preâmbulo.</p></div>'+
   '<div class="clause"><h2>Cláusula Décima</h2><p>Não configurarão novação ou adição às cláusulas contidas neste contrato os atos de tolerância da LOCADORA quanto a quaisquer das obrigações do LOCATÁRIO.</p></div>'+
-  '<div class="clause"><h2>Cláusula Décima Primeira</h2><p>Fica autorizada a manutenção de 01 (um) animal doméstico de pequeno porte no village, porém é vedada a circulação do pet nas dependências do Condomínio Paganayoh, sob pena de multa pelo descumprimento dessa regra.</p></div>'+
+  '<div class="clause"><h2>Cláusula Décima Primeira</h2><p>'+esc(petsText)+'</p></div>'+
   '<div class="clause"><h2>Cláusula Décima Segunda – Vistorias</h2><p>O LOCATÁRIO concorda em permitir, sem objeção, à LOCADORA, em horário estabelecido entre ambos, realizar vistorias no imóvel, podendo a LOCADORA, por si ou por preposto, averiguar o funcionamento de todas as instalações e acessórios do imóvel.</p></div>'+
   '<div class="clause"><h2>Cláusula Décima Terceira</h2><p>Eventuais desabastecimentos de água e energia decorrentes de casos fortuitos ou de força maior, a exemplo de problemas na prestação de tais serviços pelas empresas correspondentes, não serão de responsabilidade da LOCADORA.</p></div>'+
   '<div class="clause"><h2>Cláusula Décima Quarta – Da rescisão contratual</h2><p>Ocorrerá a rescisão do presente contrato de locação de imóvel residencial, independentemente de comunicação prévia, interpelação judicial ou extrajudicial ou indenização por parte da LOCADORA, quando:</p>'+
