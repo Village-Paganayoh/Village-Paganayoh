@@ -69,6 +69,15 @@
     <div class="hero-row section-anchor" id="reservasTopo"><div><h2>Reservas</h2><p>Visão unificada das reservas diretas e períodos ocupados pelo Airbnb.</p></div><button id="newBtn" class="btn btn-primary">+ Nova reserva</button></div>
     <div class="stats"><div class="stat"><small>Reservas diretas</small><strong id="activeCount">—</strong></div><div class="stat"><small>Indisponibilidades Airbnb</small><strong id="airbnbCount">—</strong></div><div class="stat"><small>Próxima ocupação</small><strong id="nextCheckin" style="font-size:1.25rem">—</strong></div><div class="stat"><small>Total de períodos</small><strong id="totalCount">—</strong></div></div>
     <section class="panel section-anchor" id="listaReservas"><div class="panel-head"><h3>Lista de reservas</h3><button id="refresh" class="btn btn-light">Atualizar</button></div><div class="table-wrap"><table><thead><tr><th>Período</th><th>Hóspede</th><th>Telefone</th><th>Origem</th><th>Status</th><th>Ações</th></tr></thead><tbody id="rows"></tbody></table><div id="empty" class="empty hidden">Nenhuma reserva cadastrada.</div></div></section>
+    <span id="historicoReservas" class="section-anchor"></span><section class="panel history-panel section-anchor" id="historyPanel">
+      <button class="history-toggle" id="historyToggle" type="button" aria-expanded="false">
+        <span><strong>Histórico de reservas canceladas</strong><br><span id="historySummary">Nenhuma reserva cancelada</span></span>
+        <span class="chev">⌄</span>
+      </button>
+      <div id="historyContent" class="history-content hidden">
+        <div class="table-wrap"><table><thead><tr><th>Período</th><th>Hóspede</th><th>Telefone</th><th>Origem</th><th>Status</th><th>Ações</th></tr></thead><tbody id="historyRows"></tbody></table><div id="historyEmpty" class="empty hidden">Nenhuma reserva cancelada.</div></div>
+      </div>
+    </section>
     <span id="contratosAdmin" class="section-anchor"></span>
     <section class="panel section-anchor" id="contractsPanel" data-nav="contratosAdmin" style="margin-top:18px">
       <div class="panel-head">
@@ -196,15 +205,7 @@
         <div id="specialPeriodsEmpty" class="empty hidden">Nenhum período especial cadastrado.</div>
       </div>
     </section>
-    <span id="historicoReservas" class="section-anchor"></span><section class="panel history-panel section-anchor" id="historyPanel">
-      <button class="history-toggle" id="historyToggle" type="button" aria-expanded="false">
-        <span><strong>Histórico de reservas canceladas</strong><br><span id="historySummary">Nenhuma reserva cancelada</span></span>
-        <span class="chev">⌄</span>
-      </button>
-      <div id="historyContent" class="history-content hidden">
-        <div class="table-wrap"><table><thead><tr><th>Período</th><th>Hóspede</th><th>Telefone</th><th>Origem</th><th>Status</th><th>Ações</th></tr></thead><tbody id="historyRows"></tbody></table><div id="historyEmpty" class="empty hidden">Nenhuma reserva cancelada.</div></div>
-      </div>
-    </section>
+    
   </main>
     </div>
   </div>
