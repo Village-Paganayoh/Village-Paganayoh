@@ -51,10 +51,6 @@
         <a class="admin-nav-link" href="#historicoReservas">🕘 Histórico</a>
       </div>
       <div class="admin-nav-group">
-        <div class="admin-nav-title">Documentos</div>
-        <a class="admin-nav-link" href="#contratosAdmin">📄 Contratos</a>
-      </div>
-      <div class="admin-nav-group">
         <div class="admin-nav-title">Conteúdo do site</div>
         <a class="admin-nav-link" href="#galeriaMidia">🖼️ Galeria e Mídia</a>
         <a class="admin-nav-link" href="#exploreRegiao">📍 Explore a Região</a>
@@ -77,31 +73,6 @@
       <div id="historyContent" class="history-content hidden">
         <div class="table-wrap"><table><thead><tr><th>Período</th><th>Hóspede</th><th>Telefone</th><th>Origem</th><th>Status</th><th>Ações</th></tr></thead><tbody id="historyRows"></tbody></table><div id="historyEmpty" class="empty hidden">Nenhuma reserva cancelada.</div></div>
       </div>
-    </section>
-    <span id="contratosAdmin" class="section-anchor"></span>
-    <section class="panel section-anchor" id="contractsPanel" data-nav="contratosAdmin" style="margin-top:18px">
-      <div class="panel-head">
-        <div>
-          <h3>Contratos</h3>
-          <div style="color:var(--muted);font-size:.82rem;margin-top:4px">Gere contratos de locação por temporada a partir das reservas diretas.</div>
-        </div>
-        <button id="newContractBtn" class="btn btn-primary" type="button">+ Gerar contrato</button>
-      </div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px">
-        <div style="border:1px solid var(--line);border-radius:14px;padding:15px;background:#fff">
-          <small style="color:var(--muted)">Reservas aptas</small>
-          <strong id="contractEligibleCount" style="display:block;font-size:1.7rem;margin-top:5px">—</strong>
-        </div>
-        <div style="border:1px solid var(--line);border-radius:14px;padding:15px;background:#fff">
-          <small style="color:var(--muted)">Modelo</small>
-          <strong style="display:block;margin-top:8px">Locação por temporada</strong>
-        </div>
-        <div style="border:1px solid var(--line);border-radius:14px;padding:15px;background:#fff">
-          <small style="color:var(--muted)">Saída</small>
-          <strong style="display:block;margin-top:8px">Impressão / PDF</strong>
-        </div>
-      </div>
-      <div style="margin-top:14px;color:var(--muted);font-size:.8rem;line-height:1.5">O contrato usa os dados da reserva e permite complementar CPF, endereço, valor, forma de pagamento e quantidade de hóspedes antes da emissão.</div>
     </section>
     <span id="galeriaMidia" class="section-anchor"></span><section class="panel section-anchor" id="mediaPanel" data-nav="galeriaMidia" style="margin-top:18px">
       <div class="panel-head"><div><h3>Galeria e Mídia</h3><div style="color:var(--muted);font-size:.82rem;margin-top:4px">Conteúdo dinâmico cadastrado para o site.</div></div><div class="actions"><button id="addMediaBtn" class="btn btn-primary" type="button">+ Adicionar mídia</button><button id="refreshMedia" class="btn btn-light" type="button">Atualizar</button></div></div>
@@ -1499,7 +1470,7 @@ $('#ruleForm')?.addEventListener('submit',async e=>{
 });
 
 async function loadReservations(){const panel=$('.panel');panel.classList.add('loading');try{const [direct,airbnb]=await Promise.all([api('/reservas'),fetch('disponibilidade.json?ts='+Date.now(),{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error('Calendário Airbnb indisponível.');return r.json()})]);reservations=direct.reservas||[];airbnbPeriods=Array.isArray(airbnb.periods)?airbnb.periods:[];render()}catch(err){toast(err.message)}finally{panel.classList.remove('loading')}}
-function render(){const body=$('#rows');body.innerHTML='';const activeDirect=[...reservations].filter(r=>r.status!=='cancelada').sort((a,b)=>a.checkin.localeCompare(b.checkin));const cancelled=[...reservations].filter(r=>r.status==='cancelada').sort((a,b)=>b.checkin.localeCompare(a.checkin));const airbnb=airbnbPeriods.map((p,i)=>({id:'airbnb-'+i,checkin:p.start,checkout:p.end,hospede:'Airbnb',telefone:'—',origem:'Airbnb',status:'Airbnb',_airbnb:true}));const sorted=[...activeDirect,...airbnb].sort((a,b)=>a.checkin.localeCompare(b.checkin));$('#empty').classList.toggle('hidden',sorted.length>0);for(const r of sorted){const tr=document.createElement('tr');const origin=r._airbnb?'<span class="badge airbnb-badge">Airbnb</span>':esc(r.origem||'direta');const actions=r._airbnb?'<span style="color:var(--muted);font-size:.8rem">Gerenciar no Airbnb</span>':`<div class="row-actions"><button class="mini edit" data-edit="${r.id}">Editar</button><button class="mini edit" data-contract="${r.id}">Contrato</button><button class="mini cancel" data-cancel="${r.id}">Cancelar</button></div>`;tr.innerHTML=`<td><strong>${brDate(r.checkin)}</strong><br><span style="color:var(--muted)">até ${brDate(r.checkout)}</span></td><td>${r._airbnb?'<span class="origin-airbnb">Airbnb</span>':esc(r.hospede||'—')}</td><td>${esc(r.telefone||'—')}</td><td>${origin}</td><td><span class="badge ${r._airbnb?'airbnb-badge':'confirmada'}">${esc(r.status||'confirmada')}</span></td><td>${actions}</td>`;body.appendChild(tr)}body.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>openEdit(Number(b.dataset.edit)));body.querySelectorAll('[data-contract]').forEach(b=>b.onclick=()=>openContract(Number(b.dataset.contract)));body.querySelectorAll('[data-cancel]').forEach(b=>b.onclick=()=>cancelReservation(Number(b.dataset.cancel)));const historyBody=$('#historyRows');historyBody.innerHTML='';$('#historySummary').textContent=cancelled.length===0?'Nenhuma reserva cancelada':cancelled.length===1?'1 reserva cancelada':cancelled.length+' reservas canceladas';$('#historyEmpty').classList.toggle('hidden',cancelled.length>0);for(const r of cancelled){const tr=document.createElement('tr');tr.innerHTML=`<td><strong>${brDate(r.checkin)}</strong><br><span style="color:var(--muted)">até ${brDate(r.checkout)}</span></td><td>${esc(r.hospede||'—')}</td><td>${esc(r.telefone||'—')}</td><td>${esc(r.origem||'direta')}</td><td><span class="badge cancelada">cancelada</span></td><td><button class="mini edit" data-history-edit="${r.id}">Editar</button></td>`;historyBody.appendChild(tr)}historyBody.querySelectorAll('[data-history-edit]').forEach(b=>b.onclick=()=>openEdit(Number(b.dataset.historyEdit)));$('#activeCount').textContent=activeDirect.length;$('#airbnbCount').textContent=airbnb.length;$('#totalCount').textContent=activeDirect.length+airbnb.length;const today=new Date().toISOString().slice(0,10);const next=[...activeDirect,...airbnb].filter(r=>r.checkin>=today).sort((a,b)=>a.checkin.localeCompare(b.checkin))[0];$('#nextCheckin').textContent=next?brDate(next.checkin):'Nenhuma';const cc=$('#contractEligibleCount');if(cc)cc.textContent=activeDirect.length}
+function render(){const body=$('#rows');body.innerHTML='';const activeDirect=[...reservations].filter(r=>r.status!=='cancelada').sort((a,b)=>a.checkin.localeCompare(b.checkin));const cancelled=[...reservations].filter(r=>r.status==='cancelada').sort((a,b)=>b.checkin.localeCompare(a.checkin));const airbnb=airbnbPeriods.map((p,i)=>({id:'airbnb-'+i,checkin:p.start,checkout:p.end,hospede:'Airbnb',telefone:'—',origem:'Airbnb',status:'Airbnb',_airbnb:true}));const sorted=[...activeDirect,...airbnb].sort((a,b)=>a.checkin.localeCompare(b.checkin));$('#empty').classList.toggle('hidden',sorted.length>0);for(const r of sorted){const tr=document.createElement('tr');const origin=r._airbnb?'<span class="badge airbnb-badge">Airbnb</span>':esc(r.origem||'direta');const actions=r._airbnb?'<span style="color:var(--muted);font-size:.8rem">Gerenciar no Airbnb</span>':`<div class="row-actions"><button class="mini edit" data-edit="${r.id}">Editar</button><button class="mini edit" data-contract="${r.id}">Contrato</button><button class="mini cancel" data-cancel="${r.id}">Cancelar</button></div>`;tr.innerHTML=`<td><strong>${brDate(r.checkin)}</strong><br><span style="color:var(--muted)">até ${brDate(r.checkout)}</span></td><td>${r._airbnb?'<span class="origin-airbnb">Airbnb</span>':esc(r.hospede||'—')}</td><td>${esc(r.telefone||'—')}</td><td>${origin}</td><td><span class="badge ${r._airbnb?'airbnb-badge':'confirmada'}">${esc(r.status||'confirmada')}</span></td><td>${actions}</td>`;body.appendChild(tr)}body.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>openEdit(Number(b.dataset.edit)));body.querySelectorAll('[data-contract]').forEach(b=>b.onclick=()=>openContract(Number(b.dataset.contract)));body.querySelectorAll('[data-cancel]').forEach(b=>b.onclick=()=>cancelReservation(Number(b.dataset.cancel)));const historyBody=$('#historyRows');historyBody.innerHTML='';$('#historySummary').textContent=cancelled.length===0?'Nenhuma reserva cancelada':cancelled.length===1?'1 reserva cancelada':cancelled.length+' reservas canceladas';$('#historyEmpty').classList.toggle('hidden',cancelled.length>0);for(const r of cancelled){const tr=document.createElement('tr');tr.innerHTML=`<td><strong>${brDate(r.checkin)}</strong><br><span style="color:var(--muted)">até ${brDate(r.checkout)}</span></td><td>${esc(r.hospede||'—')}</td><td>${esc(r.telefone||'—')}</td><td>${esc(r.origem||'direta')}</td><td><span class="badge cancelada">cancelada</span></td><td><button class="mini edit" data-history-edit="${r.id}">Editar</button></td>`;historyBody.appendChild(tr)}historyBody.querySelectorAll('[data-history-edit]').forEach(b=>b.onclick=()=>openEdit(Number(b.dataset.historyEdit)));$('#activeCount').textContent=activeDirect.length;$('#airbnbCount').textContent=airbnb.length;$('#totalCount').textContent=activeDirect.length+airbnb.length;const today=new Date().toISOString().slice(0,10);const next=[...activeDirect,...airbnb].filter(r=>r.checkin>=today).sort((a,b)=>a.checkin.localeCompare(b.checkin))[0];$('#nextCheckin').textContent=next?brDate(next.checkin):'Nenhuma'}
 function esc(v){return String(v).replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
 function ymd(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
 function parseYmd(v){if(!v)return null;const [y,m,d]=v.split('-').map(Number);return new Date(y,m-1,d)}
@@ -1585,7 +1556,6 @@ function openContract(id){
   $('#contractDialog').showModal()
 }
 $('#contractReservation').addEventListener('change',e=>fillContractFromReservation(e.target.value));
-$('#newContractBtn').onclick=()=>openContract();
 $('#closeContractModal').onclick=()=>$('#contractDialog').close();
 $('#cancelContractModal').onclick=()=>$('#contractDialog').close();
 ['contractTotal','contractDeposit','contractCleaningValue','contractOverstayFine'].forEach(id=>{
