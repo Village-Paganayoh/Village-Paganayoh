@@ -420,32 +420,48 @@
     <div class="modal-actions"><button type="button" class="btn btn-light" id="cancelRuleModal">Voltar</button><button type="submit" class="btn btn-primary" id="saveRuleBtn">Salvar regra</button></div>
   </form>
 </dialog>
-<dialog id="contractDialog" style="width:min(900px,calc(100% - 28px))">
+<dialog id="contractDialog" style="width:min(980px,calc(100% - 28px))">
   <form id="contractForm" class="modal">
-    <div class="modal-head"><h3>Gerar contrato</h3><button type="button" class="x" id="closeContractModal">×</button></div>
+    <div class="modal-head"><h3>Gerar contrato de locação por temporada</h3><button type="button" class="x" id="closeContractModal">×</button></div>
+    <div style="color:var(--muted);font-size:.82rem;line-height:1.5;margin:8px 0 18px">Os dados da reserva são carregados automaticamente. Complete apenas o que variar em cada locação.</div>
+
+    <div style="font-weight:800;margin:4px 0 8px">Reserva e locatário</div>
     <div class="field"><label>Reserva</label><select id="contractReservation" required></select></div>
     <div class="grid2">
-      <div class="field"><label>Locatário</label><input id="contractGuestName" type="text" required></div>
-      <div class="field"><label>CPF do locatário</label><input id="contractGuestCpf" type="text" placeholder="000.000.000-00"></div>
+      <div class="field"><label>Nome completo do locatário</label><input id="contractGuestName" type="text" required></div>
+      <div class="field"><label>CPF</label><input id="contractGuestCpf" type="text" placeholder="000.000.000-00" required></div>
     </div>
-    <div class="field"><label>Endereço do locatário</label><input id="contractGuestAddress" type="text" placeholder="Rua, número, bairro, cidade/UF"></div>
+    <div class="field"><label>Endereço completo</label><input id="contractGuestAddress" type="text" placeholder="Rua, número, complemento, bairro, cidade/UF" required></div>
     <div class="grid2">
-      <div class="field"><label>Valor total da locação (R$)</label><input id="contractTotal" type="number" min="0" step="0.01" placeholder="0,00"></div>
-      <div class="field"><label>Quantidade de hóspedes</label><input id="contractGuests" type="number" min="1" step="1" value="1"></div>
+      <div class="field"><label>Quantidade de hóspedes</label><input id="contractGuests" type="number" min="1" max="8" step="1" value="1" required></div>
+      <div class="field"><label>Enxoval</label><select id="contractLinens"><option value="nao">Não serão fornecidas roupas de cama e banho</option><option value="sim">Serão fornecidas roupas de cama e banho</option></select></div>
+    </div>
+
+    <div style="border-top:1px solid var(--line);margin:20px 0 10px;padding-top:16px;font-weight:800">Valores e pagamento</div>
+    <div class="grid2">
+      <div class="field"><label>Valor total da locação (R$)</label><input id="contractTotal" type="number" min="0" step="0.01" required placeholder="0,00"></div>
+      <div class="field"><label>Caução (R$)</label><input id="contractDeposit" type="number" min="0" step="0.01" value="0"></div>
+    </div>
+    <div class="field"><label>Forma / cronograma de pagamento</label><textarea id="contractPayment" rows="5" required placeholder="Ex.: R$ 1.000,00 na assinatura do contrato&#10;R$ 1.000,00 em 10/12/2026&#10;R$ 1.000,00 em 15/12/2026"></textarea></div>
+    <div class="grid2">
+      <div class="field"><label>Taxa de limpeza</label><select id="contractCleaningMode"><option value="included">Incluída no valor da locação</option><option value="separate">Cobrada à parte</option></select></div>
+      <div class="field"><label>Valor da taxa de limpeza (R$)</label><input id="contractCleaningValue" type="number" min="0" step="0.01" value="0"></div>
     </div>
     <div class="grid2">
-      <div class="field"><label>Forma de pagamento</label><input id="contractPayment" type="text" placeholder="Ex.: PIX / transferência"></div>
-      <div class="field"><label>Caução (R$)</label><input id="contractDeposit" type="number" min="0" step="0.01" placeholder="0,00"></div>
+      <div class="field"><label>Multa por dia de permanência após o prazo (R$)</label><input id="contractOverstayFine" type="number" min="0" step="0.01" value="0"></div>
+      <div class="field"><label>Consumo de energia</label><select id="contractElectricity"><option value="separate">Pago pelo locatário conforme leitura do contador</option><option value="included">Incluído no valor da locação</option></select></div>
     </div>
-    <div class="field"><label>Observações adicionais</label><textarea id="contractNotes" rows="3" placeholder="Condições específicas desta locação"></textarea></div>
-    <div style="border-top:1px solid var(--line);margin:20px 0 10px;padding-top:16px;font-weight:800">Dados do locador</div>
+
+    <div style="border-top:1px solid var(--line);margin:20px 0 10px;padding-top:16px;font-weight:800">Dados da locadora</div>
     <div class="grid2">
-      <div class="field"><label>Nome do locador</label><input id="contractOwnerName" type="text" placeholder="Nome completo"></div>
-      <div class="field"><label>CPF/CNPJ do locador</label><input id="contractOwnerDoc" type="text" placeholder="CPF ou CNPJ"></div>
+      <div class="field"><label>Nome</label><input id="contractOwnerName" type="text" value="MAIRA DE SÁ VELOSO DE OLIVEIRA"></div>
+      <div class="field"><label>CPF</label><input id="contractOwnerDoc" type="text" value="918.760.445-00"></div>
     </div>
-    <div class="field"><label>Endereço do locador</label><input id="contractOwnerAddress" type="text" placeholder="Endereço completo"></div>
+    <div class="field"><label>Qualificação / endereço</label><textarea id="contractOwnerAddress" rows="3">brasileira, casada, servidora pública, residente na Rua Cons. Correa de Meneses, 182, Edf. Imperial Boulevard, ap. 2002, Horto Florestal, Salvador/BA</textarea></div>
+
+    <div class="field"><label>Observações adicionais (opcional)</label><textarea id="contractNotes" rows="3" placeholder="Condições específicas desta reserva, se houver"></textarea></div>
     <div id="contractMsg" class="msg"></div>
-    <div class="modal-actions"><button type="button" class="btn btn-light" id="cancelContractModal">Voltar</button><button type="submit" class="btn btn-primary">Visualizar / Imprimir PDF</button></div>
+    <div class="modal-actions"><button type="button" class="btn btn-light" id="cancelContractModal">Voltar</button><button type="submit" class="btn btn-primary">Visualizar contrato / PDF</button></div>
   </form>
 </dialog>
 <dialog id="reservationDialog"><form id="reservationForm" class="modal"><div class="modal-head"><h3 id="modalTitle">Nova reserva</h3><button type="button" class="x" id="closeModal">×</button></div><input id="reservationId" type="hidden"><div class="admin-cal"><div class="admin-cal-hint" id="adminCalHint">Informe ou clique na data inicial</div><div class="admin-cal-head"><button type="button" id="adminPrev">‹</button><div class="admin-cal-title" id="adminCalTitle"></div><button type="button" id="adminNext">›</button></div><div class="admin-week"><div>DOM</div><div>SEG</div><div>TER</div><div>QUA</div><div>QUI</div><div>SEX</div><div>SÁB</div></div><div class="admin-days" id="adminDays"></div><div class="admin-legend"><span><b class="lg-free"></b>Livre</span><span><b class="lg-direct"></b>Direta</span><span><b class="lg-airbnb"></b>Airbnb</span><span><b class="lg-pick"></b>Selecionado</span></div></div><div class="grid2"><div class="field"><label>Check-in</label><input id="checkin" type="date" required></div><div class="field"><label>Check-out</label><input id="checkout" type="date" required></div></div><div class="field"><label>Hóspede</label><input id="hospede" type="text" placeholder="Nome do hóspede"></div><div class="grid2"><div class="field"><label>Telefone</label><input id="telefone" type="tel" placeholder="(71) 99999-9999"></div><div class="field"><label>Origem</label><select id="origem"><option value="direta">Direta</option><option value="airbnb">Airbnb</option><option value="outro">Outro</option></select></div></div><div class="field"><label>Status</label><select id="status"><option value="confirmada">Confirmada</option><option value="cancelada">Cancelada</option></select></div><div class="field"><label>Observações</label><textarea id="observacoes" rows="4" placeholder="Informações importantes sobre a reserva"></textarea></div><div id="formMsg" class="msg"></div><div class="modal-actions"><button type="button" class="btn btn-light" id="cancelModal">Voltar</button><button type="submit" class="btn btn-primary">Salvar reserva</button></div></form></dialog>
@@ -1495,8 +1511,21 @@ $('#adminPrev').onclick=()=>{adminCalMonth.setMonth(adminCalMonth.getMonth()-1);
 
 function moneyBR(v){const n=Number(v||0);return n.toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}
 function contractNights(a,b){const x=parseYmd(a),y=parseYmd(b);if(!x||!y)return 0;return Math.max(0,Math.round((y-x)/86400000))}
-function saveContractOwnerPrefs(){localStorage.setItem('vp_contract_owner',JSON.stringify({name:$('#contractOwnerName').value.trim(),doc:$('#contractOwnerDoc').value.trim(),address:$('#contractOwnerAddress').value.trim()}))}
-function loadContractOwnerPrefs(){try{const p=JSON.parse(localStorage.getItem('vp_contract_owner')||'{}');$('#contractOwnerName').value=p.name||'';$('#contractOwnerDoc').value=p.doc||'';$('#contractOwnerAddress').value=p.address||''}catch(e){}}
+function saveContractOwnerPrefs(){
+  localStorage.setItem('vp_contract_owner',JSON.stringify({
+    name:$('#contractOwnerName').value.trim(),
+    doc:$('#contractOwnerDoc').value.trim(),
+    address:$('#contractOwnerAddress').value.trim()
+  }))
+}
+function loadContractOwnerPrefs(){
+  try{
+    const p=JSON.parse(localStorage.getItem('vp_contract_owner')||'{}');
+    if(p.name)$('#contractOwnerName').value=p.name;
+    if(p.doc)$('#contractOwnerDoc').value=p.doc;
+    if(p.address)$('#contractOwnerAddress').value=p.address
+  }catch(e){}
+}
 function fillContractFromReservation(id){
   const r=reservations.find(x=>String(x.id)===String(id));
   if(!r)return;
@@ -1504,10 +1533,15 @@ function fillContractFromReservation(id){
   $('#contractGuestCpf').value='';
   $('#contractGuestAddress').value='';
   $('#contractTotal').value='';
+  $('#contractDeposit').value='0';
   $('#contractGuests').value='1';
+  $('#contractLinens').value='nao';
   $('#contractPayment').value='';
-  $('#contractDeposit').value='';
-  $('#contractNotes').value=r.observacoes||'';
+  $('#contractCleaningMode').value='included';
+  $('#contractCleaningValue').value='0';
+  $('#contractOverstayFine').value='0';
+  $('#contractElectricity').value='separate';
+  $('#contractNotes').value=r.observacoes||''
 }
 function openContract(id){
   const sel=$('#contractReservation');
@@ -1518,51 +1552,107 @@ function openContract(id){
   loadContractOwnerPrefs();
   fillContractFromReservation(sel.value);
   $('#contractMsg').textContent='';
-  $('#contractDialog').showModal();
+  $('#contractDialog').showModal()
 }
 $('#contractReservation').addEventListener('change',e=>fillContractFromReservation(e.target.value));
 $('#newContractBtn').onclick=()=>openContract();
 $('#closeContractModal').onclick=()=>$('#contractDialog').close();
 $('#cancelContractModal').onclick=()=>$('#contractDialog').close();
+
 $('#contractForm').addEventListener('submit',e=>{
   e.preventDefault();
+  const msg=$('#contractMsg');msg.textContent='';
   const r=reservations.find(x=>String(x.id)===String($('#contractReservation').value));
-  if(!r){$('#contractMsg').textContent='Selecione uma reserva válida.';return}
+  if(!r){msg.textContent='Selecione uma reserva válida.';return}
+  const guests=Number($('#contractGuests').value||1);
+  if(guests>8){msg.textContent='O modelo atual limita a ocupação a 8 pessoas.';return}
   saveContractOwnerPrefs();
-  const guest=$('#contractGuestName').value.trim()||r.hospede||'LOCATÁRIO';
-  const guestCpf=$('#contractGuestCpf').value.trim()||'não informado';
-  const guestAddress=$('#contractGuestAddress').value.trim()||'não informado';
-  const owner=$('#contractOwnerName').value.trim()||'LOCADOR';
-  const ownerDoc=$('#contractOwnerDoc').value.trim()||'não informado';
-  const ownerAddress=$('#contractOwnerAddress').value.trim()||'não informado';
+
+  const guest=$('#contractGuestName').value.trim();
+  const guestCpf=$('#contractGuestCpf').value.trim();
+  const guestAddress=$('#contractGuestAddress').value.trim();
+  const owner=$('#contractOwnerName').value.trim()||'MAIRA DE SÁ VELOSO DE OLIVEIRA';
+  const ownerDoc=$('#contractOwnerDoc').value.trim()||'918.760.445-00';
+  const ownerAddress=$('#contractOwnerAddress').value.trim();
   const total=moneyBR($('#contractTotal').value);
-  const payment=$('#contractPayment').value.trim()||'a combinar';
+  const payment=$('#contractPayment').value.trim();
   const deposit=moneyBR($('#contractDeposit').value);
-  const guests=$('#contractGuests').value||'1';
+  const cleaningMode=$('#contractCleaningMode').value;
+  const cleaningValue=moneyBR($('#contractCleaningValue').value);
+  const overstayFine=moneyBR($('#contractOverstayFine').value);
+  const electricity=$('#contractElectricity').value;
+  const linens=$('#contractLinens').value;
   const notes=$('#contractNotes').value.trim();
   const nights=contractNights(r.checkin,r.checkout);
+  const start=brDate(r.checkin), end=brDate(r.checkout);
   const issueDate=new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'});
-  const extra=notes?'<p><strong>Condições adicionais:</strong> '+esc(notes)+'</p>':'';
-  const doc='<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>Contrato - '+esc(guest)+'</title><style>body{font-family:Georgia,serif;color:#191919;max-width:820px;margin:38px auto;padding:0 26px;line-height:1.55;font-size:14px}h1{text-align:center;font-size:20px;margin-bottom:30px}h2{font-size:14px;margin-top:22px;text-transform:uppercase}.meta{border:1px solid #bbb;padding:14px;margin:18px 0;background:#fafafa}p{text-align:justify}.sign{display:grid;grid-template-columns:1fr 1fr;gap:50px;margin-top:70px}.line{border-top:1px solid #333;text-align:center;padding-top:7px}.muted{color:#555;font-size:12px}@media print{body{margin:0;max-width:none}.no-print{display:none}}</style></head><body>'+
-  '<h1>CONTRATO PARTICULAR DE LOCAÇÃO POR TEMPORADA</h1>'+
-  '<p><strong>LOCADOR:</strong> '+esc(owner)+', CPF/CNPJ '+esc(ownerDoc)+', endereço '+esc(ownerAddress)+'.</p>'+
-  '<p><strong>LOCATÁRIO:</strong> '+esc(guest)+', CPF '+esc(guestCpf)+', endereço '+esc(guestAddress)+'.</p>'+
-  '<div class="meta"><strong>Imóvel:</strong> Village Paganayoh – Casa 01, Guarajuba, Camaçari/BA.<br><strong>Período:</strong> '+brDate(r.checkin)+' a '+brDate(r.checkout)+' ('+nights+' noites).<br><strong>Hóspedes:</strong> '+esc(guests)+'.<br><strong>Valor total:</strong> '+esc(total)+'.<br><strong>Pagamento:</strong> '+esc(payment)+'.<br><strong>Caução:</strong> '+esc(deposit)+'.</div>'+
-  '<h2>1. Objeto e prazo</h2><p>O LOCADOR cede ao LOCATÁRIO, exclusivamente para hospedagem temporária e lazer, o uso do imóvel acima identificado durante o período indicado neste instrumento. O contrato encerra-se automaticamente no check-out, sem prorrogação tácita.</p>'+
-  '<h2>2. Uso do imóvel</h2><p>O imóvel deverá ser utilizado com zelo, respeitando-se a capacidade informada, as regras da casa e do condomínio, os horários de silêncio, as normas de segurança e as restrições aplicáveis às áreas comuns. É vedada a cessão, sublocação ou transferência da hospedagem a terceiros sem autorização expressa do LOCADOR.</p>'+
-  '<h2>3. Pagamento e caução</h2><p>O valor da locação e a forma de pagamento são os descritos acima. Havendo caução, esta poderá ser utilizada para ressarcir danos materiais, perdas de itens, multas condominiais ou outras despesas comprovadamente decorrentes da estadia, sem prejuízo de cobrança complementar quando o prejuízo exceder o valor caucionado.</p>'+
-  '<h2>4. Conservação e responsabilidade</h2><p>O LOCATÁRIO declara receber o imóvel em condições adequadas de uso e compromete-se a devolvê-lo no mesmo estado de conservação, ressalvado o desgaste normal. Danos causados pelo LOCATÁRIO, seus acompanhantes, visitantes ou prestadores por ele autorizados serão de sua responsabilidade.</p>'+
-  '<h2>5. Regras e ocorrências</h2><p>O descumprimento grave das regras do imóvel ou do condomínio, a realização de eventos não autorizados, a perturbação reiterada do sossego ou a prática de ato ilícito poderá ensejar encerramento antecipado da hospedagem, observadas as circunstâncias do caso e as obrigações legais aplicáveis.</p>'+
-  '<h2>6. Check-in e check-out</h2><p>Os horários, forma de entrega de chaves/acesso e demais orientações operacionais serão informados pelo LOCADOR. Eventual permanência além do horário de check-out dependerá de autorização prévia.</p>'+
-  '<h2>7. Disposições gerais</h2><p>As partes reconhecem que este instrumento registra as condições da locação por temporada indicada acima. Alterações específicas deverão constar por escrito. Fica eleito o foro legalmente competente para solução de controvérsias, observadas as regras de competência aplicáveis.</p>'+
-  extra+
-  '<p style="margin-top:32px">Guarajuba, Camaçari/BA, '+esc(issueDate)+'.</p>'+
-  '<div class="sign"><div class="line">'+esc(owner)+'<br><span class="muted">LOCADOR</span></div><div class="line">'+esc(guest)+'<br><span class="muted">LOCATÁRIO</span></div></div>'+
-  '<div class="no-print" style="margin-top:45px;text-align:center"><button onclick="window.print()" style="padding:12px 18px;border:0;border-radius:8px;background:#1f9d68;color:white;font-weight:700;cursor:pointer">Imprimir / Salvar como PDF</button></div>'+
+
+  const linensText=linens==='sim'
+    ?'Serão fornecidas roupas de cama e de banho.'
+    :'Não serão fornecidas roupas de cama e de banho.';
+  const cleaningText=cleaningMode==='included'
+    ?'O valor da taxa de limpeza já está incluído no valor da locação.'
+    :'Fica ajustado o valor de '+cleaningValue+', referente à taxa de limpeza, a ser pago pelo LOCATÁRIO no momento da entrega das chaves.';
+  const electricityText=electricity==='included'
+    ?'O consumo de energia elétrica está incluído no valor desta locação.'
+    :'No valor do aluguel não está incluído o consumo de energia elétrica. A aferição do consumo durante o período de locação será feita por leitura do contador e paga pelo LOCATÁRIO ao final do período, via PIX ou transferência bancária.';
+  const paymentHtml=payment.split(/\n+/).filter(Boolean).map(x=>'<div>• '+esc(x)+'</div>').join('');
+  const notesHtml=notes?'<div class="box"><strong>CONDIÇÕES ADICIONAIS:</strong><br>'+esc(notes).replace(/\n/g,'<br>')+'</div>':'';
+
+  const doc='<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>Contrato - '+esc(guest)+'</title><style>'+
+  '@page{size:A4;margin:17mm 17mm 18mm}*{box-sizing:border-box}body{font-family:Arial,Helvetica,sans-serif;color:#171717;max-width:820px;margin:28px auto;padding:0 26px;line-height:1.48;font-size:12.5px}'+
+  '.header{text-align:center;border-bottom:2px solid #1f6f50;padding-bottom:14px;margin-bottom:22px}.brandc{font-size:11px;letter-spacing:.16em;color:#8a6b2e;font-weight:800}.header h1{font-size:18px;margin:7px 0 0}.box{border:1px solid #d8ddda;border-radius:8px;padding:13px 14px;margin:14px 0;background:#fafcfb}.party{display:grid;grid-template-columns:110px 1fr;gap:8px;margin:8px 0}.label{font-weight:800}.clause{margin:14px 0}.clause h2{font-size:12.5px;margin:0 0 6px;text-transform:uppercase}.clause p{margin:6px 0;text-align:justify}.subp{padding-left:12px}.pay{padding:9px 12px;border-left:3px solid #1f6f50;margin:8px 0}.sign{display:grid;grid-template-columns:1fr 1fr;gap:45px;margin-top:58px}.line{border-top:1px solid #333;text-align:center;padding-top:7px}.witness{margin-top:35px}.muted{color:#555;font-size:11px}.no-print{text-align:center;margin:30px 0}.no-print button{padding:12px 18px;border:0;border-radius:8px;background:#1f9d68;color:#fff;font-weight:800;cursor:pointer}@media print{body{margin:0;max-width:none;padding:0}.no-print{display:none}.clause{break-inside:avoid}}'+
+  '</style></head><body>'+
+  '<div class="header"><div class="brandc">VILLAGE PAGANAYOH • CASA 01</div><h1>CONTRATO DE LOCAÇÃO RESIDENCIAL POR TEMPORADA</h1></div>'+
+  '<div class="box"><div class="party"><div class="label">LOCADORA:</div><div>'+esc(owner)+', '+esc(ownerAddress)+', CPF '+esc(ownerDoc)+'.</div></div>'+
+  '<div class="party"><div class="label">LOCATÁRIO(A):</div><div>'+esc(guest)+', CPF '+esc(guestCpf)+', residente e domiciliado(a) em '+esc(guestAddress)+'.</div></div></div>'+
+
+  '<div class="clause"><h2>Cláusula Primeira – Objeto</h2><p>Este contrato tem por objeto a locação, exclusivamente para residência temporária de lazer do LOCATÁRIO, da unidade de propriedade da LOCADORA, do VILLAGE de número 01, situado no Condomínio PAGANAYOH, Condomínio COSTA SMERALDA, em Guarajuba, área de praia situada no Município de Camaçari, Estado da Bahia.</p>'+
+  '<p class="subp"><strong>Parágrafo Primeiro –</strong> A unidade objeto desta locação possui hall tipo varanda de entrada, sala, cozinha, área de serviço, três suítes, banheiro de empregada, totalizando 97 metros quadrados de área privativa, com direito a uma vaga para carro, identificada pelo número 01, ao lado da guarita, no estacionamento lateral externo.</p>'+
+  '<p class="subp"><strong>Parágrafo Segundo –</strong> O village dispõe como área comum a todos os condôminos de piscina, churrasqueira e guarita de entrada.</p>'+
+  '<p class="subp"><strong>Parágrafo Terceiro –</strong> A unidade é entregue mobiliada e guarnecida com utensílios de cozinha, estando tais bens em perfeito estado de conservação, os quais deverão ser devolvidos nas mesmas condições, juntamente com o imóvel, ao fim do prazo de locação. '+esc(linensText)+'</p>'+
+  '<p class="subp"><strong>Parágrafo Quarto –</strong> Não será permitida, em nenhuma hipótese, a sublocação nem a utilização para fins que desvirtuem a finalidade única e específica residencial de lazer, nem que firam os bons costumes ou as normas internas do condomínio.</p>'+
+  '<p class="subp"><strong>Parágrafo Quinto –</strong> O imóvel será devolvido nas mesmas condições e com todas as despesas de responsabilidade do LOCATÁRIO pagas, assim comprovadas no ato da devolução das chaves.</p>'+
+  '<p class="subp"><strong>Parágrafo Sexto –</strong> Fica o LOCATÁRIO obrigado por todas as cláusulas constantes na Convenção e no Regulamento Interno do village, cuja cópia está à disposição de qualquer interessado na portaria e no próprio village, comprometendo-se o LOCATÁRIO a lê-las e acatá-las.</p>'+
+  '<p class="subp"><strong>Parágrafo Sétimo –</strong> Deve ser respeitada a Lei de Silêncio, inclusive não utilizando som das 22h às 9h do dia seguinte. É proibida a realização de festas ou reuniões, bem como a acomodação de mais de 08 (oito) pessoas, sob pena de multa de 1/3 do valor total acordado na Cláusula Terceira por pessoa acrescida indevidamente.</p></div>'+
+
+  '<div class="clause"><h2>Cláusula Segunda – Prazo</h2><p>O presente contrato tem prazo de <strong>'+nights+' dias</strong> e inicia-se às 12h do dia <strong>'+start+'</strong>, com término até às 12h do dia <strong>'+end+'</strong>.</p>'+
+  '<p class="subp"><strong>Parágrafo Primeiro –</strong> Cumpridas as obrigações do LOCATÁRIO, as chaves do imóvel lhe serão entregues, devendo ser devolvidas à LOCADORA ao final da locação.</p>'+
+  '<p class="subp"><strong>Parágrafo Segundo –</strong> Na hipótese de vencimento antecipado deste contrato, que ocorrerá quando houver infração de quaisquer das suas condições, o imóvel deverá ser devolvido à LOCADORA de imediato, independentemente de qualquer notificação.</p></div>'+
+
+  '<div class="clause"><h2>Cláusula Terceira – Aluguel e pagamento</h2><p>Pelo prazo de locação acima fixado, as partes contratantes ajustam o aluguel no valor total de <strong>'+esc(total)+'</strong>, devendo ser pago da seguinte forma:</p><div class="pay">'+paymentHtml+'</div>'+
+  '<p>'+esc(electricityText)+'</p><p>Fica estipulada multa por atraso no ressarcimento das contas na proporção de 10% do valor total devido, acrescida de 1% ao mês de juros e correção monetária.</p>'+
+  '<p>Fica convencionado que o LOCATÁRIO será considerado em mora após o 1º (primeiro) dia de permanência no imóvel além do prazo acordado.</p><p>'+esc(cleaningText)+'</p>'+
+  '<p>Se houver caução, fica registrado o valor de <strong>'+esc(deposit)+'</strong>, a ser devolvido após a saída, descontados valores comprovadamente devidos em razão da locação.</p></div>'+
+
+  '<div class="clause"><h2>Cláusula Quarta – Multa</h2><p>Por cada dia em que o LOCATÁRIO permanecer no imóvel além da data fixada para devolução, fica estipulada a quantia de <strong>'+esc(overstayFine)+'</strong>, devida até a correta devolução do imóvel dentro das condições aqui aprazadas, sobre cujo valor incidirão correção monetária e juros legais.</p></div>'+
+  '<div class="clause"><h2>Cláusula Quinta</h2><p>Na hipótese de desistência ou devolução antecipada do imóvel, a LOCADORA não está obrigada a devolver as quantias já recebidas, exceto aquela recebida a título de caução, que será devolvida após atendidas as condições às quais se destina.</p></div>'+
+  '<div class="clause"><h2>Cláusula Sexta</h2><p>O LOCATÁRIO se compromete a comunicar e entregar à LOCADORA todo e qualquer documento que chegar às suas mãos referente ao imóvel.</p></div>'+
+  '<div class="clause"><h2>Cláusula Sétima</h2><p>Qualquer acidente que venha a ocorrer na área privativa ou na área de uso comum dos condôminos do imóvel locado, por culpa ou dolo do LOCATÁRIO ou de pessoas a ele ligadas, obrigará o LOCATÁRIO a pagar todas as despesas de reparação pelos danos materiais ou pessoais causados.</p></div>'+
+  '<div class="clause"><h2>Cláusula Oitava</h2><p>Em caso de ação judicial de despejo ou cobrança de dívida referente à locação do imóvel, fica estabelecido que o LOCATÁRIO será responsável pelo pagamento das custas judiciais e extrajudiciais mais honorários advocatícios de 20% (vinte por cento) sobre o valor da causa.</p></div>'+
+  '<div class="clause"><h2>Cláusula Nona – Dos atos de informação entre os contratantes</h2><p>As partes acordam que toda e qualquer comunicação referente à locação será na forma escrita e inequívoca e com assinatura de recebimento. Por forma inequívoca entende-se “em mãos” ou envio por Cartório de Títulos e Documentos ou Correio com A.R.</p><p class="subp"><strong>Parágrafo Único –</strong> O LOCATÁRIO poderá receber citação, intimação, notificação e qualquer ato de comunicação tanto no imóvel ora locado, se ainda não o tiver devolvido, como no endereço de residência e domicílio identificado no preâmbulo.</p></div>'+
+  '<div class="clause"><h2>Cláusula Décima</h2><p>Não configurarão novação ou adição às cláusulas contidas neste contrato os atos de tolerância da LOCADORA quanto a quaisquer das obrigações do LOCATÁRIO.</p></div>'+
+  '<div class="clause"><h2>Cláusula Décima Primeira</h2><p>Fica autorizada a manutenção de 01 (um) animal doméstico de pequeno porte no village, porém é vedada a circulação do pet nas dependências do Condomínio Paganayoh, sob pena de multa pelo descumprimento dessa regra.</p></div>'+
+  '<div class="clause"><h2>Cláusula Décima Segunda – Vistorias</h2><p>O LOCATÁRIO concorda em permitir, sem objeção, à LOCADORA, em horário estabelecido entre ambos, realizar vistorias no imóvel, podendo a LOCADORA, por si ou por preposto, averiguar o funcionamento de todas as instalações e acessórios do imóvel.</p></div>'+
+  '<div class="clause"><h2>Cláusula Décima Terceira</h2><p>Eventuais desabastecimentos de água e energia decorrentes de casos fortuitos ou de força maior, a exemplo de problemas na prestação de tais serviços pelas empresas correspondentes, não serão de responsabilidade da LOCADORA.</p></div>'+
+  '<div class="clause"><h2>Cláusula Décima Quarta – Da rescisão contratual</h2><p>Ocorrerá a rescisão do presente contrato de locação de imóvel residencial, independentemente de comunicação prévia, interpelação judicial ou extrajudicial ou indenização por parte da LOCADORA, quando:</p>'+
+  '<p class="subp">a) ocorrer infração de qualquer cláusula deste contrato, da lei, regulamento ou posturas em vigor, hipótese em que o LOCATÁRIO deverá efetuar o pagamento das multas e despesas previstas neste contrato;</p>'+
+  '<p class="subp">b) ocorrer força maior que acarrete impedimento total ou parcial do uso, ou impedimento ordenado pelo poder público;</p>'+
+  '<p class="subp">c) ocorrer sinistro, incêndio ou fato que impossibilite a posse do imóvel, independentemente de dolo ou culpa do LOCATÁRIO ou da LOCADORA, bem como outras hipóteses que tornem impossível a posse;</p>'+
+  '<p class="subp">d) ocorrer desapropriação do imóvel alugado por necessidade ou utilidade pública.</p></div>'+
+  '<div class="clause"><h2>Cláusula Décima Quinta – Regência</h2><p>As partes acordam que este contrato rege-se pela Lei nº 8.245, de 18 de outubro de 1991, com as alterações posteriores, em especial seus arts. 48 a 50, e pelo Código Civil nos casos em que a referida lei for omissa, declarando ciência de seu conteúdo.</p></div>'+
+  '<div class="clause"><h2>Cláusula Décima Sexta – Foro</h2><p>Fica eleito o foro da cidade de Salvador, Bahia, com renúncia expressa a outro domicílio que tenham ou venham a ter as partes contratantes, para dirimir dúvidas provenientes da execução e cumprimento deste contrato.</p></div>'+
+  notesHtml+
+  '<p style="margin-top:28px;text-align:justify">E, por estarem justos e contratados, de pleno acordo com todas as cláusulas e condições estipuladas neste instrumento, assinam o presente contrato em 02 (duas) vias de igual teor, na presença de 02 (duas) testemunhas.</p>'+
+  '<p style="margin-top:30px">Salvador, '+esc(issueDate)+'.</p>'+
+  '<div class="sign"><div class="line">'+esc(owner)+'<br>CPF '+esc(ownerDoc)+'<br><span class="muted">LOCADORA</span></div><div class="line">'+esc(guest)+'<br>CPF '+esc(guestCpf)+'<br><span class="muted">LOCATÁRIO(A)</span></div></div>'+
+  '<div class="sign witness"><div class="line">Testemunha 1<br><span class="muted">Nome / CPF</span></div><div class="line">Testemunha 2<br><span class="muted">Nome / CPF</span></div></div>'+
+  '<div class="no-print"><button onclick="window.print()">Imprimir / Salvar como PDF</button></div>'+
   '</body></html>';
+
   const w=window.open('','_blank');
-  if(!w){$('#contractMsg').textContent='O navegador bloqueou a nova janela. Permita pop-ups para gerar o contrato.';return}
-  w.document.open();w.document.write(doc);w.document.close();
+  if(!w){msg.textContent='O navegador bloqueou a nova janela. Permita pop-ups para gerar o contrato.';return}
+  w.document.open();w.document.write(doc);w.document.close()
 });
 
 $('#newBtn').onclick=openNew;$('#closeModal').onclick=()=>$('#reservationDialog').close();$('#cancelModal').onclick=()=>$('#reservationDialog').close();$('#refresh').onclick=loadReservations;
