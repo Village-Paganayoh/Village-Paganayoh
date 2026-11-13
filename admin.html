@@ -392,6 +392,57 @@
     <div class="modal-actions"><button type="button" class="btn btn-light" id="cancelRuleModal">Voltar</button><button type="submit" class="btn btn-primary" id="saveRuleBtn">Salvar regra</button></div>
   </form>
 </dialog>
+<dialog id="energyDialog" style="width:min(900px,calc(100% - 28px))">
+  <form id="energyForm" class="modal">
+    <div class="modal-head"><h3>Cálculo de cobrança da energia</h3><button type="button" class="x" id="closeEnergyModal">×</button></div>
+    <div style="color:var(--muted);font-size:.82rem;line-height:1.5;margin:8px 0 18px">Baseado na planilha de cobrança: consumo da rede (03) + consumo instantâneo solar, multiplicados pela tarifa de energia.</div>
+
+    <div class="field"><label>Reserva</label><input id="energyReservationLabel" type="text" readonly></div>
+    <div class="grid2">
+      <div class="field"><label>Entrada do hóspede</label><input id="energyCheckin" type="date"></div>
+      <div class="field"><label>Saída do hóspede</label><input id="energyCheckout" type="date"></div>
+    </div>
+    <div class="grid2">
+      <div class="field"><label>Hora de entrada</label><input id="energyCheckinTime" type="time" value="12:00"></div>
+      <div class="field"><label>Hora de saída</label><input id="energyCheckoutTime" type="time" value="12:00"></div>
+    </div>
+
+    <div style="border-top:1px solid var(--line);margin:20px 0 10px;padding-top:16px;font-weight:800">Medidor bidirecional</div>
+    <div style="color:var(--muted);font-size:.78rem;margin-bottom:8px">Código 03 = energia consumida da rede elétrica.</div>
+    <div class="grid2">
+      <div class="field"><label>Consumo 03 — entrada (kWh)</label><input id="energyGridStart" type="number" min="0" step="0.01" placeholder="Ex.: 9175"></div>
+      <div class="field"><label>Consumo 03 — saída (kWh)</label><input id="energyGridEnd" type="number" min="0" step="0.01" placeholder="Ex.: 9227"></div>
+    </div>
+
+    <div style="color:var(--muted);font-size:.78rem;margin:12px 0 8px">Código 103 = energia solar excedente injetada na rede.</div>
+    <div class="grid2">
+      <div class="field"><label>Injetado 103 — entrada (kWh)</label><input id="energyInjectedStart" type="number" min="0" step="0.01" placeholder="Ex.: 24370"></div>
+      <div class="field"><label>Injetado 103 — saída (kWh)</label><input id="energyInjectedEnd" type="number" min="0" step="0.01" placeholder="Ex.: 24413"></div>
+    </div>
+
+    <div class="grid2">
+      <div class="field"><label>Produção solar total no período (kWh)</label><input id="energySolarProduction" type="number" min="0" step="0.01" placeholder="Ex.: 74,22"></div>
+      <div class="field"><label>Tarifa Coelba (R$/kWh)</label><input id="energyTariff" type="text" inputmode="decimal" value="1,06"></div>
+    </div>
+
+    <div id="energyMsg" class="msg"></div>
+
+    <div style="border-top:1px solid var(--line);margin:18px 0 12px;padding-top:16px;font-weight:800">Resultado</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px">
+      <div style="border:1px solid var(--line);border-radius:12px;padding:12px;background:#fafcfb"><small style="color:var(--muted)">Consumo da rede</small><strong id="energyGridUsed" style="display:block;font-size:1.2rem;margin-top:5px">0,00 kWh</strong></div>
+      <div style="border:1px solid var(--line);border-radius:12px;padding:12px;background:#fafcfb"><small style="color:var(--muted)">Energia injetada</small><strong id="energyInjected" style="display:block;font-size:1.2rem;margin-top:5px">0,00 kWh</strong></div>
+      <div style="border:1px solid var(--line);border-radius:12px;padding:12px;background:#fafcfb"><small style="color:var(--muted)">Consumo solar instantâneo</small><strong id="energyInstant" style="display:block;font-size:1.2rem;margin-top:5px">0,00 kWh</strong></div>
+      <div style="border:1px solid var(--line);border-radius:12px;padding:12px;background:#fafcfb"><small style="color:var(--muted)">Consumo total</small><strong id="energyTotalKwh" style="display:block;font-size:1.2rem;margin-top:5px">0,00 kWh</strong></div>
+      <div style="border:2px solid var(--green);border-radius:12px;padding:12px;background:#f2fbf7"><small style="color:var(--green2);font-weight:800">À cobrar do hóspede</small><strong id="energyAmount" style="display:block;font-size:1.45rem;margin-top:5px;color:var(--green2)">R$ 0,00</strong></div>
+    </div>
+
+    <div style="margin-top:14px;padding:12px;border-radius:12px;background:#f7f9f8;color:var(--muted);font-size:.78rem;line-height:1.5">
+      Fórmula: consumo instantâneo = produção solar − energia injetada. Consumo total = consumo da rede + consumo instantâneo. Valor = consumo total × tarifa.
+    </div>
+
+    <div class="modal-actions"><button type="button" class="btn btn-light" id="clearEnergyBtn">Limpar leituras</button><button type="button" class="btn btn-primary" id="closeEnergyBtn">Fechar</button></div>
+  </form>
+</dialog>
 <dialog id="contractDialog" style="width:min(980px,calc(100% - 28px))">
   <form id="contractForm" class="modal">
     <div class="modal-head"><h3>Gerar contrato de locação por temporada</h3><button type="button" class="x" id="closeContractModal">×</button></div>
@@ -1470,7 +1521,7 @@ $('#ruleForm')?.addEventListener('submit',async e=>{
 });
 
 async function loadReservations(){const panel=$('.panel');panel.classList.add('loading');try{const [direct,airbnb]=await Promise.all([api('/reservas'),fetch('disponibilidade.json?ts='+Date.now(),{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error('Calendário Airbnb indisponível.');return r.json()})]);reservations=direct.reservas||[];airbnbPeriods=Array.isArray(airbnb.periods)?airbnb.periods:[];render()}catch(err){toast(err.message)}finally{panel.classList.remove('loading')}}
-function render(){const body=$('#rows');body.innerHTML='';const activeDirect=[...reservations].filter(r=>r.status!=='cancelada').sort((a,b)=>a.checkin.localeCompare(b.checkin));const cancelled=[...reservations].filter(r=>r.status==='cancelada').sort((a,b)=>b.checkin.localeCompare(a.checkin));const airbnb=airbnbPeriods.map((p,i)=>({id:'airbnb-'+i,checkin:p.start,checkout:p.end,hospede:'Airbnb',telefone:'—',origem:'Airbnb',status:'Airbnb',_airbnb:true}));const sorted=[...activeDirect,...airbnb].sort((a,b)=>a.checkin.localeCompare(b.checkin));$('#empty').classList.toggle('hidden',sorted.length>0);for(const r of sorted){const tr=document.createElement('tr');const origin=r._airbnb?'<span class="badge airbnb-badge">Airbnb</span>':esc(r.origem||'direta');const actions=r._airbnb?'<span style="color:var(--muted);font-size:.8rem">Gerenciar no Airbnb</span>':`<div class="row-actions"><button class="mini edit" data-edit="${r.id}">Editar</button><button class="mini edit" data-contract="${r.id}">Contrato</button><button class="mini cancel" data-cancel="${r.id}">Cancelar</button></div>`;tr.innerHTML=`<td><strong>${brDate(r.checkin)}</strong><br><span style="color:var(--muted)">até ${brDate(r.checkout)}</span></td><td>${r._airbnb?'<span class="origin-airbnb">Airbnb</span>':esc(r.hospede||'—')}</td><td>${esc(r.telefone||'—')}</td><td>${origin}</td><td><span class="badge ${r._airbnb?'airbnb-badge':'confirmada'}">${esc(r.status||'confirmada')}</span></td><td>${actions}</td>`;body.appendChild(tr)}body.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>openEdit(Number(b.dataset.edit)));body.querySelectorAll('[data-contract]').forEach(b=>b.onclick=()=>openContract(Number(b.dataset.contract)));body.querySelectorAll('[data-cancel]').forEach(b=>b.onclick=()=>cancelReservation(Number(b.dataset.cancel)));const historyBody=$('#historyRows');historyBody.innerHTML='';$('#historySummary').textContent=cancelled.length===0?'Nenhuma reserva cancelada':cancelled.length===1?'1 reserva cancelada':cancelled.length+' reservas canceladas';$('#historyEmpty').classList.toggle('hidden',cancelled.length>0);for(const r of cancelled){const tr=document.createElement('tr');tr.innerHTML=`<td><strong>${brDate(r.checkin)}</strong><br><span style="color:var(--muted)">até ${brDate(r.checkout)}</span></td><td>${esc(r.hospede||'—')}</td><td>${esc(r.telefone||'—')}</td><td>${esc(r.origem||'direta')}</td><td><span class="badge cancelada">cancelada</span></td><td><button class="mini edit" data-history-edit="${r.id}">Editar</button></td>`;historyBody.appendChild(tr)}historyBody.querySelectorAll('[data-history-edit]').forEach(b=>b.onclick=()=>openEdit(Number(b.dataset.historyEdit)));$('#activeCount').textContent=activeDirect.length;$('#airbnbCount').textContent=airbnb.length;$('#totalCount').textContent=activeDirect.length+airbnb.length;const today=new Date().toISOString().slice(0,10);const next=[...activeDirect,...airbnb].filter(r=>r.checkin>=today).sort((a,b)=>a.checkin.localeCompare(b.checkin))[0];$('#nextCheckin').textContent=next?brDate(next.checkin):'Nenhuma'}
+function render(){const body=$('#rows');body.innerHTML='';const activeDirect=[...reservations].filter(r=>r.status!=='cancelada').sort((a,b)=>a.checkin.localeCompare(b.checkin));const cancelled=[...reservations].filter(r=>r.status==='cancelada').sort((a,b)=>b.checkin.localeCompare(a.checkin));const airbnb=airbnbPeriods.map((p,i)=>({id:'airbnb-'+i,checkin:p.start,checkout:p.end,hospede:'Airbnb',telefone:'—',origem:'Airbnb',status:'Airbnb',_airbnb:true}));const sorted=[...activeDirect,...airbnb].sort((a,b)=>a.checkin.localeCompare(b.checkin));$('#empty').classList.toggle('hidden',sorted.length>0);for(const r of sorted){const tr=document.createElement('tr');const origin=r._airbnb?'<span class="badge airbnb-badge">Airbnb</span>':esc(r.origem||'direta');const actions=r._airbnb?'<span style="color:var(--muted);font-size:.8rem">Gerenciar no Airbnb</span>':`<div class="row-actions"><button class="mini edit" data-edit="${r.id}">Editar</button><button class="mini edit" data-contract="${r.id}">Contrato</button><button class="mini edit" data-energy="${r.id}">Energia</button><button class="mini cancel" data-cancel="${r.id}">Cancelar</button></div>`;tr.innerHTML=`<td><strong>${brDate(r.checkin)}</strong><br><span style="color:var(--muted)">até ${brDate(r.checkout)}</span></td><td>${r._airbnb?'<span class="origin-airbnb">Airbnb</span>':esc(r.hospede||'—')}</td><td>${esc(r.telefone||'—')}</td><td>${origin}</td><td><span class="badge ${r._airbnb?'airbnb-badge':'confirmada'}">${esc(r.status||'confirmada')}</span></td><td>${actions}</td>`;body.appendChild(tr)}body.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>openEdit(Number(b.dataset.edit)));body.querySelectorAll('[data-contract]').forEach(b=>b.onclick=()=>openContract(Number(b.dataset.contract)));body.querySelectorAll('[data-energy]').forEach(b=>b.onclick=()=>openEnergy(Number(b.dataset.energy)));body.querySelectorAll('[data-cancel]').forEach(b=>b.onclick=()=>cancelReservation(Number(b.dataset.cancel)));const historyBody=$('#historyRows');historyBody.innerHTML='';$('#historySummary').textContent=cancelled.length===0?'Nenhuma reserva cancelada':cancelled.length===1?'1 reserva cancelada':cancelled.length+' reservas canceladas';$('#historyEmpty').classList.toggle('hidden',cancelled.length>0);for(const r of cancelled){const tr=document.createElement('tr');tr.innerHTML=`<td><strong>${brDate(r.checkin)}</strong><br><span style="color:var(--muted)">até ${brDate(r.checkout)}</span></td><td>${esc(r.hospede||'—')}</td><td>${esc(r.telefone||'—')}</td><td>${esc(r.origem||'direta')}</td><td><span class="badge cancelada">cancelada</span></td><td><button class="mini edit" data-history-edit="${r.id}">Editar</button></td>`;historyBody.appendChild(tr)}historyBody.querySelectorAll('[data-history-edit]').forEach(b=>b.onclick=()=>openEdit(Number(b.dataset.historyEdit)));$('#activeCount').textContent=activeDirect.length;$('#airbnbCount').textContent=airbnb.length;$('#totalCount').textContent=activeDirect.length+airbnb.length;const today=new Date().toISOString().slice(0,10);const next=[...activeDirect,...airbnb].filter(r=>r.checkin>=today).sort((a,b)=>a.checkin.localeCompare(b.checkin))[0];$('#nextCheckin').textContent=next?brDate(next.checkin):'Nenhuma'}
 function esc(v){return String(v).replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
 function ymd(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
 function parseYmd(v){if(!v)return null;const [y,m,d]=v.split('-').map(Number);return new Date(y,m-1,d)}
@@ -1485,6 +1536,63 @@ function resetForm(){reservationForm.reset();$('#reservationId').value='';$('#or
 function openNew(){resetForm();adminCalMonth=new Date();adminCalMonth.setDate(1);renderAdminCalendar();$('#reservationDialog').showModal()}
 function openEdit(id){const r=reservations.find(x=>x.id===id);if(!r)return;resetForm();$('#modalTitle').textContent='Editar reserva';$('#reservationId').value=r.id;$('#checkin').value=r.checkin;$('#checkout').value=r.checkout;$('#hospede').value=r.hospede||'';$('#telefone').value=r.telefone||'';$('#origem').value=r.origem||'direta';$('#status').value=r.status||'confirmada';$('#observacoes').value=r.observacoes||'';adminCalMonth=parseYmd(r.checkin)||new Date();adminCalMonth.setDate(1);renderAdminCalendar();$('#reservationDialog').showModal()}
 $('#adminPrev').onclick=()=>{adminCalMonth.setMonth(adminCalMonth.getMonth()-1);renderAdminCalendar()};$('#adminNext').onclick=()=>{adminCalMonth.setMonth(adminCalMonth.getMonth()+1);renderAdminCalendar()};$('#checkin').addEventListener('change',()=>{if($('#checkin').value&&$('#checkout').value&&$('#checkout').value<=$('#checkin').value)$('#checkout').value='';renderAdminCalendar()});$('#checkout').addEventListener('change',renderAdminCalendar);
+
+function energyNum(id){const n=Number(String($('#'+id).value||'').replace(',','.'));return Number.isFinite(n)?n:0}
+function fmtKwh(n){return Number(n||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})+' kWh'}
+function calculateEnergy(){
+  const msg=$('#energyMsg');msg.textContent='';
+  const gridStart=energyNum('energyGridStart'),gridEnd=energyNum('energyGridEnd');
+  const injStart=energyNum('energyInjectedStart'),injEnd=energyNum('energyInjectedEnd');
+  const production=energyNum('energySolarProduction');
+  const tariff=parseMoneyBR($('#energyTariff').value);
+  const gridUsed=gridEnd-gridStart;
+  const injected=injEnd-injStart;
+  const instant=production-injected;
+  const total=gridUsed+instant;
+
+  if($('#energyGridStart').value && $('#energyGridEnd').value && gridUsed<0) msg.textContent='A leitura final do consumo 03 não pode ser menor que a leitura inicial.';
+  else if($('#energyInjectedStart').value && $('#energyInjectedEnd').value && injected<0) msg.textContent='A leitura final do código 103 não pode ser menor que a leitura inicial.';
+  else if($('#energySolarProduction').value && instant<0) msg.textContent='A produção solar informada é menor que a energia injetada no período. Confira os valores.';
+
+  $('#energyGridUsed').textContent=fmtKwh(Math.max(0,gridUsed));
+  $('#energyInjected').textContent=fmtKwh(Math.max(0,injected));
+  $('#energyInstant').textContent=fmtKwh(Math.max(0,instant));
+  $('#energyTotalKwh').textContent=fmtKwh(Math.max(0,total));
+  $('#energyAmount').textContent=moneyBR(Math.max(0,total)*Math.max(0,tariff));
+}
+function openEnergy(id){
+  const r=reservations.find(x=>String(x.id)===String(id));
+  if(!r)return;
+  $('#energyReservationLabel').value=(r.hospede||'Sem nome')+' • '+brDate(r.checkin)+' a '+brDate(r.checkout);
+  $('#energyCheckin').value=r.checkin||'';
+  $('#energyCheckout').value=r.checkout||'';
+  $('#energyCheckinTime').value='12:00';
+  $('#energyCheckoutTime').value='12:00';
+  $('#energyGridStart').value='';
+  $('#energyGridEnd').value='';
+  $('#energyInjectedStart').value='';
+  $('#energyInjectedEnd').value='';
+  $('#energySolarProduction').value='';
+  try{const t=localStorage.getItem('vp_energy_tariff');if(t)$('#energyTariff').value=t}catch(e){}
+  $('#energyMsg').textContent='';
+  calculateEnergy();
+  $('#energyDialog').showModal()
+}
+['energyGridStart','energyGridEnd','energyInjectedStart','energyInjectedEnd','energySolarProduction','energyTariff'].forEach(id=>{
+  $('#'+id).addEventListener('input',calculateEnergy)
+});
+$('#energyTariff').addEventListener('blur',()=>{
+  normalizeMoneyInput($('#energyTariff'));
+  try{localStorage.setItem('vp_energy_tariff',$('#energyTariff').value)}catch(e){}
+  calculateEnergy()
+});
+$('#closeEnergyModal').onclick=()=>$('#energyDialog').close();
+$('#closeEnergyBtn').onclick=()=>$('#energyDialog').close();
+$('#clearEnergyBtn').onclick=()=>{
+  ['energyGridStart','energyGridEnd','energyInjectedStart','energyInjectedEnd','energySolarProduction'].forEach(id=>$('#'+id).value='');
+  $('#energyMsg').textContent='';
+  calculateEnergy()
+};
 
 function parseMoneyBR(v){const s=String(v??'').trim().replace(/\./g,'').replace(',','.').replace(/[^0-9.-]/g,'');const n=Number(s);return Number.isFinite(n)?n:0}
 function moneyBR(v){return parseMoneyBR(v).toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}
