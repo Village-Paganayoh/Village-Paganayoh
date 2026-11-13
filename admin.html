@@ -440,7 +440,7 @@
       Fórmula: consumo instantâneo = produção solar − energia injetada. Consumo total = consumo da rede + consumo instantâneo. Valor = consumo total × tarifa.
     </div>
 
-    <div class="modal-actions"><button type="button" class="btn btn-light" id="clearEnergyBtn">Limpar leituras</button><button type="button" class="btn btn-primary" id="closeEnergyBtn">Fechar</button></div>
+    <div class="modal-actions"><button type="button" class="btn btn-light" id="clearEnergyBtn">Limpar leituras</button><button type="button" class="btn btn-light" id="energyStatementBtn">Gerar extrato</button><button type="button" class="btn btn-primary" id="closeEnergyBtn">Fechar</button></div>
   </form>
 </dialog>
 <dialog id="contractDialog" style="width:min(980px,calc(100% - 28px))">
@@ -1597,6 +1597,62 @@ function openEnergyAirbnb(id){
   calculateEnergy();
   $('#energyDialog').showModal()
 }
+function generateEnergyStatement(){
+  const label=$('#energyReservationLabel').value.trim()||'Hospedagem';
+  const checkin=$('#energyCheckin').value;
+  const checkout=$('#energyCheckout').value;
+  const checkinTime=$('#energyCheckinTime').value||'—';
+  const checkoutTime=$('#energyCheckoutTime').value||'—';
+  const gridStart=energyNum('energyGridStart'),gridEnd=energyNum('energyGridEnd');
+  const injStart=energyNum('energyInjectedStart'),injEnd=energyNum('energyInjectedEnd');
+  const production=energyNum('energySolarProduction');
+  const tariff=parseMoneyBR($('#energyTariff').value);
+  const gridUsed=gridEnd-gridStart;
+  const injected=injEnd-injStart;
+  const instant=production-injected;
+  const total=gridUsed+instant;
+  const amount=Math.max(0,total)*Math.max(0,tariff);
+
+  const msg=$('#energyMsg');msg.textContent='';
+  if(!$('#energyGridStart').value || !$('#energyGridEnd').value || !$('#energyInjectedStart').value || !$('#energyInjectedEnd').value || !$('#energySolarProduction').value){
+    msg.textContent='Preencha todas as leituras e a produção solar antes de gerar o extrato.';
+    return
+  }
+  if(gridUsed<0 || injected<0 || instant<0){
+    msg.textContent='Há valores inconsistentes no cálculo. Confira as leituras antes de gerar o extrato.';
+    return
+  }
+
+  const issued=new Date().toLocaleDateString('pt-BR');
+  const doc='<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>Extrato de energia - '+esc(label)+'</title><style>'+
+  '@page{size:A4;margin:18mm}*{box-sizing:border-box}body{font-family:Arial,Helvetica,sans-serif;color:#17201d;max-width:820px;margin:30px auto;padding:0 24px;font-size:13px;line-height:1.5}.head{text-align:center;border-bottom:2px solid #1f9d68;padding-bottom:14px;margin-bottom:22px}.head h1{font-size:20px;margin:5px 0}.sub{color:#66736d}.box{border:1px solid #dfe5e2;border-radius:10px;padding:14px;margin:14px 0;background:#fafcfb}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.item{border:1px solid #e4e9e6;border-radius:8px;padding:11px}.item small{display:block;color:#718079;margin-bottom:5px}.item strong{font-size:15px}.calc{margin:18px 0;border-left:4px solid #1f9d68;padding:12px 14px;background:#f4fbf7}.total{margin-top:20px;border:2px solid #1f9d68;border-radius:10px;padding:16px;text-align:center;background:#f2fbf7}.total small{color:#167a51;font-weight:700}.total strong{display:block;font-size:26px;color:#167a51;margin-top:6px}.note{font-size:11px;color:#66736d;margin-top:20px}.no-print{text-align:center;margin-top:28px}.no-print button{padding:12px 18px;border:0;border-radius:8px;background:#1f9d68;color:#fff;font-weight:800;cursor:pointer}@media print{body{margin:0;max-width:none;padding:0}.no-print{display:none}}</style></head><body>'+
+  '<div class="head"><div style="font-weight:800;color:#8a6b2e;letter-spacing:.1em;font-size:11px">VILLAGE PAGANAYOH • CASA 01</div><h1>EXTRATO DE CONSUMO DE ENERGIA</h1><div class="sub">Demonstrativo de cálculo para cobrança da hospedagem</div></div>'+
+  '<div class="box"><strong>'+esc(label)+'</strong><br>Período: '+(checkin?brDate(checkin):'—')+' às '+esc(checkinTime)+' até '+(checkout?brDate(checkout):'—')+' às '+esc(checkoutTime)+'<br>Emitido em: '+esc(issued)+'</div>'+
+  '<div class="grid">'+
+  '<div class="item"><small>Leitura 03 - entrada</small><strong>'+fmtKwh(gridStart)+'</strong></div>'+
+  '<div class="item"><small>Leitura 03 - saída</small><strong>'+fmtKwh(gridEnd)+'</strong></div>'+
+  '<div class="item"><small>Leitura 103 - entrada</small><strong>'+fmtKwh(injStart)+'</strong></div>'+
+  '<div class="item"><small>Leitura 103 - saída</small><strong>'+fmtKwh(injEnd)+'</strong></div>'+
+  '<div class="item"><small>Produção solar no período</small><strong>'+fmtKwh(production)+'</strong></div>'+
+  '<div class="item"><small>Tarifa aplicada</small><strong>'+moneyBR(tariff)+' / kWh</strong></div>'+
+  '</div>'+
+  '<div class="calc"><strong>Detalhamento do cálculo</strong><br><br>'+
+  'Consumo da rede: '+fmtKwh(gridEnd)+' − '+fmtKwh(gridStart)+' = <strong>'+fmtKwh(gridUsed)+'</strong><br>'+
+  'Energia injetada: '+fmtKwh(injEnd)+' − '+fmtKwh(injStart)+' = <strong>'+fmtKwh(injected)+'</strong><br>'+
+  'Consumo solar instantâneo: '+fmtKwh(production)+' − '+fmtKwh(injected)+' = <strong>'+fmtKwh(instant)+'</strong><br>'+
+  'Consumo total: '+fmtKwh(gridUsed)+' + '+fmtKwh(instant)+' = <strong>'+fmtKwh(total)+'</strong><br>'+
+  'Valor: '+fmtKwh(total)+' × '+moneyBR(tariff)+' = <strong>'+moneyBR(amount)+'</strong></div>'+
+  '<div class="total"><small>VALOR A COBRAR DO HÓSPEDE</small><strong>'+moneyBR(amount)+'</strong></div>'+
+  '<div class="note">Cálculo baseado nas leituras do medidor bidirecional e na produção solar registrada no período da hospedagem.</div>'+
+  '<div class="no-print"><button onclick="window.print()">Imprimir / Salvar como PDF</button></div>'+
+  '</body></html>';
+
+  const w=window.open('','_blank');
+  if(!w){msg.textContent='O navegador bloqueou a nova janela. Permita pop-ups para gerar o extrato.';return}
+  w.document.open();w.document.write(doc);w.document.close()
+}
+$('#energyStatementBtn').onclick=generateEnergyStatement;
+
 ['energyGridStart','energyGridEnd','energyInjectedStart','energyInjectedEnd','energySolarProduction','energyTariff'].forEach(id=>{
   $('#'+id).addEventListener('input',calculateEnergy)
 });
