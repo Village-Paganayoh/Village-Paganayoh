@@ -49,6 +49,7 @@
         <a class="admin-nav-link" href="#reservasTopo">📅 Visão geral</a>
         <a class="admin-nav-link" href="#listaReservas">🧾 Lista de reservas</a>
         <a class="admin-nav-link" href="#historicoReservas">🕘 Histórico</a>
+        <a class="admin-nav-link" href="#relatoriosReservas">📊 Relatórios</a>
       </div>
       <div class="admin-nav-group">
         <div class="admin-nav-title">Conteúdo do site</div>
@@ -73,6 +74,33 @@
       <div id="historyContent" class="history-content hidden">
         <div class="table-wrap"><table><thead><tr><th>Período</th><th>Hóspede</th><th>Telefone</th><th>Origem</th><th>Status</th><th>Ações</th></tr></thead><tbody id="historyRows"></tbody></table><div id="historyEmpty" class="empty hidden">Nenhuma reserva cancelada.</div></div>
       </div>
+    </section>
+    <span id="relatoriosReservas" class="section-anchor"></span>
+    <section class="panel section-anchor" id="reportsPanel" style="margin-top:18px">
+      <div class="panel-head">
+        <div>
+          <h3>Relatórios de reservas</h3>
+          <div style="color:var(--muted);font-size:.82rem;margin-top:4px">Combina reservas diretas com o histórico acumulado do Airbnb.</div>
+        </div>
+        <div class="actions">
+          <button id="reportCsvBtn" class="btn btn-light" type="button">Baixar CSV</button>
+          <button id="reportPrintBtn" class="btn btn-primary" type="button">Imprimir relatório</button>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:16px">
+        <div class="field" style="margin:0"><label>De</label><input id="reportFrom" type="date"></div>
+        <div class="field" style="margin:0"><label>Até</label><input id="reportTo" type="date"></div>
+        <div class="field" style="margin:0"><label>Origem</label><select id="reportOrigin"><option value="all">Todas</option><option value="direct">Diretas</option><option value="airbnb">Airbnb</option></select></div>
+        <div class="field" style="margin:0"><label>Status</label><select id="reportStatus"><option value="all">Todos</option><option value="active">Ativas / realizadas</option><option value="cancelled">Canceladas</option></select></div>
+      </div>
+      <div class="stats" style="grid-template-columns:repeat(4,1fr);margin-bottom:16px">
+        <div class="stat" style="min-height:100px"><small>Reservas / períodos</small><strong id="reportCount">0</strong></div>
+        <div class="stat" style="min-height:100px"><small>Diárias</small><strong id="reportNights">0</strong></div>
+        <div class="stat" style="min-height:100px"><small>Diretas</small><strong id="reportDirect">0</strong></div>
+        <div class="stat" style="min-height:100px"><small>Airbnb</small><strong id="reportAirbnb">0</strong></div>
+      </div>
+      <div class="table-wrap"><table><thead><tr><th>Período</th><th>Origem</th><th>Hóspede</th><th>Status</th><th>Diárias</th><th>Energia</th></tr></thead><tbody id="reportRows"></tbody></table><div id="reportEmpty" class="empty hidden">Nenhuma reserva no período selecionado.</div></div>
+      <div style="color:var(--muted);font-size:.74rem;margin-top:12px;line-height:1.45">O histórico do Airbnb passa a ser acumulado automaticamente a partir deste arquivo histórico. Valores de energia aparecem quando estiverem salvos neste navegador.</div>
     </section>
     <span id="galeriaMidia" class="section-anchor"></span><section class="panel section-anchor" id="mediaPanel" data-nav="galeriaMidia" style="margin-top:18px">
       <div class="panel-head"><div><h3>Galeria e Mídia</h3><div style="color:var(--muted);font-size:.82rem;margin-top:4px">Conteúdo dinâmico cadastrado para o site.</div></div><div class="actions"><button id="addMediaBtn" class="btn btn-primary" type="button">+ Adicionar mídia</button><button id="refreshMedia" class="btn btn-light" type="button">Atualizar</button></div></div>
@@ -513,6 +541,7 @@ const API='https://village-paganayoh-api.dario-cdao.workers.dev';
 let adminToken='';;
 let reservations=[];
 let airbnbPeriods=[];
+let airbnbHistory=[];
 let mediaItems=[];
 let editingMediaId=null;
 let regionItems=[];
@@ -1546,7 +1575,73 @@ $('#ruleForm')?.addEventListener('submit',async e=>{
   finally{btn.disabled=false;btn.textContent=editingRuleId?'Salvar alterações':'Salvar regra'}
 });
 
-async function loadReservations(){const panel=$('.panel');panel.classList.add('loading');try{const [direct,airbnb]=await Promise.all([api('/reservas'),fetch('disponibilidade.json?ts='+Date.now(),{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error('Calendário Airbnb indisponível.');return r.json()})]);reservations=direct.reservas||[];airbnbPeriods=Array.isArray(airbnb.periods)?airbnb.periods:[];render()}catch(err){toast(err.message)}finally{panel.classList.remove('loading')}}
+async function loadReservations(){const panel=$('.panel');panel.classList.add('loading');try{const [direct,airbnb,history]=await Promise.all([api('/reservas'),fetch('disponibilidade.json?ts='+Date.now(),{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error('Calendário Airbnb indisponível.');return r.json()}),fetch('airbnb_historico.json?ts='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():({periods:[]})).catch(()=>({periods:[]}))]);reservations=direct.reservas||[];airbnbPeriods=Array.isArray(airbnb.periods)?airbnb.periods:[];airbnbHistory=Array.isArray(history.periods)?history.periods:[];render();renderReservationReport()}catch(err){toast(err.message)}finally{panel.classList.remove('loading')}}
+function reportNightCount(item){
+  const a=parseYmd(item.checkin),b=parseYmd(item.checkout);
+  if(!a||!b)return 0;
+  const d=Math.max(0,Math.round((b-a)/86400000));
+  return item._airbnb?d+1:d
+}
+function reportData(){
+  const direct=reservations.map(r=>({...r,_airbnb:false,_origin:'direct',_status:r.status==='cancelada'?'cancelled':'active'}));
+  const airbnb=airbnbHistory.map((p,i)=>({id:'hist-airbnb-'+i,checkin:p.start,checkout:p.end,hospede:'Airbnb',telefone:'—',origem:'Airbnb',status:p.active===false?'Arquivada':'Airbnb',_airbnb:true,_origin:'airbnb',_status:'active'}));
+  return [...direct,...airbnb]
+}
+function filteredReportData(){
+  const from=$('#reportFrom')?.value||'',to=$('#reportTo')?.value||'';
+  const origin=$('#reportOrigin')?.value||'all',status=$('#reportStatus')?.value||'all';
+  return reportData().filter(r=>{
+    if(from && r.checkout<from)return false;
+    if(to && r.checkin>to)return false;
+    if(origin!=='all' && r._origin!==origin)return false;
+    if(status!=='all' && r._status!==status)return false;
+    return true
+  }).sort((a,b)=>a.checkin.localeCompare(b.checkin))
+}
+function reportEnergyText(r){
+  const key=r._airbnb?'airbnb_'+String(r.checkin)+'_'+String(r.checkout):'direct_'+String(r.id);
+  const s=getEnergyStatus(key);
+  if(s?.status==='done')return s.amount||'Calculada';
+  if(s?.status==='none')return 'Não cobrada';
+  if(s?.status==='draft')return 'Rascunho';
+  return '—'
+}
+function renderReservationReport(){
+  const body=$('#reportRows');if(!body)return;
+  const rows=filteredReportData();body.innerHTML='';
+  $('#reportEmpty').classList.toggle('hidden',rows.length>0);
+  let nights=0,direct=0,airbnb=0;
+  for(const r of rows){
+    const n=reportNightCount(r);nights+=n;r._airbnb?airbnb++:direct++;
+    const tr=document.createElement('tr');
+    tr.innerHTML='<td><strong>'+brDate(r.checkin)+'</strong><br><span style="color:var(--muted)">até '+brDate(r.checkout)+'</span></td>'+
+      '<td>'+(r._airbnb?'<span class="badge airbnb-badge">Airbnb</span>':'Direta')+'</td>'+
+      '<td>'+esc(r.hospede||'—')+'</td>'+
+      '<td><span class="badge '+(r._status==='cancelled'?'cancelada':'confirmada')+'">'+esc(r._status==='cancelled'?'cancelada':(r._airbnb?'arquivada':'confirmada'))+'</span></td>'+
+      '<td>'+n+'</td><td>'+esc(reportEnergyText(r))+'</td>';
+    body.appendChild(tr)
+  }
+  $('#reportCount').textContent=rows.length;$('#reportNights').textContent=nights;$('#reportDirect').textContent=direct;$('#reportAirbnb').textContent=airbnb
+}
+function csvCell(v){const s=String(v??'');return '"'+s.replace(/"/g,'""')+'"'}
+function downloadReservationCsv(){
+  const rows=filteredReportData();
+  const lines=[['Entrada','Saída','Origem','Hóspede','Status','Diárias','Energia'].map(csvCell).join(';')];
+  rows.forEach(r=>lines.push([brDate(r.checkin),brDate(r.checkout),r._airbnb?'Airbnb':'Direta',r.hospede||'',r._status==='cancelled'?'Cancelada':'Ativa',reportNightCount(r),reportEnergyText(r)].map(csvCell).join(';')));
+  const blob=new Blob(['\ufeff'+lines.join('\n')],{type:'text/csv;charset=utf-8;'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='relatorio-reservas-village.csv';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)
+}
+function printReservationReport(){
+  const rows=filteredReportData();
+  const totalNights=rows.reduce((s,r)=>s+reportNightCount(r),0);
+  const html=rows.map(r=>'<tr><td>'+brDate(r.checkin)+' a '+brDate(r.checkout)+'</td><td>'+(r._airbnb?'Airbnb':'Direta')+'</td><td>'+esc(r.hospede||'—')+'</td><td>'+(r._status==='cancelled'?'Cancelada':'Ativa')+'</td><td>'+reportNightCount(r)+'</td><td>'+esc(reportEnergyText(r))+'</td></tr>').join('');
+  const doc='<!doctype html><html><head><meta charset="utf-8"><title>Relatório de reservas</title><style>@page{size:A4;margin:15mm}body{font-family:Arial,sans-serif;color:#17201d;font-size:12px}h1{font-size:20px}table{width:100%;border-collapse:collapse;margin-top:16px}th,td{border-bottom:1px solid #ddd;padding:8px;text-align:left}th{font-size:10px;text-transform:uppercase;color:#66736d}.sum{padding:12px;background:#f4fbf7;border-left:4px solid #1f9d68;margin:14px 0}.no-print{text-align:center;margin-top:20px}@media print{.no-print{display:none}}</style></head><body><h1>Relatório de reservas — Village Paganayoh</h1><div class="sum"><strong>'+rows.length+'</strong> reservas/períodos • <strong>'+totalNights+'</strong> diárias</div><table><thead><tr><th>Período</th><th>Origem</th><th>Hóspede</th><th>Status</th><th>Diárias</th><th>Energia</th></tr></thead><tbody>'+html+'</tbody></table><div class="no-print"><button onclick="window.print()">Imprimir / Salvar PDF</button></div></body></html>';
+  const w=window.open('','_blank');if(!w){toast('Permita pop-ups para imprimir o relatório.');return}w.document.write(doc);w.document.close()
+}
+['reportFrom','reportTo','reportOrigin','reportStatus'].forEach(id=>$('#'+id)?.addEventListener('change',renderReservationReport));
+$('#reportCsvBtn')?.addEventListener('click',downloadReservationCsv);
+$('#reportPrintBtn')?.addEventListener('click',printReservationReport);
+
 function getEnergyStatus(key){
   try{return JSON.parse(localStorage.getItem('vp_energy_status_'+key)||'null')}catch(e){return null}
 }
@@ -1567,7 +1662,7 @@ function energyButtonHtml(r){
   if(s?.status==='draft')return '<button class="mini energy-btn" '+attr+'>💾 Rascunho</button>';
   return '<button class="mini energy-btn" '+attr+'>⚡ Energia</button>'
 }
-function render(){const body=$('#rows');body.innerHTML='';const activeDirect=[...reservations].filter(r=>r.status!=='cancelada').sort((a,b)=>a.checkin.localeCompare(b.checkin));const cancelled=[...reservations].filter(r=>r.status==='cancelada').sort((a,b)=>b.checkin.localeCompare(a.checkin));const airbnb=airbnbPeriods.map((p,i)=>({id:'airbnb-'+i,checkin:p.start,checkout:p.end,hospede:'Airbnb',telefone:'—',origem:'Airbnb',status:'Airbnb',_airbnb:true}));const sorted=[...activeDirect,...airbnb].sort((a,b)=>a.checkin.localeCompare(b.checkin));$('#empty').classList.toggle('hidden',sorted.length>0);for(const r of sorted){const tr=document.createElement('tr');const origin=r._airbnb?'<span class="badge airbnb-badge">Airbnb</span>':esc(r.origem||'direta');const energyBtn=energyButtonHtml(r).replace('<button ','<button class="energy-slot" ').replace('class="energy-slot" class="','class="energy-slot ');const actions=r._airbnb?`<div class="airbnb-actions">${energyBtn}<span class="airbnb-note">Gerenciar no Airbnb</span></div>`:`<div class="row-actions"><button class="mini edit" data-edit="${r.id}">Editar</button><button class="mini edit" data-contract="${r.id}">Contrato</button>${energyBtn}<button class="mini cancel" data-cancel="${r.id}">Cancelar</button></div>`;tr.innerHTML=`<td><strong>${brDate(r.checkin)}</strong><br><span style="color:var(--muted)">até ${brDate(r.checkout)}</span></td><td>${r._airbnb?'<span class="origin-airbnb">Airbnb</span>':esc(r.hospede||'—')}</td><td>${esc(r.telefone||'—')}</td><td>${origin}</td><td><span class="badge ${r._airbnb?'airbnb-badge':'confirmada'}">${esc(r.status||'confirmada')}</span></td><td>${actions}</td>`;body.appendChild(tr)}body.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>openEdit(Number(b.dataset.edit)));body.querySelectorAll('[data-contract]').forEach(b=>b.onclick=()=>openContract(Number(b.dataset.contract)));body.querySelectorAll('[data-energy]').forEach(b=>b.onclick=()=>openEnergy(Number(b.dataset.energy)));body.querySelectorAll('[data-energy-airbnb]').forEach(b=>b.onclick=()=>openEnergyAirbnb(String(b.dataset.energyAirbnb)));body.querySelectorAll('[data-cancel]').forEach(b=>b.onclick=()=>cancelReservation(Number(b.dataset.cancel)));const historyBody=$('#historyRows');historyBody.innerHTML='';$('#historySummary').textContent=cancelled.length===0?'Nenhuma reserva cancelada':cancelled.length===1?'1 reserva cancelada':cancelled.length+' reservas canceladas';$('#historyEmpty').classList.toggle('hidden',cancelled.length>0);for(const r of cancelled){const tr=document.createElement('tr');tr.innerHTML=`<td><strong>${brDate(r.checkin)}</strong><br><span style="color:var(--muted)">até ${brDate(r.checkout)}</span></td><td>${esc(r.hospede||'—')}</td><td>${esc(r.telefone||'—')}</td><td>${esc(r.origem||'direta')}</td><td><span class="badge cancelada">cancelada</span></td><td><button class="mini edit" data-history-edit="${r.id}">Editar</button></td>`;historyBody.appendChild(tr)}historyBody.querySelectorAll('[data-history-edit]').forEach(b=>b.onclick=()=>openEdit(Number(b.dataset.historyEdit)));$('#activeCount').textContent=activeDirect.length;$('#airbnbCount').textContent=airbnb.length;$('#totalCount').textContent=activeDirect.length+airbnb.length;const today=new Date().toISOString().slice(0,10);const next=[...activeDirect,...airbnb].filter(r=>r.checkin>=today).sort((a,b)=>a.checkin.localeCompare(b.checkin))[0];$('#nextCheckin').textContent=next?brDate(next.checkin):'Nenhuma'}
+function render(){const body=$('#rows');body.innerHTML='';const activeDirect=[...reservations].filter(r=>r.status!=='cancelada').sort((a,b)=>a.checkin.localeCompare(b.checkin));const cancelled=[...reservations].filter(r=>r.status==='cancelada').sort((a,b)=>b.checkin.localeCompare(a.checkin));const airbnb=airbnbPeriods.map((p,i)=>({id:'airbnb-'+i,checkin:p.start,checkout:p.end,hospede:'Airbnb',telefone:'—',origem:'Airbnb',status:'Airbnb',_airbnb:true}));const sorted=[...activeDirect,...airbnb].sort((a,b)=>a.checkin.localeCompare(b.checkin));$('#empty').classList.toggle('hidden',sorted.length>0);for(const r of sorted){const tr=document.createElement('tr');const origin=r._airbnb?'<span class="badge airbnb-badge">Airbnb</span>':esc(r.origem||'direta');const energyBtn=energyButtonHtml(r).replace('<button ','<button class="energy-slot" ').replace('class="energy-slot" class="','class="energy-slot ');const actions=r._airbnb?`<div class="airbnb-actions">${energyBtn}<span class="airbnb-note">Gerenciar no Airbnb</span></div>`:`<div class="row-actions"><button class="mini edit" data-edit="${r.id}">Editar</button><button class="mini edit" data-contract="${r.id}">Contrato</button>${energyBtn}<button class="mini cancel" data-cancel="${r.id}">Cancelar</button></div>`;tr.innerHTML=`<td><strong>${brDate(r.checkin)}</strong><br><span style="color:var(--muted)">até ${brDate(r.checkout)}</span></td><td>${r._airbnb?'<span class="origin-airbnb">Airbnb</span>':esc(r.hospede||'—')}</td><td>${esc(r.telefone||'—')}</td><td>${origin}</td><td><span class="badge ${r._airbnb?'airbnb-badge':'confirmada'}">${esc(r.status||'confirmada')}</span></td><td>${actions}</td>`;body.appendChild(tr)}body.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>openEdit(Number(b.dataset.edit)));body.querySelectorAll('[data-contract]').forEach(b=>b.onclick=()=>openContract(Number(b.dataset.contract)));body.querySelectorAll('[data-energy]').forEach(b=>b.onclick=()=>openEnergy(Number(b.dataset.energy)));body.querySelectorAll('[data-energy-airbnb]').forEach(b=>b.onclick=()=>openEnergyAirbnb(String(b.dataset.energyAirbnb)));body.querySelectorAll('[data-cancel]').forEach(b=>b.onclick=()=>cancelReservation(Number(b.dataset.cancel)));const historyBody=$('#historyRows');historyBody.innerHTML='';$('#historySummary').textContent=cancelled.length===0?'Nenhuma reserva cancelada':cancelled.length===1?'1 reserva cancelada':cancelled.length+' reservas canceladas';$('#historyEmpty').classList.toggle('hidden',cancelled.length>0);for(const r of cancelled){const tr=document.createElement('tr');tr.innerHTML=`<td><strong>${brDate(r.checkin)}</strong><br><span style="color:var(--muted)">até ${brDate(r.checkout)}</span></td><td>${esc(r.hospede||'—')}</td><td>${esc(r.telefone||'—')}</td><td>${esc(r.origem||'direta')}</td><td><span class="badge cancelada">cancelada</span></td><td><button class="mini edit" data-history-edit="${r.id}">Editar</button></td>`;historyBody.appendChild(tr)}historyBody.querySelectorAll('[data-history-edit]').forEach(b=>b.onclick=()=>openEdit(Number(b.dataset.historyEdit)));$('#activeCount').textContent=activeDirect.length;$('#airbnbCount').textContent=airbnb.length;$('#totalCount').textContent=activeDirect.length+airbnb.length;const today=new Date().toISOString().slice(0,10);const next=[...activeDirect,...airbnb].filter(r=>r.checkin>=today).sort((a,b)=>a.checkin.localeCompare(b.checkin))[0];$('#nextCheckin').textContent=next?brDate(next.checkin):'Nenhuma';renderReservationReport()}
 function esc(v){return String(v).replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
 function ymd(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
 function parseYmd(v){if(!v)return null;const [y,m,d]=v.split('-').map(Number);return new Date(y,m-1,d)}
