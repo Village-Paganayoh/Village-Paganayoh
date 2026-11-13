@@ -106,78 +106,65 @@
       </div>
     </section>
     <span id="galeriaMidia" class="section-anchor"></span><section class="panel section-anchor" id="mediaPanel" data-nav="galeriaMidia" style="margin-top:18px">
-      <div class="panel-head"><div><h3>Galeria e Mídia</h3><div style="color:var(--muted);font-size:.82rem;margin-top:4px">Conteúdo dinâmico cadastrado para o site.</div></div><div class="actions"><button id="addMediaBtn" class="btn btn-primary" type="button">+ Adicionar mídia</button><button id="refreshMedia" class="btn btn-light" type="button">Atualizar</button></div></div>
+      <button class="history-toggle" id="mediaToggle" type="button" aria-expanded="false" style="padding:0"><span><strong>Galeria e Mídia</strong><br><span>Conteúdo dinâmico cadastrado para o site.</span></span><span class="chev">⌄</span></button>
+      <div id="mediaContent" class="history-content hidden">
+      <div class="panel-head" style="margin-top:8px"><div></div><div class="actions"><button id="addMediaBtn" class="btn btn-primary" type="button">+ Adicionar mídia</button><button id="refreshMedia" class="btn btn-light" type="button">Atualizar</button></div></div>
       <div id="mediaOrderHint" style="color:var(--muted);font-size:.78rem;margin:-4px 0 12px">Organize a ordem das mídias no computador. No celular, use apenas Editar e Excluir.</div><div id="mediaGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px"></div>
       <div id="mediaEmpty" class="empty hidden">Nenhuma mídia cadastrada.</div>
       <div id="mediaLoadError" class="empty hidden" style="color:var(--red);padding:24px">
         Não foi possível carregar a galeria de mídia. <button id="retryMediaBtn" type="button" class="btn btn-light" style="margin-left:8px">Tentar novamente</button>
       </div>
-    </section>
+    
+      </div></section>
     <span id="exploreRegiao" class="section-anchor"></span><section class="panel section-anchor" id="regionAdminPanel" data-nav="exploreRegiao" style="margin-top:18px">
-      <div class="panel-head">
-        <div>
-          <h3>Explore a Região</h3>
-          <div style="color:var(--muted);font-size:.82rem;margin-top:4px">Cadastre e atualize os locais exibidos no site.</div>
-        </div>
-        <div class="actions">
+      <button class="history-toggle" id="regionToggle" type="button" aria-expanded="false" style="padding:0"><span><strong>Explore a Região</strong><br><span>Cadastre e atualize os locais exibidos no site.</span></span><span class="chev">⌄</span></button>
+      <div id="regionContent" class="history-content hidden">
+      <div class="panel-head" style="margin-top:8px"><div></div><div class="actions">
           <button id="addRegionBtn" class="btn btn-primary" type="button">+ Adicionar local</button>
           <button id="refreshRegions" class="btn btn-light" type="button">Atualizar</button>
-        </div>
-      </div>
+        </div></div>
       <div id="regionAdminGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px"></div>
       <div id="regionAdminEmpty" class="empty hidden">Nenhum local cadastrado.</div>
-    </section>
+    
+      </div></section>
     <span id="faqAdmin" class="section-anchor"></span><section class="panel section-anchor" id="faqAdminPanel" data-nav="faqAdmin" style="margin-top:18px">
-      <div class="panel-head">
-        <div>
-          <h3>Perguntas e respostas</h3>
-          <div style="color:var(--muted);font-size:.82rem;margin-top:4px">Gerencie as dúvidas exibidas no site e na central de pesquisa.</div>
-        </div>
-        <div class="actions">
+      <button class="history-toggle" id="faqToggle" type="button" aria-expanded="false" style="padding:0"><span><strong>Perguntas e respostas</strong><br><span>Gerencie as dúvidas exibidas no site e na central de pesquisa.</span></span><span class="chev">⌄</span></button>
+      <div id="faqContent" class="history-content hidden">
+      <div class="panel-head" style="margin-top:8px"><div></div><div class="actions">
           <button id="addFaqBtn" class="btn btn-primary" type="button">+ Adicionar pergunta</button>
           <button id="refreshFaqs" class="btn btn-light" type="button">Atualizar</button>
-        </div>
-      </div>
+        </div></div>
       <div style="color:var(--muted);font-size:.78rem;margin:-4px 0 12px">Marque até 4 perguntas como destaque para aparecerem diretamente na página principal.</div>
       <div id="faqAdminList" style="display:grid;gap:10px"></div>
       <div id="faqAdminEmpty" class="empty hidden">Nenhuma pergunta cadastrada.</div>
-    </section>
+    
+      </div></section>
     <span id="infoAdmin" class="section-anchor"></span><section class="panel section-anchor" id="infoAdminPanel" data-nav="infoAdmin" style="margin-top:18px">
-      <div class="panel-head">
-        <div>
-          <h3>Informações importantes</h3>
-          <div style="color:var(--muted);font-size:.82rem;margin-top:4px">Edite os avisos exibidos na seção “Antes de reservar”.</div>
-        </div>
-        <div class="actions">
+      <button class="history-toggle" id="infoToggle" type="button" aria-expanded="false" style="padding:0"><span><strong>Informações importantes</strong><br><span>Edite os avisos exibidos na seção “Antes de reservar”.</span></span><span class="chev">⌄</span></button>
+      <div id="infoContent" class="history-content hidden">
+      <div class="panel-head" style="margin-top:8px"><div></div><div class="actions">
           <button id="addInfoBtn" class="btn btn-primary" type="button">+ Adicionar informação</button>
           <button id="refreshInfos" class="btn btn-light" type="button">Atualizar</button>
-        </div>
-      </div>
+        </div></div>
       <div id="infoAdminList" style="display:grid;gap:10px"></div>
       <div id="infoAdminEmpty" class="empty hidden">Nenhuma informação cadastrada.</div>
-    </section>
+    
+      </div></section>
     <span id="rulesAdmin" class="section-anchor"></span><section class="panel section-anchor" id="rulesAdminPanel" data-nav="rulesAdmin" style="margin-top:18px">
-      <div class="panel-head">
-        <div>
-          <h3>Regras da casa / condomínio</h3>
-          <div style="color:var(--muted);font-size:.82rem;margin-top:4px">Gerencie as regras exibidas no site.</div>
-        </div>
-        <div class="actions">
+      <button class="history-toggle" id="rulesToggle" type="button" aria-expanded="false" style="padding:0"><span><strong>Regras da casa / condomínio</strong><br><span>Gerencie as regras exibidas no site.</span></span><span class="chev">⌄</span></button>
+      <div id="rulesContent" class="history-content hidden">
+      <div class="panel-head" style="margin-top:8px"><div></div><div class="actions">
           <button id="addRuleBtn" class="btn btn-primary" type="button">+ Adicionar regra</button>
           <button id="refreshRules" class="btn btn-light" type="button">Atualizar</button>
-        </div>
-      </div>
+        </div></div>
       <div id="rulesAdminList" style="display:grid;gap:10px"></div>
       <div id="rulesAdminEmpty" class="empty hidden">Nenhuma regra cadastrada.</div>
-    </section>
+    
+      </div></section>
     <span id="pricingAdmin" class="section-anchor"></span><section class="panel section-anchor" id="pricingAdminPanel" data-nav="pricingAdmin" style="margin-top:18px">
-      <div class="panel-head">
-        <div>
-          <h3>Preços e Tarifas</h3>
-          <div style="color:var(--muted);font-size:.82rem;margin-top:4px">Defina a diária padrão, o valor de sexta a domingo e tarifas para datas especiais.</div>
-        </div>
-        <button id="refreshPricing" class="btn btn-light" type="button">Atualizar</button>
-      </div>
+      <button class="history-toggle" id="pricingToggle" type="button" aria-expanded="false" style="padding:0"><span><strong>Preços e Tarifas</strong><br><span>Defina a diária padrão, o valor de sexta a domingo e tarifas para datas especiais.</span></span><span class="chev">⌄</span></button>
+      <div id="pricingContent" class="history-content hidden">
+      <div class="panel-head" style="margin-top:8px"><div></div><button id="refreshPricing" class="btn btn-light" type="button">Atualizar</button></div>
 
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;margin-bottom:16px">
         <div style="border:1px solid var(--line);border-radius:14px;padding:15px;background:#fff">
@@ -209,7 +196,8 @@
         <div id="specialPeriodsList" style="display:grid;gap:10px"></div>
         <div id="specialPeriodsEmpty" class="empty hidden">Nenhum período especial cadastrado.</div>
       </div>
-    </section>
+    
+      </div></section>
     
   </main>
     </div>
@@ -1675,6 +1663,22 @@ $('#reportsToggle')?.addEventListener('click',()=>{
   btn.setAttribute('aria-expanded',String(!open));
   content.classList.toggle('hidden',open)
 });
+[
+  ['mediaToggle','mediaContent'],
+  ['regionToggle','regionContent'],
+  ['faqToggle','faqContent'],
+  ['infoToggle','infoContent'],
+  ['rulesToggle','rulesContent'],
+  ['pricingToggle','pricingContent']
+].forEach(([toggleId,contentId])=>{
+  $('#'+toggleId)?.addEventListener('click',()=>{
+    const btn=$('#'+toggleId),content=$('#'+contentId);
+    const open=btn.getAttribute('aria-expanded')==='true';
+    btn.setAttribute('aria-expanded',String(!open));
+    content.classList.toggle('hidden',open)
+  })
+});
+
 
 function getEnergyStatus(key){
   try{return JSON.parse(localStorage.getItem('vp_energy_status_'+key)||'null')}catch(e){return null}
