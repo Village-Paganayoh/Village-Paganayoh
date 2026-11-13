@@ -1626,8 +1626,7 @@ function generateEnergyStatement(){
     const doc='<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>Extrato de energia - '+esc(label)+'</title><style>@page{size:A4;margin:18mm}body{font-family:Arial,Helvetica,sans-serif;color:#17201d;max-width:820px;margin:30px auto;padding:0 24px;font-size:13px;line-height:1.5}.head{text-align:center;border-bottom:2px solid #1f9d68;padding-bottom:14px;margin-bottom:22px}.box{border:1px solid #dfe5e2;border-radius:10px;padding:16px;background:#fafcfb}.no-print{text-align:center;margin-top:28px}.no-print button{padding:12px 18px;border:0;border-radius:8px;background:#1f9d68;color:#fff;font-weight:800;cursor:pointer}@media print{.no-print{display:none}}</style></head><body>'+
     '<div class="head"><div style="font-weight:800;color:#8a6b2e;letter-spacing:.1em;font-size:11px">VILLAGE PAGANAYOH • CASA 01</div><h1 style="font-size:20px;margin:5px 0">EXTRATO DE ENERGIA</h1></div>'+
     '<div class="box"><strong>'+esc(label)+'</strong><br>Período: '+(checkin?brDate(checkin):'—')+' a '+(checkout?brDate(checkout):'—')+'<br>Emitido em: '+esc(issued)+'<hr style="border:0;border-top:1px solid #ddd;margin:14px 0"><strong>Não houve cobrança de energia nesta hospedagem.</strong></div>'+
-    '<div class="no-print"><button onclick="window.print()">Imprimir / Salvar como PDF</button></div><!-- deploy-refresh: 2026-11-13-energy-button -->
-</body></html>';
+    '<div class="no-print"><button onclick="window.print()">Imprimir / Salvar como PDF</button></div></body></html>';
     const w=window.open('','_blank');
     if(!w){$('#energyMsg').textContent='O navegador bloqueou a nova janela. Permita pop-ups para gerar o extrato.';return}
     w.document.open();w.document.write(doc);w.document.close();return
@@ -1902,5 +1901,6 @@ $('#newBtn').onclick=openNew;$('#closeModal').onclick=()=>$('#reservationDialog'
 $('#reservationForm').addEventListener('submit',async e=>{e.preventDefault();const id=$('#reservationId').value;const payload={checkin:$('#checkin').value,checkout:$('#checkout').value,hospede:$('#hospede').value.trim(),telefone:$('#telefone').value.trim(),origem:$('#origem').value,status:$('#status').value,observacoes:$('#observacoes').value.trim()};const msg=$('#formMsg');msg.textContent='';try{await api(id?'/reservas/'+id:'/reservas',{method:id?'PUT':'POST',body:JSON.stringify(payload)});$('#reservationDialog').close();toast(id?'Reserva atualizada.':'Reserva cadastrada.');await loadReservations()}catch(err){msg.textContent=err.message}});
 async function cancelReservation(id){const r=reservations.find(x=>x.id===id);if(!confirm(`Cancelar a reserva de ${r?.hospede||'este hóspede'}?\n\nO histórico será mantido e as datas voltarão a ficar disponíveis.`))return;try{await api('/reservas/'+id,{method:'DELETE'});toast('Reserva cancelada.');await loadReservations()}catch(err){toast(err.message)}}
 </script>
+<!-- deploy-refresh: 2026-11-13-energy-button-fixed -->
 </body>
 </html>
