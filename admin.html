@@ -537,6 +537,18 @@ let reservations=[];
 let airbnbPeriods=[];
 let airbnbHistory=[];
 let mediaItems=[];
+const MEDIA_FALLBACK_IMAGES=[
+  "assets/images/casa/fachada.png",
+  "assets/images/casa/sala.png",
+  "assets/images/casa/cozinha.png",
+  "assets/images/lazer/piscina.png",
+  "assets/images/lazer/area-externa.png",
+  "assets/images/condominio/lagoa-cond.png",
+  "assets/images/condominio/quadra-cond.png",
+  "assets/images/quartos/quarto-principal.png",
+  "assets/images/quartos/quarto-terreo.png",
+  "assets/images/guarajuba/praia.png"
+];
 let editingMediaId=null;
 let regionItems=[];
 let editingRegionId=null;
@@ -641,13 +653,27 @@ async function loadMedia(){
     renderMedia(mediaItems)
   }catch(err){
     mediaItems=[];
-    $('#mediaGrid').innerHTML='';
+    renderMediaFallback();
     $('#mediaEmpty').classList.add('hidden');
-    if(errBox)errBox.classList.remove('hidden');
-    toast('Falha ao carregar a galeria de mídia.')
+    if(errBox){
+      errBox.classList.remove('hidden');
+      errBox.innerHTML='A API da galeria está indisponível no momento. As imagens abaixo são as mídias estáticas atuais do site. <button id="retryMediaBtn" type="button" class="btn btn-light" style="margin-left:8px">Tentar novamente</button>';
+      $('#retryMediaBtn')?.addEventListener('click',loadMedia)
+    }
+    toast('API de mídia indisponível; exibindo imagens do site.')
   }finally{
     panel.classList.remove('loading')
   }
+}
+function renderMediaFallback(){
+  const grid=$('#mediaGrid');if(!grid)return;
+  grid.innerHTML=MEDIA_FALLBACK_IMAGES.map(src=>
+    '<article style="border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#fff">'+
+      '<img src="'+src+'" alt="Imagem do site" style="width:100%;aspect-ratio:4/3;object-fit:cover;display:block">'+
+      '<div style="padding:10px 12px"><strong style="font-size:.82rem">Imagem do site</strong><div style="color:var(--muted);font-size:.72rem;margin-top:3px">Somente leitura enquanto a API de mídias está indisponível.</div></div>'+
+    '</article>'
+  ).join('');
+  $('#mediaEmpty').classList.add('hidden')
 }
 function renderMedia(midias){const grid=$('#mediaGrid');grid.innerHTML='';$('#mediaEmpty').classList.toggle('hidden',midias.length>0);for(const m of midias){const card=document.createElement('article');card.draggable=false;card.dataset.mediaId=m.id;card.style.cssText='border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#fff;cursor:grab;transition:opacity .15s,transform .15s';const media=m.tipo==='video'?'<div style="position:relative;background:#17201d"><video src="'+esc(m.url)+'" preload="metadata" muted playsinline style="width:100%;aspect-ratio:4/3;object-fit:cover;display:block"></video><span style="position:absolute;inset:0;display:grid;place-items:center;color:#fff;font-size:2.2rem;background:rgba(0,0,0,.18);pointer-events:none">▶</span></div>':`<div style="position:relative"><img src="${esc(m.url)}" alt="${esc(m.titulo||m.legenda||'Foto')}" style="width:100%;aspect-ratio:4/3;object-fit:cover;display:block" loading="lazy"><span title="Arraste para reordenar" style="position:absolute;top:8px;right:8px;background:rgba(23,32,29,.78);color:#fff;border-radius:8px;padding:5px 8px;font-size:.8rem;pointer-events:none">☰</span></div>`;card.innerHTML=media+`<div style="padding:12px"><span class="badge confirmada">${esc(m.categoria||'mídia')}</span><strong style="display:block;margin-top:9px">${esc(m.titulo||m.arquivo||'Sem título')}</strong>${m.legenda?'<div style="color:var(--muted);font-size:.8rem;margin-top:4px">'+esc(m.legenda)+'</div>':''}<div style="display:grid;gap:6px;margin-top:10px"><div style="display:flex;justify-content:center;gap:4px;flex-wrap:wrap"><button type="button" class="mini edit" style="width:32px;height:36px;padding:0;display:grid;place-items:center;font-size:1rem;touch-action:manipulation" title="Mover uma linha para cima" aria-label="Mover uma linha para cima" data-move-up="${m.id}">↑</button><button type="button" class="mini edit" style="width:32px;height:36px;padding:0;display:grid;place-items:center;font-size:1rem;touch-action:manipulation" title="Mover uma linha para baixo" aria-label="Mover uma linha para baixo" data-move-down="${m.id}">↓</button><button type="button" class="mini edit" style="width:32px;height:36px;padding:0;display:grid;place-items:center;font-size:1rem;touch-action:manipulation" title="Mover uma posição para a esquerda" aria-label="Mover uma posição para a esquerda" data-move-prev="${m.id}">←</button><button type="button" class="mini edit" style="width:32px;height:36px;padding:0;display:grid;place-items:center;font-size:1rem;touch-action:manipulation" title="Mover uma posição para a direita" aria-label="Mover uma posição para a direita" data-move-next="${m.id}">→</button><button type="button" class="mini edit" style="width:34px;height:36px;padding:0;display:grid;place-items:center;font-size:1rem;touch-action:manipulation" title="Ir para o início da linha" aria-label="Ir para o início da linha" data-move-row-start="${m.id}">⇤</button><button type="button" class="mini edit" style="width:34px;height:36px;padding:0;display:grid;place-items:center;font-size:1rem;touch-action:manipulation" title="Ir para o fim da linha" aria-label="Ir para o fim da linha" data-move-row-end="${m.id}">⇥</button></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:7px"><button type="button" class="mini edit" style="white-space:nowrap" data-edit-media="${m.id}">Editar</button><button type="button" class="mini cancel" style="white-space:nowrap" data-delete-media="${m.id}">Excluir</button></div></div></div>`;grid.appendChild(card)}grid.querySelectorAll('[data-edit-media]').forEach(b=>b.onclick=()=>openMediaEdit(Number(b.dataset.editMedia)));grid.querySelectorAll('[data-delete-media]').forEach(b=>b.onclick=()=>deleteMedia(Number(b.dataset.deleteMedia)));grid.querySelectorAll('[data-move-prev]').forEach(b=>b.onclick=async e=>{e.preventDefault();e.stopPropagation();await moveMedia(Number(b.dataset.movePrev),-1)});grid.querySelectorAll('[data-move-next]').forEach(b=>b.onclick=async e=>{e.preventDefault();e.stopPropagation();await moveMedia(Number(b.dataset.moveNext),1)});grid.querySelectorAll('[data-move-up]').forEach(b=>b.onclick=async e=>{e.preventDefault();e.stopPropagation();await moveMediaRow(Number(b.dataset.moveUp),-1)});grid.querySelectorAll('[data-move-down]').forEach(b=>b.onclick=async e=>{e.preventDefault();e.stopPropagation();await moveMediaRow(Number(b.dataset.moveDown),1)});grid.querySelectorAll('[data-move-row-start]').forEach(b=>b.onclick=async e=>{e.preventDefault();e.stopPropagation();await moveMediaRowEdge(Number(b.dataset.moveRowStart),'start')});grid.querySelectorAll('[data-move-row-end]').forEach(b=>b.onclick=async e=>{e.preventDefault();e.stopPropagation();await moveMediaRowEdge(Number(b.dataset.moveRowEnd),'end')});const mobileView=window.matchMedia('(max-width:700px)').matches;if(mobileView){grid.querySelectorAll('[data-move-prev],[data-move-next],[data-move-row-start],[data-move-row-end],[data-move-up],[data-move-down]').forEach(b=>b.style.display='none')}}
 async function moveMedia(id,direction){const grid=$('#mediaGrid');const cards=[...grid.querySelectorAll('[data-media-id]')];const index=cards.findIndex(c=>Number(c.dataset.mediaId)===Number(id));const target=index+direction;if(index<0||target<0||target>=cards.length)return;const card=cards[index],other=cards[target];if(direction<0){grid.insertBefore(card,other)}else{grid.insertBefore(card,other.nextSibling)}await saveMediaOrder()}
