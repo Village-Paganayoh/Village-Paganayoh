@@ -1735,12 +1735,20 @@ function renderEnergySolarDaily(){
   const box=$('#energySolarDaily');if(!box)return;
   const old={};box.querySelectorAll('[data-solar-day]').forEach(i=>old[i.dataset.solarDay]=i.value);
   const days=energyDateRange();
-  box.innerHTML=days.map(day=>'<div class="field" style="margin:0"><label>'+brDate(day)+'</label><input type="number" min="0" step="0.01" inputmode="decimal" data-solar-day="'+day+'" value="'+(old[day]||'')+'" placeholder="0,00"></div>').join('');
-  box.querySelectorAll('[data-solar-day]').forEach(i=>i.addEventListener('input',()=>{updateEnergySolarTotal();calculateEnergy()}));
+  box.innerHTML=days.map(day=>'<div class="field" style="margin:0"><label>'+brDate(day)+'</label><input type="text" inputmode="decimal" data-solar-day="'+day+'" value="'+(old[day]||'0,00')+'" placeholder="0,00"></div>').join('');
+  box.querySelectorAll('[data-solar-day]').forEach(i=>{
+    i.addEventListener('focus',()=>{if(i.value==='0,00')i.select()});
+    i.addEventListener('input',()=>{updateEnergySolarTotal();calculateEnergy()});
+    i.addEventListener('blur',()=>{
+      const n=Number(String(i.value||'').replace('.','').replace(',','.'))||0;
+      i.value=n.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+      updateEnergySolarTotal();calculateEnergy()
+    })
+  });
   updateEnergySolarTotal()
 }
 function updateEnergySolarTotal(){
-  const total=[...$('#energySolarDaily').querySelectorAll('[data-solar-day]')].reduce((s,i)=>s+(Number(String(i.value||'').replace(',','.'))||0),0);
+  const total=[...$('#energySolarDaily').querySelectorAll('[data-solar-day]')].reduce((s,i)=>s+(parseMoneyBR(i.value)||0),0);
   $('#energySolarProduction').value=total.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
   return total
 }
@@ -1920,7 +1928,8 @@ function saveEnergyForm(){
       updatedAt:new Date().toISOString()
     });
     render();
-    toast('Dados de energia salvos.');
+    $('#energyDialog').close();
+    setTimeout(()=>toast('Dados de energia salvos.'),80);
     return
   }
   const details=collectEnergyDetails();
@@ -1939,7 +1948,7 @@ function saveEnergyForm(){
     $('#energyInjectedStart').value &&
     $('#energyInjectedEnd').value &&
     [...$('#energySolarDaily').querySelectorAll('[data-solar-day]')].length>0 &&
-    [...$('#energySolarDaily').querySelectorAll('[data-solar-day]')].every(i=>i.value!=='');
+    [...$('#energySolarDaily').querySelectorAll('[data-solar-day]')].every(i=>String(i.value||'').trim()!=='');
   setEnergyStatus(currentEnergyKey,{
     status:hasComplete && gridUsed>=0 && injected>=0 && instant>=0 ? 'done' : 'draft',
     amount:hasComplete && gridUsed>=0 && injected>=0 && instant>=0 ? moneyBR(amount) : undefined,
@@ -1948,7 +1957,8 @@ function saveEnergyForm(){
     updatedAt:new Date().toISOString()
   });
   render();
-  toast(hasComplete?'Cálculo de energia salvo.':'Dados de energia salvos como rascunho.');
+  $('#energyDialog').close();
+  setTimeout(()=>toast(hasComplete?'Cálculo de energia salvo.':'Dados de energia salvos como rascunho.'),80);
 }
 $('#saveEnergyBtn').onclick=saveEnergyForm;
 $('#energyStatementBtn').onclick=generateEnergyStatement;
