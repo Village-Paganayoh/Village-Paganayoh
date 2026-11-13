@@ -1597,6 +1597,32 @@ function updateEnergyChargeUI(){
     calculateEnergy()
   }
 }
+function validateEnergyDates(showMessage=true){
+  const ci=$('#energyCheckin').value;
+  const co=$('#energyCheckout').value;
+  const msg=$('#energyMsg');
+  if(ci && co && co<=ci){
+    if(showMessage)msg.textContent='A saída real deve ser posterior à entrada real.';
+    $('#energyCheckout').setCustomValidity('A saída deve ser posterior à entrada.');
+    return false
+  }
+  $('#energyCheckout').setCustomValidity('');
+  if(showMessage && msg.textContent==='A saída real deve ser posterior à entrada real.')msg.textContent='';
+  return true
+}
+function syncEnergyCheckoutMin(){
+  const ci=$('#energyCheckin').value;
+  if(ci){
+    const d=parseYmd(ci); d.setDate(d.getDate()+1);
+    $('#energyCheckout').min=ymd(d);
+  }else{
+    $('#energyCheckout').removeAttribute('min')
+  }
+  if($('#energyCheckout').value && $('#energyCheckout').min && $('#energyCheckout').value<$('#energyCheckout').min){
+    $('#energyCheckout').value='';
+  }
+  validateEnergyDates(false)
+}
 function energyDateRange(){
   const start=parseYmd($('#energyCheckin').value),end=parseYmd($('#energyCheckout').value);
   if(!start||!end||end<=start)return [];
@@ -1644,6 +1670,7 @@ function restoreEnergyDetails(saved,defaults){
   $('#energyInjectedEnd').value=d.injectedEnd??'';
   if(d.tariff)$('#energyTariff').value=d.tariff;
   else try{const t=localStorage.getItem('vp_energy_tariff');if(t)$('#energyTariff').value=t}catch(e){}
+  syncEnergyCheckoutMin();
   renderEnergySolarDaily();
   if(d.solar){
     $('#energySolarDaily').querySelectorAll('[data-solar-day]').forEach(i=>{
@@ -1716,6 +1743,7 @@ function generateEnergyStatement(){
   }
   const checkin=$('#energyCheckin').value;
   const checkout=$('#energyCheckout').value;
+  if(!validateEnergyDates(true)){ $('#energyCheckout').focus(); return }
   const checkinTime=$('#energyCheckinTime').value||'—';
   const checkoutTime=$('#energyCheckoutTime').value||'—';
   const gridStart=energyNum('energyGridStart'),gridEnd=energyNum('energyGridEnd');
@@ -1776,8 +1804,8 @@ function generateEnergyStatement(){
   w.document.open();w.document.write(doc);w.document.close()
 }
 $('#energyStatementBtn').onclick=generateEnergyStatement;
-$('#energyCheckin').addEventListener('change',()=>{renderEnergySolarDaily();calculateEnergy()});
-$('#energyCheckout').addEventListener('change',()=>{renderEnergySolarDaily();calculateEnergy()});
+$('#energyCheckin').addEventListener('change',()=>{syncEnergyCheckoutMin();renderEnergySolarDaily();calculateEnergy()});
+$('#energyCheckout').addEventListener('change',()=>{validateEnergyDates(true);renderEnergySolarDaily();calculateEnergy()});
 $('#energyCharge').addEventListener('change',()=>{
   if($('#energyCharge').value==='no'){
     setEnergyStatus(currentEnergyKey,{status:'none',details:collectEnergyDetails(),updatedAt:new Date().toISOString()});
