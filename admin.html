@@ -1744,6 +1744,17 @@ $('#reportsToggle')?.addEventListener('click',()=>{
   btn.setAttribute('aria-expanded',String(!open));
   content.classList.toggle('hidden',open)
 });
+const collapsibleSections={
+  historicoReservas:['historyToggle','historyContent'],
+  relatoriosReservas:['reportsToggle','reportsContent'],
+  galeriaMidia:['mediaToggle','mediaContent'],
+  exploreRegiao:['regionToggle','regionContent'],
+  faqAdmin:['faqToggle','faqContent'],
+  infoAdmin:['infoToggle','infoContent'],
+  rulesAdmin:['rulesToggle','rulesContent'],
+  pricingAdmin:['pricingToggle','pricingContent']
+};
+
 [
   ['mediaToggle','mediaContent'],
   ['regionToggle','regionContent'],
@@ -1757,6 +1768,25 @@ $('#reportsToggle')?.addEventListener('click',()=>{
     const open=btn.getAttribute('aria-expanded')==='true';
     btn.setAttribute('aria-expanded',String(!open));
     content.classList.toggle('hidden',open)
+  })
+});
+
+document.querySelectorAll('.admin-nav-link').forEach(link=>{
+  link.addEventListener('click',()=>{
+    const target=(link.getAttribute('href')||'').replace('#','');
+    const pair=collapsibleSections[target];
+    if(pair){
+      const [toggleId,contentId]=pair;
+      const btn=$('#'+toggleId),content=$('#'+contentId);
+      if(btn&&content&&btn.getAttribute('aria-expanded')!=='true'){
+        btn.setAttribute('aria-expanded','true');
+        content.classList.remove('hidden')
+      }
+    }
+    setTimeout(()=>{
+      const el=document.getElementById(target);
+      if(el)el.scrollIntoView({behavior:'smooth',block:'start'})
+    },40)
   })
 });
 
