@@ -1616,6 +1616,42 @@ function updateEnergySolarTotal(){
   $('#energySolarProduction').value=total.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
   return total
 }
+function collectEnergyDetails(){
+  const solar={};
+  $('#energySolarDaily').querySelectorAll('[data-solar-day]').forEach(i=>solar[i.dataset.solarDay]=i.value);
+  return {
+    checkin:$('#energyCheckin').value||'',
+    checkout:$('#energyCheckout').value||'',
+    checkinTime:$('#energyCheckinTime').value||'12:00',
+    checkoutTime:$('#energyCheckoutTime').value||'12:00',
+    gridStart:$('#energyGridStart').value||'',
+    gridEnd:$('#energyGridEnd').value||'',
+    injectedStart:$('#energyInjectedStart').value||'',
+    injectedEnd:$('#energyInjectedEnd').value||'',
+    tariff:$('#energyTariff').value||'1,06',
+    solar
+  }
+}
+function restoreEnergyDetails(saved,defaults){
+  const d=saved?.details||{};
+  $('#energyCheckin').value=d.checkin||defaults.checkin||'';
+  $('#energyCheckout').value=d.checkout||defaults.checkout||'';
+  $('#energyCheckinTime').value=d.checkinTime||'12:00';
+  $('#energyCheckoutTime').value=d.checkoutTime||'12:00';
+  $('#energyGridStart').value=d.gridStart??'';
+  $('#energyGridEnd').value=d.gridEnd??'';
+  $('#energyInjectedStart').value=d.injectedStart??'';
+  $('#energyInjectedEnd').value=d.injectedEnd??'';
+  if(d.tariff)$('#energyTariff').value=d.tariff;
+  else try{const t=localStorage.getItem('vp_energy_tariff');if(t)$('#energyTariff').value=t}catch(e){}
+  renderEnergySolarDaily();
+  if(d.solar){
+    $('#energySolarDaily').querySelectorAll('[data-solar-day]').forEach(i=>{
+      if(Object.prototype.hasOwnProperty.call(d.solar,i.dataset.solarDay))i.value=d.solar[i.dataset.solarDay]
+    });
+    updateEnergySolarTotal()
+  }
+}
 function calculateEnergy(){
   const msg=$('#energyMsg');msg.textContent='';
   const gridStart=energyNum('energyGridStart'),gridEnd=energyNum('energyGridEnd');
@@ -1644,18 +1680,8 @@ function openEnergy(id){
   currentEnergyKey=directEnergyKey(r);
   const savedEnergy=getEnergyStatus(currentEnergyKey);
   $('#energyCharge').value=savedEnergy?.status==='none'?'no':'yes';
-  $('#energyCheckin').value=r.checkin||'';
-  $('#energyCheckout').value=r.checkout||'';
-  $('#energyCheckinTime').value='12:00';
-  $('#energyCheckoutTime').value='12:00';
-  $('#energyGridStart').value='';
-  $('#energyGridEnd').value='';
-  $('#energyInjectedStart').value='';
-  $('#energyInjectedEnd').value='';
-  $('#energySolarProduction').value='0,00';
-  try{const t=localStorage.getItem('vp_energy_tariff');if(t)$('#energyTariff').value=t}catch(e){}
   $('#energyMsg').textContent='';
-  renderEnergySolarDaily();
+  restoreEnergyDetails(savedEnergy,{checkin:r.checkin,checkout:r.checkout});
   calculateEnergy();
   updateEnergyChargeUI();
   $('#energyDialog').showModal()
@@ -1668,18 +1694,8 @@ function openEnergyAirbnb(id){
   currentEnergyKey='airbnb_'+String(p.start)+'_'+String(p.end);
   const savedEnergy=getEnergyStatus(currentEnergyKey);
   $('#energyCharge').value=savedEnergy?.status==='none'?'no':'yes';
-  $('#energyCheckin').value=p.start||'';
-  $('#energyCheckout').value=p.end||'';
-  $('#energyCheckinTime').value='12:00';
-  $('#energyCheckoutTime').value='12:00';
-  $('#energyGridStart').value='';
-  $('#energyGridEnd').value='';
-  $('#energyInjectedStart').value='';
-  $('#energyInjectedEnd').value='';
-  $('#energySolarProduction').value='0,00';
-  try{const t=localStorage.getItem('vp_energy_tariff');if(t)$('#energyTariff').value=t}catch(e){}
   $('#energyMsg').textContent='';
-  renderEnergySolarDaily();
+  restoreEnergyDetails(savedEnergy,{checkin:p.start,checkout:p.end});
   calculateEnergy();
   updateEnergyChargeUI();
   $('#energyDialog').showModal()
@@ -1695,7 +1711,7 @@ function generateEnergyStatement(){
     '<div class="no-print"><button onclick="window.print()">Imprimir / Salvar como PDF</button></div></body></html>';
     const w=window.open('','_blank');
     if(!w){$('#energyMsg').textContent='O navegador bloqueou a nova janela. Permita pop-ups para gerar o extrato.';return}
-    setEnergyStatus(currentEnergyKey,{status:'none',updatedAt:new Date().toISOString()});render();
+    setEnergyStatus(currentEnergyKey,{status:'none',details:collectEnergyDetails(),updatedAt:new Date().toISOString()});render();
     w.document.open();w.document.write(doc);w.document.close();return
   }
   const checkin=$('#energyCheckin').value;
@@ -1753,7 +1769,7 @@ function generateEnergyStatement(){
   '<div class="no-print"><button onclick="window.print()">Imprimir / Salvar como PDF</button></div>'+
   '</body></html>';
 
-  setEnergyStatus(currentEnergyKey,{status:'done',amount:moneyBR(amount),value:amount,updatedAt:new Date().toISOString()});
+  setEnergyStatus(currentEnergyKey,{status:'done',amount:moneyBR(amount),value:amount,details:collectEnergyDetails(),updatedAt:new Date().toISOString()});
   render();
   const w=window.open('','_blank');
   if(!w){msg.textContent='O navegador bloqueou a nova janela. Permita pop-ups para gerar o extrato.';return}
@@ -1764,7 +1780,7 @@ $('#energyCheckin').addEventListener('change',()=>{renderEnergySolarDaily();calc
 $('#energyCheckout').addEventListener('change',()=>{renderEnergySolarDaily();calculateEnergy()});
 $('#energyCharge').addEventListener('change',()=>{
   if($('#energyCharge').value==='no'){
-    setEnergyStatus(currentEnergyKey,{status:'none',updatedAt:new Date().toISOString()});
+    setEnergyStatus(currentEnergyKey,{status:'none',details:collectEnergyDetails(),updatedAt:new Date().toISOString()});
   }else{
     const old=getEnergyStatus(currentEnergyKey);
     if(old?.status==='none')setEnergyStatus(currentEnergyKey,null)
