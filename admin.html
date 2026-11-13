@@ -77,30 +77,33 @@
     </section>
     <span id="relatoriosReservas" class="section-anchor"></span>
     <section class="panel section-anchor" id="reportsPanel" style="margin-top:18px">
-      <div class="panel-head">
-        <div>
-          <h3>Relatórios de reservas</h3>
-          <div style="color:var(--muted);font-size:.82rem;margin-top:4px">Combina reservas diretas com o histórico acumulado do Airbnb.</div>
+      <button class="history-toggle" id="reportsToggle" type="button" aria-expanded="false" style="padding:0">
+        <span><strong>Relatórios de reservas</strong><br><span id="reportsSummary">Clique para abrir filtros e relatório</span></span>
+        <span class="chev">⌄</span>
+      </button>
+      <div id="reportsContent" class="history-content hidden">
+        <div class="panel-head" style="margin-top:8px">
+          <div style="color:var(--muted);font-size:.82rem">Combina reservas diretas com o histórico acumulado do Airbnb.</div>
+          <div class="actions">
+            <button id="reportCsvBtn" class="btn btn-light" type="button">Baixar CSV</button>
+            <button id="reportPrintBtn" class="btn btn-primary" type="button">Imprimir relatório</button>
+          </div>
         </div>
-        <div class="actions">
-          <button id="reportCsvBtn" class="btn btn-light" type="button">Baixar CSV</button>
-          <button id="reportPrintBtn" class="btn btn-primary" type="button">Imprimir relatório</button>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:16px">
+          <div class="field" style="margin:0"><label>De</label><input id="reportFrom" type="date"></div>
+          <div class="field" style="margin:0"><label>Até</label><input id="reportTo" type="date"></div>
+          <div class="field" style="margin:0"><label>Origem</label><select id="reportOrigin"><option value="all">Todas</option><option value="direct">Diretas</option><option value="airbnb">Airbnb</option></select></div>
+          <div class="field" style="margin:0"><label>Status</label><select id="reportStatus"><option value="all">Todos</option><option value="active">Ativas / realizadas</option><option value="cancelled">Canceladas</option></select></div>
         </div>
+        <div class="stats" style="grid-template-columns:repeat(4,1fr);margin-bottom:16px">
+          <div class="stat" style="min-height:100px"><small>Reservas / períodos</small><strong id="reportCount">0</strong></div>
+          <div class="stat" style="min-height:100px"><small>Diárias</small><strong id="reportNights">0</strong></div>
+          <div class="stat" style="min-height:100px"><small>Diretas</small><strong id="reportDirect">0</strong></div>
+          <div class="stat" style="min-height:100px"><small>Airbnb</small><strong id="reportAirbnb">0</strong></div>
+        </div>
+        <div class="table-wrap"><table><thead><tr><th>Período</th><th>Origem</th><th>Hóspede</th><th>Status</th><th>Diárias</th><th>Energia</th></tr></thead><tbody id="reportRows"></tbody></table><div id="reportEmpty" class="empty hidden">Nenhuma reserva no período selecionado.</div></div>
+        <div style="color:var(--muted);font-size:.74rem;margin-top:12px;line-height:1.45">O histórico do Airbnb passa a ser acumulado automaticamente a partir deste arquivo histórico. Valores de energia aparecem quando estiverem salvos neste navegador.</div>
       </div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:16px">
-        <div class="field" style="margin:0"><label>De</label><input id="reportFrom" type="date"></div>
-        <div class="field" style="margin:0"><label>Até</label><input id="reportTo" type="date"></div>
-        <div class="field" style="margin:0"><label>Origem</label><select id="reportOrigin"><option value="all">Todas</option><option value="direct">Diretas</option><option value="airbnb">Airbnb</option></select></div>
-        <div class="field" style="margin:0"><label>Status</label><select id="reportStatus"><option value="all">Todos</option><option value="active">Ativas / realizadas</option><option value="cancelled">Canceladas</option></select></div>
-      </div>
-      <div class="stats" style="grid-template-columns:repeat(4,1fr);margin-bottom:16px">
-        <div class="stat" style="min-height:100px"><small>Reservas / períodos</small><strong id="reportCount">0</strong></div>
-        <div class="stat" style="min-height:100px"><small>Diárias</small><strong id="reportNights">0</strong></div>
-        <div class="stat" style="min-height:100px"><small>Diretas</small><strong id="reportDirect">0</strong></div>
-        <div class="stat" style="min-height:100px"><small>Airbnb</small><strong id="reportAirbnb">0</strong></div>
-      </div>
-      <div class="table-wrap"><table><thead><tr><th>Período</th><th>Origem</th><th>Hóspede</th><th>Status</th><th>Diárias</th><th>Energia</th></tr></thead><tbody id="reportRows"></tbody></table><div id="reportEmpty" class="empty hidden">Nenhuma reserva no período selecionado.</div></div>
-      <div style="color:var(--muted);font-size:.74rem;margin-top:12px;line-height:1.45">O histórico do Airbnb passa a ser acumulado automaticamente a partir deste arquivo histórico. Valores de energia aparecem quando estiverem salvos neste navegador.</div>
     </section>
     <span id="galeriaMidia" class="section-anchor"></span><section class="panel section-anchor" id="mediaPanel" data-nav="galeriaMidia" style="margin-top:18px">
       <div class="panel-head"><div><h3>Galeria e Mídia</h3><div style="color:var(--muted);font-size:.82rem;margin-top:4px">Conteúdo dinâmico cadastrado para o site.</div></div><div class="actions"><button id="addMediaBtn" class="btn btn-primary" type="button">+ Adicionar mídia</button><button id="refreshMedia" class="btn btn-light" type="button">Atualizar</button></div></div>
@@ -1621,7 +1624,8 @@ function renderReservationReport(){
       '<td>'+n+'</td><td>'+esc(reportEnergyText(r))+'</td>';
     body.appendChild(tr)
   }
-  $('#reportCount').textContent=rows.length;$('#reportNights').textContent=nights;$('#reportDirect').textContent=direct;$('#reportAirbnb').textContent=airbnb
+  $('#reportCount').textContent=rows.length;$('#reportNights').textContent=nights;$('#reportDirect').textContent=direct;$('#reportAirbnb').textContent=airbnb;
+  const rs=$('#reportsSummary');if(rs)rs.textContent=rows.length+' reserva(s)/período(s) • '+nights+' diária(s)'
 }
 function csvCell(v){const s=String(v??'');return '"'+s.replace(/"/g,'""')+'"'}
 function downloadReservationCsv(){
@@ -1641,6 +1645,12 @@ function printReservationReport(){
 ['reportFrom','reportTo','reportOrigin','reportStatus'].forEach(id=>$('#'+id)?.addEventListener('change',renderReservationReport));
 $('#reportCsvBtn')?.addEventListener('click',downloadReservationCsv);
 $('#reportPrintBtn')?.addEventListener('click',printReservationReport);
+$('#reportsToggle')?.addEventListener('click',()=>{
+  const btn=$('#reportsToggle'),content=$('#reportsContent');
+  const open=btn.getAttribute('aria-expanded')==='true';
+  btn.setAttribute('aria-expanded',String(!open));
+  content.classList.toggle('hidden',open)
+});
 
 function getEnergyStatus(key){
   try{return JSON.parse(localStorage.getItem('vp_energy_status_'+key)||'null')}catch(e){return null}
