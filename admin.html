@@ -425,8 +425,13 @@
       <div class="field"><label>Injetado 103 — saída (kWh)</label><input id="energyInjectedEnd" type="number" min="0" step="0.01" placeholder="Ex.: 24413"></div>
     </div>
 
+    <div class="field">
+      <label>Produção solar diária (kWh)</label>
+      <div id="energySolarDaily" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px"></div>
+      <div style="color:var(--muted);font-size:.76rem;margin-top:6px">Inclui o dia da entrada e exclui o dia da saída.</div>
+    </div>
     <div class="grid2">
-      <div class="field"><label>Produção solar total no período (kWh)</label><input id="energySolarProduction" type="number" min="0" step="0.01" placeholder="Ex.: 74,22"></div>
+      <div class="field"><label>Produção solar total no período (kWh)</label><input id="energySolarProduction" type="text" value="0,00" readonly></div>
       <div class="field"><label>Tarifa Coelba (R$/kWh)</label><input id="energyTariff" type="text" inputmode="decimal" value="1,06"></div>
     </div>
 
@@ -1592,11 +1597,30 @@ function updateEnergyChargeUI(){
     calculateEnergy()
   }
 }
+function energyDateRange(){
+  const start=parseYmd($('#energyCheckin').value),end=parseYmd($('#energyCheckout').value);
+  if(!start||!end||end<=start)return [];
+  const days=[];for(let d=new Date(start);d<end;d.setDate(d.getDate()+1))days.push(ymd(d));
+  return days
+}
+function renderEnergySolarDaily(){
+  const box=$('#energySolarDaily');if(!box)return;
+  const old={};box.querySelectorAll('[data-solar-day]').forEach(i=>old[i.dataset.solarDay]=i.value);
+  const days=energyDateRange();
+  box.innerHTML=days.map(day=>'<div class="field" style="margin:0"><label>'+brDate(day)+'</label><input type="number" min="0" step="0.01" inputmode="decimal" data-solar-day="'+day+'" value="'+(old[day]||'')+'" placeholder="0,00"></div>').join('');
+  box.querySelectorAll('[data-solar-day]').forEach(i=>i.addEventListener('input',()=>{updateEnergySolarTotal();calculateEnergy()}));
+  updateEnergySolarTotal()
+}
+function updateEnergySolarTotal(){
+  const total=[...$('#energySolarDaily').querySelectorAll('[data-solar-day]')].reduce((s,i)=>s+(Number(String(i.value||'').replace(',','.'))||0),0);
+  $('#energySolarProduction').value=total.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+  return total
+}
 function calculateEnergy(){
   const msg=$('#energyMsg');msg.textContent='';
   const gridStart=energyNum('energyGridStart'),gridEnd=energyNum('energyGridEnd');
   const injStart=energyNum('energyInjectedStart'),injEnd=energyNum('energyInjectedEnd');
-  const production=energyNum('energySolarProduction');
+  const production=updateEnergySolarTotal();
   const tariff=parseMoneyBR($('#energyTariff').value);
   const gridUsed=gridEnd-gridStart;
   const injected=injEnd-injStart;
@@ -1628,9 +1652,10 @@ function openEnergy(id){
   $('#energyGridEnd').value='';
   $('#energyInjectedStart').value='';
   $('#energyInjectedEnd').value='';
-  $('#energySolarProduction').value='';
+  $('#energySolarProduction').value='0,00';
   try{const t=localStorage.getItem('vp_energy_tariff');if(t)$('#energyTariff').value=t}catch(e){}
   $('#energyMsg').textContent='';
+  renderEnergySolarDaily();
   calculateEnergy();
   updateEnergyChargeUI();
   $('#energyDialog').showModal()
@@ -1651,9 +1676,10 @@ function openEnergyAirbnb(id){
   $('#energyGridEnd').value='';
   $('#energyInjectedStart').value='';
   $('#energyInjectedEnd').value='';
-  $('#energySolarProduction').value='';
+  $('#energySolarProduction').value='0,00';
   try{const t=localStorage.getItem('vp_energy_tariff');if(t)$('#energyTariff').value=t}catch(e){}
   $('#energyMsg').textContent='';
+  renderEnergySolarDaily();
   calculateEnergy();
   updateEnergyChargeUI();
   $('#energyDialog').showModal()
@@ -1678,7 +1704,7 @@ function generateEnergyStatement(){
   const checkoutTime=$('#energyCheckoutTime').value||'—';
   const gridStart=energyNum('energyGridStart'),gridEnd=energyNum('energyGridEnd');
   const injStart=energyNum('energyInjectedStart'),injEnd=energyNum('energyInjectedEnd');
-  const production=energyNum('energySolarProduction');
+  const production=updateEnergySolarTotal();
   const tariff=parseMoneyBR($('#energyTariff').value);
   const gridUsed=gridEnd-gridStart;
   const injected=injEnd-injStart;
@@ -1687,7 +1713,8 @@ function generateEnergyStatement(){
   const amount=Math.max(0,total)*Math.max(0,tariff);
 
   const msg=$('#energyMsg');msg.textContent='';
-  if(!$('#energyGridStart').value || !$('#energyGridEnd').value || !$('#energyInjectedStart').value || !$('#energyInjectedEnd').value || !$('#energySolarProduction').value){
+  const solarInputs=[...$('#energySolarDaily').querySelectorAll('[data-solar-day]')];
+  if(!$('#energyGridStart').value || !$('#energyGridEnd').value || !$('#energyInjectedStart').value || !$('#energyInjectedEnd').value || !solarInputs.length || solarInputs.some(i=>i.value==='')){
     msg.textContent='Preencha todas as leituras e a produção solar antes de gerar o extrato.';
     return
   }
@@ -1727,6 +1754,8 @@ function generateEnergyStatement(){
   w.document.open();w.document.write(doc);w.document.close()
 }
 $('#energyStatementBtn').onclick=generateEnergyStatement;
+$('#energyCheckin').addEventListener('change',()=>{renderEnergySolarDaily();calculateEnergy()});
+$('#energyCheckout').addEventListener('change',()=>{renderEnergySolarDaily();calculateEnergy()});
 $('#energyCharge').addEventListener('change',()=>{
   if($('#energyCharge').value==='no'){
     setEnergyStatus(currentEnergyKey,{status:'none',updatedAt:new Date().toISOString()});
@@ -1738,7 +1767,7 @@ $('#energyCharge').addEventListener('change',()=>{
   render()
 });
 
-['energyGridStart','energyGridEnd','energyInjectedStart','energyInjectedEnd','energySolarProduction','energyTariff'].forEach(id=>{
+['energyGridStart','energyGridEnd','energyInjectedStart','energyInjectedEnd','energyTariff'].forEach(id=>{
   $('#'+id).addEventListener('input',calculateEnergy)
 });
 $('#energyTariff').addEventListener('blur',()=>{
@@ -1749,13 +1778,15 @@ $('#energyTariff').addEventListener('blur',()=>{
 $('#closeEnergyModal').onclick=()=>$('#energyDialog').close();
 $('#closeEnergyBtn').onclick=()=>$('#energyDialog').close();
 $('#clearEnergyBtn').onclick=()=>{
-  ['energyGridStart','energyGridEnd','energyInjectedStart','energyInjectedEnd','energySolarProduction'].forEach(id=>$('#'+id).value='');
+  ['energyGridStart','energyGridEnd','energyInjectedStart','energyInjectedEnd'].forEach(id=>$('#'+id).value='');
+  $('#energySolarDaily').querySelectorAll('[data-solar-day]').forEach(i=>i.value='');
+  updateEnergySolarTotal();
   $('#energyMsg').textContent='';
   calculateEnergy()
 };
 
 function parseMoneyBR(v){const s=String(v??'').trim().replace(/\./g,'').replace(',','.').replace(/[^0-9.-]/g,'');const n=Number(s);return Number.isFinite(n)?n:0}
-function moneyBR(v){return parseMoneyBR(v).toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}
+function moneyBR(v){const n=typeof v==='number'?v:parseMoneyBR(v);return (Number.isFinite(n)?n:0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}
 function normalizeMoneyInput(el){el.value=parseMoneyBR(el.value).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}
 function paymentScheduleTotal(text){
   let total=0,found=0;
