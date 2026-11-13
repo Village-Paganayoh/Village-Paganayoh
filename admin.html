@@ -1584,6 +1584,7 @@ function openEdit(id){const r=reservations.find(x=>x.id===id);if(!r)return;reset
 $('#adminPrev').onclick=()=>{adminCalMonth.setMonth(adminCalMonth.getMonth()-1);renderAdminCalendar()};$('#adminNext').onclick=()=>{adminCalMonth.setMonth(adminCalMonth.getMonth()+1);renderAdminCalendar()};$('#checkin').addEventListener('change',()=>{if($('#checkin').value&&$('#checkout').value&&$('#checkout').value<=$('#checkin').value)$('#checkout').value='';renderAdminCalendar()});$('#checkout').addEventListener('change',renderAdminCalendar);
 
 let currentEnergyKey='';
+let currentEnergyDefaults={checkin:'',checkout:''};
 function energyNum(id){const n=Number(String($('#'+id).value||'').replace(',','.'));return Number.isFinite(n)?n:0}
 function fmtKwh(n){return Number(n||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})+' kWh'}
 function updateEnergyChargeUI(){
@@ -1597,6 +1598,11 @@ function updateEnergyChargeUI(){
   }else{
     calculateEnergy()
   }
+}
+function ensureEnergyPeriodDefaults(){
+  if(!$('#energyCheckin').value && currentEnergyDefaults.checkin)$('#energyCheckin').value=currentEnergyDefaults.checkin;
+  if(!$('#energyCheckout').value && currentEnergyDefaults.checkout)$('#energyCheckout').value=currentEnergyDefaults.checkout;
+  syncEnergyCheckoutMin();
 }
 function validateEnergyDates(showMessage=true){
   const ci=$('#energyCheckin').value;
@@ -1706,6 +1712,7 @@ function openEnergy(id){
   if(!r)return;
   $('#energyReservationLabel').value=(r.hospede||'Sem nome')+' • '+brDate(r.checkin)+' a '+brDate(r.checkout);
   currentEnergyKey=directEnergyKey(r);
+  currentEnergyDefaults={checkin:r.checkin||'',checkout:r.checkout||''};
   const savedEnergy=getEnergyStatus(currentEnergyKey);
   $('#energyCharge').value=savedEnergy?.status==='none'?'no':'yes';
   $('#energyMsg').textContent='';
@@ -1720,6 +1727,7 @@ function openEnergyAirbnb(id){
   if(!p)return;
   $('#energyReservationLabel').value='Airbnb • '+brDate(p.start)+' a '+brDate(p.end);
   currentEnergyKey='airbnb_'+String(p.start)+'_'+String(p.end);
+  currentEnergyDefaults={checkin:p.start||'',checkout:p.end||''};
   const savedEnergy=getEnergyStatus(currentEnergyKey);
   $('#energyCharge').value=savedEnergy?.status==='none'?'no':'yes';
   $('#energyMsg').textContent='';
@@ -1730,6 +1738,7 @@ function openEnergyAirbnb(id){
 }
 function generateEnergyStatement(){
   const label=$('#energyReservationLabel').value.trim()||'Hospedagem';
+  ensureEnergyPeriodDefaults();
   if($('#energyCharge').value==='no'){
     const checkin=$('#energyCheckin').value,checkout=$('#energyCheckout').value;
     const issued=new Date().toLocaleDateString('pt-BR');
@@ -1806,6 +1815,7 @@ function generateEnergyStatement(){
 }
 function saveEnergyForm(){
   const msg=$('#energyMsg');msg.textContent='';
+  ensureEnergyPeriodDefaults();
   if(!validateEnergyDates(true)){ $('#energyCheckout').focus(); return }
   const charge=$('#energyCharge').value;
   if(charge==='no'){
