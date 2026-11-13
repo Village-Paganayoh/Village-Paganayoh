@@ -42,6 +42,42 @@ for p in periods:
     else:
         merged.append(p.copy())
 
-payload={"source":"Airbnb iCal","updated_at":datetime.now(timezone.utc).isoformat(),"periods":merged}
+now=datetime.now(timezone.utc).isoformat()
+payload={"source":"Airbnb iCal","updated_at":now,"periods":merged}
 Path("disponibilidade.json").write_text(json.dumps(payload,ensure_ascii=False,indent=2)+"\n", encoding="utf-8")
-print(f"{len(merged)} período(s) de indisponibilidade gravado(s).")
+
+# Histórico cumulativo: períodos já vistos nunca são removidos.
+history_path=Path("airbnb_historico.json")
+try:
+    history=json.loads(history_path.read_text(encoding="utf-8")) if history_path.exists() else {}
+except Exception:
+    history={}
+entries=history.get("periods", [])
+by_key={f"{p.get('start','')}|{p.get('end','')}":p for p in entries if p.get("start") and p.get("end")}
+active_keys=set()
+for p in merged:
+    key=f"{p['start']}|{p['end']}"
+    active_keys.add(key)
+    if key not in by_key:
+        by_key[key]={
+            "start":p["start"],
+            "end":p["end"],
+            "first_seen":now,
+            "last_seen":now,
+            "active":True
+        }
+    else:
+        by_key[key]["last_seen"]=now
+        by_key[key]["active"]=True
+
+for key,item in by_key.items():
+    if key not in active_keys:
+        item["active"]=False
+
+history_payload={
+    "source":"Airbnb iCal - histórico cumulativo",
+    "updated_at":now,
+    "periods":sorted(by_key.values(), key=lambda p:(p.get("start",""),p.get("end","")))
+}
+history_path.write_text(json.dumps(history_payload,ensure_ascii=False,indent=2)+"\n", encoding="utf-8")
+print(f"{len(merged)} período(s) atuais; {len(history_payload['periods'])} período(s) no histórico.")
