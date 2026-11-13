@@ -454,7 +454,7 @@
       Esta hospedagem foi marcada como <strong>sem cobrança de energia</strong>. Nenhum cálculo será exigido.
     </div>
 
-    <div class="modal-actions"><button type="button" class="btn btn-light" id="clearEnergyBtn">Limpar leituras</button><button type="button" class="btn btn-light" id="energyStatementBtn">Gerar extrato</button><button type="button" class="btn btn-primary" id="closeEnergyBtn">Fechar</button></div>
+    <div class="modal-actions"><button type="button" class="btn btn-light" id="clearEnergyBtn">Limpar leituras</button><button type="button" class="btn btn-light" id="saveEnergyBtn">Salvar</button><button type="button" class="btn btn-light" id="energyStatementBtn">Gerar extrato</button><button type="button" class="btn btn-primary" id="closeEnergyBtn">Fechar</button></div>
   </form>
 </dialog>
 <dialog id="contractDialog" style="width:min(980px,calc(100% - 28px))">
@@ -1564,6 +1564,7 @@ function energyButtonHtml(r){
   const attr=r._airbnb?'data-energy-airbnb="'+r.id+'"':'data-energy="'+r.id+'"';
   if(s?.status==='none')return '<button class="mini energy-btn energy-none" '+attr+'>🚫 Não cobrada</button>';
   if(s?.status==='done')return '<button class="mini energy-btn energy-done" '+attr+'>✅ '+esc(s.amount||'Calculada')+'</button>';
+  if(s?.status==='draft')return '<button class="mini energy-btn" '+attr+'>💾 Rascunho</button>';
   return '<button class="mini energy-btn" '+attr+'>⚡ Energia</button>'
 }
 function render(){const body=$('#rows');body.innerHTML='';const activeDirect=[...reservations].filter(r=>r.status!=='cancelada').sort((a,b)=>a.checkin.localeCompare(b.checkin));const cancelled=[...reservations].filter(r=>r.status==='cancelada').sort((a,b)=>b.checkin.localeCompare(a.checkin));const airbnb=airbnbPeriods.map((p,i)=>({id:'airbnb-'+i,checkin:p.start,checkout:p.end,hospede:'Airbnb',telefone:'—',origem:'Airbnb',status:'Airbnb',_airbnb:true}));const sorted=[...activeDirect,...airbnb].sort((a,b)=>a.checkin.localeCompare(b.checkin));$('#empty').classList.toggle('hidden',sorted.length>0);for(const r of sorted){const tr=document.createElement('tr');const origin=r._airbnb?'<span class="badge airbnb-badge">Airbnb</span>':esc(r.origem||'direta');const energyBtn=energyButtonHtml(r).replace('<button ','<button class="energy-slot" ').replace('class="energy-slot" class="','class="energy-slot ');const actions=r._airbnb?`<div class="airbnb-actions">${energyBtn}<span class="airbnb-note">Gerenciar no Airbnb</span></div>`:`<div class="row-actions"><button class="mini edit" data-edit="${r.id}">Editar</button><button class="mini edit" data-contract="${r.id}">Contrato</button>${energyBtn}<button class="mini cancel" data-cancel="${r.id}">Cancelar</button></div>`;tr.innerHTML=`<td><strong>${brDate(r.checkin)}</strong><br><span style="color:var(--muted)">até ${brDate(r.checkout)}</span></td><td>${r._airbnb?'<span class="origin-airbnb">Airbnb</span>':esc(r.hospede||'—')}</td><td>${esc(r.telefone||'—')}</td><td>${origin}</td><td><span class="badge ${r._airbnb?'airbnb-badge':'confirmada'}">${esc(r.status||'confirmada')}</span></td><td>${actions}</td>`;body.appendChild(tr)}body.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>openEdit(Number(b.dataset.edit)));body.querySelectorAll('[data-contract]').forEach(b=>b.onclick=()=>openContract(Number(b.dataset.contract)));body.querySelectorAll('[data-energy]').forEach(b=>b.onclick=()=>openEnergy(Number(b.dataset.energy)));body.querySelectorAll('[data-energy-airbnb]').forEach(b=>b.onclick=()=>openEnergyAirbnb(String(b.dataset.energyAirbnb)));body.querySelectorAll('[data-cancel]').forEach(b=>b.onclick=()=>cancelReservation(Number(b.dataset.cancel)));const historyBody=$('#historyRows');historyBody.innerHTML='';$('#historySummary').textContent=cancelled.length===0?'Nenhuma reserva cancelada':cancelled.length===1?'1 reserva cancelada':cancelled.length+' reservas canceladas';$('#historyEmpty').classList.toggle('hidden',cancelled.length>0);for(const r of cancelled){const tr=document.createElement('tr');tr.innerHTML=`<td><strong>${brDate(r.checkin)}</strong><br><span style="color:var(--muted)">até ${brDate(r.checkout)}</span></td><td>${esc(r.hospede||'—')}</td><td>${esc(r.telefone||'—')}</td><td>${esc(r.origem||'direta')}</td><td><span class="badge cancelada">cancelada</span></td><td><button class="mini edit" data-history-edit="${r.id}">Editar</button></td>`;historyBody.appendChild(tr)}historyBody.querySelectorAll('[data-history-edit]').forEach(b=>b.onclick=()=>openEdit(Number(b.dataset.historyEdit)));$('#activeCount').textContent=activeDirect.length;$('#airbnbCount').textContent=airbnb.length;$('#totalCount').textContent=activeDirect.length+airbnb.length;const today=new Date().toISOString().slice(0,10);const next=[...activeDirect,...airbnb].filter(r=>r.checkin>=today).sort((a,b)=>a.checkin.localeCompare(b.checkin))[0];$('#nextCheckin').textContent=next?brDate(next.checkin):'Nenhuma'}
@@ -1803,6 +1804,48 @@ function generateEnergyStatement(){
   if(!w){msg.textContent='O navegador bloqueou a nova janela. Permita pop-ups para gerar o extrato.';return}
   w.document.open();w.document.write(doc);w.document.close()
 }
+function saveEnergyForm(){
+  const msg=$('#energyMsg');msg.textContent='';
+  if(!validateEnergyDates(true)){ $('#energyCheckout').focus(); return }
+  const charge=$('#energyCharge').value;
+  if(charge==='no'){
+    setEnergyStatus(currentEnergyKey,{
+      status:'none',
+      details:collectEnergyDetails(),
+      updatedAt:new Date().toISOString()
+    });
+    render();
+    toast('Dados de energia salvos.');
+    return
+  }
+  const details=collectEnergyDetails();
+  const gridStart=energyNum('energyGridStart'),gridEnd=energyNum('energyGridEnd');
+  const injStart=energyNum('energyInjectedStart'),injEnd=energyNum('energyInjectedEnd');
+  const production=updateEnergySolarTotal();
+  const tariff=parseMoneyBR($('#energyTariff').value);
+  const gridUsed=gridEnd-gridStart;
+  const injected=injEnd-injStart;
+  const instant=production-injected;
+  const total=gridUsed+instant;
+  const amount=Math.max(0,total)*Math.max(0,tariff);
+  const hasComplete=
+    $('#energyGridStart').value &&
+    $('#energyGridEnd').value &&
+    $('#energyInjectedStart').value &&
+    $('#energyInjectedEnd').value &&
+    [...$('#energySolarDaily').querySelectorAll('[data-solar-day]')].length>0 &&
+    [...$('#energySolarDaily').querySelectorAll('[data-solar-day]')].every(i=>i.value!=='');
+  setEnergyStatus(currentEnergyKey,{
+    status:hasComplete && gridUsed>=0 && injected>=0 && instant>=0 ? 'done' : 'draft',
+    amount:hasComplete && gridUsed>=0 && injected>=0 && instant>=0 ? moneyBR(amount) : undefined,
+    value:hasComplete && gridUsed>=0 && injected>=0 && instant>=0 ? amount : undefined,
+    details,
+    updatedAt:new Date().toISOString()
+  });
+  render();
+  toast(hasComplete?'Cálculo de energia salvo.':'Dados de energia salvos como rascunho.');
+}
+$('#saveEnergyBtn').onclick=saveEnergyForm;
 $('#energyStatementBtn').onclick=generateEnergyStatement;
 $('#energyCheckin').addEventListener('change',()=>{syncEnergyCheckoutMin();renderEnergySolarDaily();calculateEnergy()});
 $('#energyCheckout').addEventListener('change',()=>{validateEnergyDates(true);renderEnergySolarDaily();calculateEnergy()});
