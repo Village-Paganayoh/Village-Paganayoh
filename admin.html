@@ -432,7 +432,7 @@
     </div>
     <div class="grid2">
       <div class="field"><label>Produção solar total no período (kWh)</label><input id="energySolarProduction" type="text" value="0,00" readonly></div>
-      <div class="field"><label>Tarifa Coelba (R$/kWh)</label><input id="energyTariff" type="text" inputmode="decimal" value="1,06"></div>
+      <div class="field"><label>Valor do kWh para cobrança (R$/kWh)</label><input id="energyTariff" type="text" inputmode="decimal" value="1,06"></div>
     </div>
 
     <div id="energyMsg" class="msg"></div>
@@ -1734,7 +1734,7 @@ function generateEnergyStatement(){
   '<div class="item"><small>Leitura 103 - entrada</small><strong>'+fmtKwh(injStart)+'</strong></div>'+
   '<div class="item"><small>Leitura 103 - saída</small><strong>'+fmtKwh(injEnd)+'</strong></div>'+
   '<div class="item"><small>Produção solar no período</small><strong>'+fmtKwh(production)+'</strong></div>'+
-  '<div class="item"><small>Tarifa aplicada</small><strong>'+moneyBR(tariff)+' / kWh</strong></div>'+
+  '<div class="item"><small>Valor do kWh para cobrança</small><strong>'+moneyBR(tariff)+' / kWh</strong></div>'+
   '</div>'+
   '<div class="calc"><strong>Detalhamento do cálculo</strong><br><br>'+
   'Consumo da rede: '+fmtKwh(gridEnd)+' − '+fmtKwh(gridStart)+' = <strong>'+fmtKwh(gridUsed)+'</strong><br>'+
