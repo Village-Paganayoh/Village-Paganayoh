@@ -400,13 +400,16 @@
     <div class="field"><label>Reserva</label><input id="energyReservationLabel" type="text" readonly></div>
     <div class="field"><label>Cobrar energia desta hospedagem?</label><select id="energyCharge"><option value="yes">Sim, cobrar energia</option><option value="no">Não cobrar energia</option></select></div>
     <div id="energyChargeFields">
-    <div class="grid2">
-      <div class="field"><label>Entrada do hóspede</label><input id="energyCheckin" type="date"></div>
-      <div class="field"><label>Saída do hóspede</label><input id="energyCheckout" type="date"></div>
+    <div style="padding:12px 14px;border-radius:12px;background:#f7f9f8;color:var(--muted);font-size:.78rem;line-height:1.5;margin-bottom:10px">
+      As datas abaixo vêm preenchidas pela reserva, mas podem ser ajustadas para refletir a <strong>entrada e saída reais</strong> do hóspede.
     </div>
     <div class="grid2">
-      <div class="field"><label>Hora de entrada</label><input id="energyCheckinTime" type="time" value="12:00"></div>
-      <div class="field"><label>Hora de saída</label><input id="energyCheckoutTime" type="time" value="12:00"></div>
+      <div class="field"><label>Entrada real do hóspede</label><input id="energyCheckin" type="date"></div>
+      <div class="field"><label>Saída real do hóspede</label><input id="energyCheckout" type="date"></div>
+    </div>
+    <div class="grid2">
+      <div class="field"><label>Hora real de entrada</label><input id="energyCheckinTime" type="time" value="12:00"></div>
+      <div class="field"><label>Hora real de saída</label><input id="energyCheckoutTime" type="time" value="12:00"></div>
     </div>
 
     <div style="border-top:1px solid var(--line);margin:20px 0 10px;padding-top:16px;font-weight:800">Medidor bidirecional</div>
@@ -1637,7 +1640,7 @@ function generateEnergyStatement(){
     const issued=new Date().toLocaleDateString('pt-BR');
     const doc='<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>Extrato de energia - '+esc(label)+'</title><style>@page{size:A4;margin:18mm}body{font-family:Arial,Helvetica,sans-serif;color:#17201d;max-width:820px;margin:30px auto;padding:0 24px;font-size:13px;line-height:1.5}.head{text-align:center;border-bottom:2px solid #1f9d68;padding-bottom:14px;margin-bottom:22px}.box{border:1px solid #dfe5e2;border-radius:10px;padding:16px;background:#fafcfb}.no-print{text-align:center;margin-top:28px}.no-print button{padding:12px 18px;border:0;border-radius:8px;background:#1f9d68;color:#fff;font-weight:800;cursor:pointer}@media print{.no-print{display:none}}</style></head><body>'+
     '<div class="head"><div style="font-weight:800;color:#8a6b2e;letter-spacing:.1em;font-size:11px">VILLAGE PAGANAYOH • CASA 01</div><h1 style="font-size:20px;margin:5px 0">EXTRATO DE ENERGIA</h1></div>'+
-    '<div class="box"><strong>'+esc(label)+'</strong><br>Período: '+(checkin?brDate(checkin):'—')+' a '+(checkout?brDate(checkout):'—')+'<br>Emitido em: '+esc(issued)+'<hr style="border:0;border-top:1px solid #ddd;margin:14px 0"><strong>Não houve cobrança de energia nesta hospedagem.</strong></div>'+
+    '<div class="box"><strong>'+esc(label)+'</strong><br>Período efetivo: '+(checkin?brDate(checkin):'—')+' a '+(checkout?brDate(checkout):'—')+'<br>Emitido em: '+esc(issued)+'<hr style="border:0;border-top:1px solid #ddd;margin:14px 0"><strong>Não houve cobrança de energia nesta hospedagem.</strong></div>'+
     '<div class="no-print"><button onclick="window.print()">Imprimir / Salvar como PDF</button></div></body></html>';
     const w=window.open('','_blank');
     if(!w){$('#energyMsg').textContent='O navegador bloqueou a nova janela. Permita pop-ups para gerar o extrato.';return}
@@ -1671,7 +1674,7 @@ function generateEnergyStatement(){
   const doc='<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>Extrato de energia - '+esc(label)+'</title><style>'+
   '@page{size:A4;margin:18mm}*{box-sizing:border-box}body{font-family:Arial,Helvetica,sans-serif;color:#17201d;max-width:820px;margin:30px auto;padding:0 24px;font-size:13px;line-height:1.5}.head{text-align:center;border-bottom:2px solid #1f9d68;padding-bottom:14px;margin-bottom:22px}.head h1{font-size:20px;margin:5px 0}.sub{color:#66736d}.box{border:1px solid #dfe5e2;border-radius:10px;padding:14px;margin:14px 0;background:#fafcfb}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.item{border:1px solid #e4e9e6;border-radius:8px;padding:11px}.item small{display:block;color:#718079;margin-bottom:5px}.item strong{font-size:15px}.calc{margin:18px 0;border-left:4px solid #1f9d68;padding:12px 14px;background:#f4fbf7}.total{margin-top:20px;border:2px solid #1f9d68;border-radius:10px;padding:16px;text-align:center;background:#f2fbf7}.total small{color:#167a51;font-weight:700}.total strong{display:block;font-size:26px;color:#167a51;margin-top:6px}.note{font-size:11px;color:#66736d;margin-top:20px}.no-print{text-align:center;margin-top:28px}.no-print button{padding:12px 18px;border:0;border-radius:8px;background:#1f9d68;color:#fff;font-weight:800;cursor:pointer}@media print{body{margin:0;max-width:none;padding:0}.no-print{display:none}}</style></head><body>'+
   '<div class="head"><div style="font-weight:800;color:#8a6b2e;letter-spacing:.1em;font-size:11px">VILLAGE PAGANAYOH • CASA 01</div><h1>EXTRATO DE CONSUMO DE ENERGIA</h1><div class="sub">Demonstrativo de cálculo para cobrança da hospedagem</div></div>'+
-  '<div class="box"><strong>'+esc(label)+'</strong><br>Período: '+(checkin?brDate(checkin):'—')+' às '+esc(checkinTime)+' até '+(checkout?brDate(checkout):'—')+' às '+esc(checkoutTime)+'<br>Emitido em: '+esc(issued)+'</div>'+
+  '<div class="box"><strong>'+esc(label)+'</strong><br>Período efetivo: '+(checkin?brDate(checkin):'—')+' às '+esc(checkinTime)+' até '+(checkout?brDate(checkout):'—')+' às '+esc(checkoutTime)+'<br>Emitido em: '+esc(issued)+'</div>'+
   '<div class="grid">'+
   '<div class="item"><small>Leitura 03 - entrada</small><strong>'+fmtKwh(gridStart)+'</strong></div>'+
   '<div class="item"><small>Leitura 03 - saída</small><strong>'+fmtKwh(gridEnd)+'</strong></div>'+
